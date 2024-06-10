@@ -167,25 +167,25 @@ table 6085580 "CDC Template Field"
         field(38; "Lookup Rel. Code"; Code[20])
         {
             Caption = 'Relation Code';
-            TableRelation = IF ("Lookup Table" = CONST("Dimension Value")) Dimension;
+            TableRelation = if ("Lookup Table" = const("Dimension Value")) Dimension;
         }
         field(39; "Codeunit ID: Is OK"; Integer)
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Is OK';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(41; "Codeunit ID: Lookup"; Integer)
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Lookup';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(43; "Codeunit ID: Validate"; Integer)
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Validate';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(45; Formula; Code[250])
         {
