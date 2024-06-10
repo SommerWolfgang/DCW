@@ -78,35 +78,11 @@ table 6086322 "CEM Expense Allocation Inbox"
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                GLSetup: Record "General Ledger Setup";
-                SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-            begin
-                GLSetup.Get;
-                if GLSetup."Global Dimension 1 Code" <> '' then
-                    SplitAndAllocationMgt.UpdateExpInboxAllocDim(
-                      DATABASE::"CEM Expense Allocation Inbox", "Entry No.", GLSetup."Global Dimension 1 Code", "Global Dimension 1 Code", '', '');
-            end;
         }
         field(20; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                GLSetup: Record "General Ledger Setup";
-                SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-            begin
-                GLSetup.Get;
-                if GLSetup."Global Dimension 2 Code" <> '' then
-                    SplitAndAllocationMgt.UpdateExpInboxAllocDim(
-                      DATABASE::"CEM Expense Allocation Inbox", "Entry No.", GLSetup."Global Dimension 2 Code", "Global Dimension 2 Code", '', '');
-            end;
         }
         field(21; "Job No."; Code[20])
         {
@@ -234,23 +210,6 @@ table 6086322 "CEM Expense Allocation Inbox"
         EMAttendeeInbox.DeleteAll;
     end;
 
-    trigger OnInsert()
-    var
-        ExpenseInbox: Record "CEM Expense Inbox";
-        SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-    begin
-        ExpenseInbox.Get("Inbox Entry No.");
-        SplitAndAllocationMgt.CopyExpInboxDimToAllocationDim(ExpenseInbox, Rec);
-
-        if not ("Amount %" in [0, 100]) then
-            Modified := true;
-    end;
-
-    trigger OnModify()
-    begin
-        Modified := true;
-    end;
-
     var
         ConfRemAmount: Label 'The amount on the expense (%1 %2) and the total allocated amount (%1 %3) do not match. Do you want to close the page anyway?';
         ConfZeroLines: Label 'Allocations with 0 amount exist. Are you sure you want to keep these?';
@@ -306,98 +265,17 @@ table 6086322 "CEM Expense Allocation Inbox"
         DrillDownDimensions(not ReadOnly);
     end;
 
-    local procedure DrillDownDimensions(Editable: Boolean)
-    var
-        EMDimInbox: Record "CEM Dimension Inbox";
-        TempEMDimInbox: Record "CEM Dimension Inbox" temporary;
-        ExpInbox: Record "CEM Expense Inbox";
-        ExpInboxDim: Page "CEM Inbox Dimension";
-    begin
-        EMDimInbox.SetRange("Table ID", DATABASE::"CEM Expense Allocation Inbox");
-        EMDimInbox.SetRange("Document Type", 0);
-        EMDimInbox.SetRange("Document No.", '');
-        EMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-
-        ExpInbox.Get("Inbox Entry No.");
-
-        TempEMDimInbox.DeleteAll;
-        if (not (ExpInbox.Status = ExpInbox.Status::Accepted)) and Editable then begin
-            if EMDimInbox.FindSet then
-                repeat
-                    TempEMDimInbox := EMDimInbox;
-                    TempEMDimInbox.Insert;
-                until EMDimInbox.Next = 0;
-
-            TempEMDimInbox.SetRange("Table ID", DATABASE::"CEM Expense Allocation Inbox");
-            TempEMDimInbox.SetRange("Document Type", 0);
-            TempEMDimInbox.SetRange("Document No.", '');
-            TempEMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-            PAGE.RunModal(PAGE::"CEM Inbox Dimension", TempEMDimInbox);
-
-            if EMDimInbox.EMDimInboxUpdated(TempEMDimInbox, DATABASE::"CEM Expense Allocation Inbox", 0, '', "Entry No.") then begin
-                EMDimInbox.DeleteAll(true);
-
-                if TempEMDimInbox.FindSet then
-                    repeat
-                        EMDimInbox := TempEMDimInbox;
-                        EMDimInbox.Insert(true);
-                    until TempEMDimInbox.Next = 0;
-            end;
-        end else begin
-            ExpInboxDim.SetTableView(EMDimInbox);
-            ExpInboxDim.Editable := false;
-            ExpInboxDim.RunModal;
-        end;
-    end;
-
-
     procedure InitFromExpInbox(var ExpAllInbox: Record "CEM Expense Allocation Inbox"; ExpInbox: Record "CEM Expense Inbox")
     begin
-        ExpAllInbox."Entry No." := GetLastEntryNo + 1;
-        ExpAllInbox."Table ID" := DATABASE::"CEM Expense Inbox";
-        ExpAllInbox."Inbox Entry No." := ExpInbox."Entry No.";
-        ExpAllInbox."Continia User ID" := ExpInbox."Continia User ID";
-        ExpAllInbox."Document Date" := ExpInbox."Document Date";
-        ExpAllInbox."Date Created" := Today;
-        ExpAllInbox."Cash/Private Card" := ExpInbox."Cash/Private Card";
-        ExpAllInbox.Description := ExpInbox.Description;
-        ExpAllInbox."Description 2" := ExpInbox."Description 2";
-        ExpAllInbox."Country/Region Code" := ExpInbox."Country/Region Code";
-        ExpAllInbox."Document Date" := ExpInbox."Document Date";
-        ExpAllInbox."Currency Code" := ExpInbox."Currency Code";
-        ExpAllInbox.Amount := Amount;
-        ExpAllInbox."Expense Type" := ExpInbox."Expense Type";
-        ExpAllInbox."Global Dimension 1 Code" := ExpInbox."Global Dimension 1 Code";
-        ExpAllInbox."Global Dimension 2 Code" := ExpInbox."Global Dimension 2 Code";
-        ExpAllInbox."Job No." := ExpInbox."Job No.";
-        ExpAllInbox."Job Task No." := ExpInbox."Job Task No.";
-        ExpAllInbox.Billable := ExpInbox.Billable;
     end;
-
 
     procedure DrillDownAttendees()
-    var
-        ExpAttendeeInbox: Record "CEM Attendee Inbox";
-        ExpInbox: Record "CEM Expense Inbox";
-        ExpAttendeesInbox: Page "CEM Expense Attendees Inbox";
     begin
-        if ExpInbox.Get("Inbox Entry No.") then begin
-            ExpAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Expense Allocation Inbox");
-            ExpAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-            ExpAttendeesInbox.SetTableView(ExpAttendeeInbox);
-            ExpAttendeesInbox.Editable := not (ExpInbox.Status = ExpInbox.Status::Accepted);
-            ExpAttendeesInbox.RunModal;
-        end;
     end;
-
 
     procedure GetAttendeesForDisplay() DisplayTxt: Text[150]
-    var
-        ExpAttendeeInbox: Record "CEM Attendee Inbox";
     begin
-        exit(ExpAttendeeInbox.GetAttendeesForDisplay(DATABASE::"CEM Expense Allocation Inbox", "Entry No."));
     end;
-
 
     procedure ValidateAllocationConsistency(ShowDialog: Boolean): Boolean
     var

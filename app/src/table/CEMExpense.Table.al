@@ -24,40 +24,6 @@ table 6086320 "CEM Expense"
         field(2; "Continia User ID"; Code[50])
         {
             Caption = 'Continia User ID';
-            TableRelation = "CDC Continia User Setup";
-
-            trigger OnValidate()
-            var
-                UserDelegation: Record "CEM User Delegation";
-                EmptyGuid: Guid;
-            begin
-                if "Settlement No." <> '' then
-                    Error(CannotChangeWhenSttl, FieldCaption("Continia User ID"));
-
-                if "Continia User ID" = xRec."Continia User ID" then
-                    exit;
-
-                UserDelegation.VerifyUser("Continia User ID");
-
-                TestField(Status, Status::Open);
-                TestField("Matched to Bank Transaction", false);
-                CheckInboxAndThrowError;
-
-                if not SupressAllocationsExist then
-                    if AllocationExists then
-                        Error(ExpenseAllocatedErr, FieldCaption("Continia User ID"));
-
-                Validate("Reimbursement Method", GetReimbursMethodForRecUsr);
-
-                if "Expense GUID" <> EmptyGuid then
-                    "Expense GUID" := EmptyGuid;
-
-                Validate("Expense Type");
-
-                CalcFields("Continia User Name");
-
-                AddDefaultDim(CurrFieldNo);
-            end;
         }
         field(3; "Continia User Name"; Text[50])
         {
@@ -98,54 +64,21 @@ table 6086320 "CEM Expense"
         field(9; "Currency Code"; Code[10])
         {
             Caption = 'Currency Code';
-            TableRelation = Currency;
-
-            trigger OnValidate()
-            begin
-                TestStatusAllowsChange;
-                UpdateAmount(FieldNo("Currency Code"));
-                ExpValidate.Run(Rec);
-            end;
         }
         field(10; "No Refund"; Boolean)
         {
             Caption = 'No Refund';
-
-            trigger OnValidate()
-            begin
-                if "No Refund" <> xRec."No Refund" then
-                    TestStatusAllowsChange;
-            end;
         }
         field(11; Amount; Decimal)
         {
             AutoFormatExpression = "Currency Code";
             AutoFormatType = 1;
             Caption = 'Amount';
-
-            trigger OnValidate()
-            begin
-                TestStatusAllowsChange;
-                if not SupressAllocationsExist then
-                    if AllocationExists then
-                        Error(ExpenseAllocatedErr, FieldCaption(Amount));
-
-                UpdateAmount(FieldNo(Amount));
-            end;
         }
         field(12; "Amount (LCY)"; Decimal)
         {
             AutoFormatType = 1;
             Caption = 'Amount (LCY)';
-
-            trigger OnValidate()
-            begin
-                TestStatusAllowsChange;
-                if AllocationExists then
-                    Error(ExpenseAllocatedErr, FieldCaption("Amount (LCY)"));
-
-                UpdateAmount(FieldNo("Amount (LCY)"));
-            end;
         }
         field(13; "Created Doc. Type"; Integer)
         {
@@ -232,7 +165,7 @@ table 6086320 "CEM Expense"
 
             trigger OnValidate()
             begin
-                TestStatusAllowsChange;
+                TestStatusAllowsChange();
                 "VAT Amount" := Amount - "Amount w/o VAT";
             end;
         }
@@ -243,7 +176,7 @@ table 6086320 "CEM Expense"
 
             trigger OnValidate()
             begin
-                TestStatusAllowsChange;
+                TestStatusAllowsChange();
                 "Amount w/o VAT" := Amount - "VAT Amount";
             end;
         }
@@ -336,7 +269,7 @@ table 6086320 "CEM Expense"
                     TestField("Matched to Bank Transaction", false);
 
                 if not SupressAllocationsExist then
-                    if AllocationExists then
+                    if AllocationExists() then
                         Error(ExpenseAllocatedErr, FieldCaption("Cash/Private Card"));
 
             end;
@@ -406,23 +339,6 @@ table 6086320 "CEM Expense"
             Caption = 'Expense Account Type';
             OptionCaption = ' ,G/L Account,,,Item';
             OptionMembers = " ","G/L Account",,,Item;
-
-            trigger OnValidate()
-            var
-                EMSetup: Record "CEM Expense Management Setup";
-            begin
-                if xRec."Expense Account Type" <> "Expense Account Type" then
-                    Clear("Expense Account");
-
-                if "Expense Account Type" = "Expense Account Type"::Item then begin
-                    EMSetup.Get;
-                    if EMSetup."Expense Posting" <> EMSetup."Expense Posting"::"Preferable Purchase Invoice" then
-                        Error(ItemRequiresPurchInv);
-                end;
-
-                if xRec."Expense Account Type" <> "Expense Account Type" then
-                    ExpValidate.Run(Rec);
-            end;
         }
         field(110; "Expense Account"; Code[20])
         {
@@ -480,78 +396,6 @@ table 6086320 "CEM Expense"
         field(180; "Expense Type"; Code[20])
         {
             Caption = 'Expense Type';
-            TableRelation = "CEM Expense Type";
-
-            trigger OnValidate()
-            var
-                ContiniaUserSetup: Record "CDC Continia User Setup";
-                BankTransaction: Record "CEM Bank Transaction";
-                EMSetup: Record "CEM Expense Management Setup";
-                ExpenseType: Record "CEM Expense Type";
-                ExpPostingSetup: Record "CEM Posting Setup";
-                ValidPostingSetupFound: Boolean;
-            begin
-                if not ExpenseType.Get("Expense Type") then
-                    Clear(ExpenseType);
-
-                if not ExpenseType."Attendees Required" then begin
-                    CalcFields("No. of Attendees");
-                    if "No. of Attendees" <> 0 then
-                        Error(ExpTypeAttNotAllowed, ExpenseType.TableCaption, ExpenseType.Code);
-                end;
-
-                Validate("No Refund", ExpenseType."No Refund");
-
-                if not ContiniaUserSetup.Get("Continia User ID") then
-                    Clear(ContiniaUserSetup);
-
-                ValidPostingSetupFound := (ExpenseType.Code <> '') and
-                  ExpPostingSetup.FindPostingSetup(DATABASE::"CEM Expense", "Expense Type", "Country/Region Code",
-                    "Continia User ID", ContiniaUserSetup."Expense User Group", false);
-
-                if ValidPostingSetupFound then begin
-                    if ExpPostingSetup."Posting Account Type" = ExpPostingSetup."Posting Account Type"::Item then begin
-                        EMSetup.Get;
-                        if EMSetup."Expense Posting" <> EMSetup."Expense Posting"::"Preferable Purchase Invoice" then
-                            Error(ItemRequiresPurchInv);
-                    end;
-
-                    "Expense Account Type" := ExpPostingSetup."Posting Account Type";
-                    "Expense Account" := ExpPostingSetup."Posting Account No.";
-                    "External Posting Account Type" := ExpPostingSetup."External Posting Account Type";
-                    "External Posting Account No." := ExpPostingSetup."External Posting Account No.";
-                    "Gen. Prod. Posting Group" := ExpPostingSetup."Gen. Prod. Posting Group";
-                    "VAT Prod. Posting Group" := ExpPostingSetup."VAT Prod. Posting Group";
-                    "Gen. Bus. Posting Group" := ExpPostingSetup."Gen. Bus. Posting Group";
-                    "VAT Bus. Posting Group" := ExpPostingSetup."VAT Bus. Posting Group";
-                    "Tax Group Code" := ExpPostingSetup."Tax Group Code";
-                end else begin
-                    "Expense Account Type" := "Expense Account Type"::" ";
-                    "Expense Account" := '';
-                    "External Posting Account Type" := "External Posting Account Type"::" ";
-                    "External Posting Account No." := '';
-                    "Gen. Prod. Posting Group" := '';
-                    "VAT Prod. Posting Group" := '';
-                    "Gen. Bus. Posting Group" := '';
-                    "VAT Bus. Posting Group" := '';
-                    "Tax Group Code" := '';
-                end;
-
-                "Exp. Account Manually Changed" := false;
-
-                AddDefaultDim(CurrFieldNo);
-
-                if Description = '' then
-                    Description := ExpenseType.Description;
-
-                if BankTransaction.Get(GetMatchingBankEntryNo) then begin
-                    BankTransaction."Expense Type" := "Expense Type";
-                    BankTransaction.Modify;
-                end;
-
-                OnExpenseTypeValidateBeforeExpValidation(ExpPostingSetup, ValidPostingSetupFound, Rec);
-                ExpValidate.Run(Rec);
-            end;
         }
         field(200; "Matched to Bank Transaction"; Boolean)
         {
@@ -622,25 +466,6 @@ table 6086320 "CEM Expense"
             Caption = 'External Posting Account Type';
             OptionCaption = ' ,Lessor Pay Type,Dataloen Pay Type';
             OptionMembers = " ","Lessor Pay Type","Dataloen Pay Type";
-
-            trigger OnValidate()
-            var
-                EMSetup: Record "CEM Expense Management Setup";
-            begin
-                if "External Posting Account Type" in ["External Posting Account Type"::"Lessor Pay Type",
-                  "External Posting Account Type"::"Dataloen Pay Type"]
-                then begin
-                    EMSetup.Get;
-                    if EMSetup."Expense Posting" = EMSetup."Expense Posting"::"Preferable Purchase Invoice" then
-                        Error(PurchasePostingNotAllowed, EMSetup.TableCaption, EMSetup.FieldCaption("Expense Posting"),
-                          Format(EMSetup."Expense Posting"), TableCaption, Format("External Posting Account Type"));
-                end;
-
-                if xRec."External Posting Account Type" <> "External Posting Account Type" then
-                    "External Posting Account No." := '';
-
-                ExpValidate.Run(Rec);
-            end;
         }
         field(285; "External Posting Account No."; Code[20])
         {
@@ -770,12 +595,12 @@ table 6086320 "CEM Expense"
         AccountCurrencyFactor: Decimal;
         ExpenseCurrencyFactor: Decimal;
     begin
-        EMSetup.Get;
+        EMSetup.Get();
         if CalledByFieldNo <> FieldNo("Bank Currency Code") then
             TestField("Matched to Bank Transaction", false);
 
         if "Document Date" = 0D then
-            CurrencyDate := WorkDate
+            CurrencyDate := WorkDate()
         else
             CurrencyDate := "Document Date";
 
@@ -784,16 +609,16 @@ table 6086320 "CEM Expense"
         if "Currency Code" <> '' then begin
             ExpenseCurrencyFactor := CurrExchRate.ExchangeRate(CurrencyDate, "Currency Code");
             Currency.Get("Currency Code");
-            Currency.CheckAmountRoundingPrecision;
+            Currency.CheckAmountRoundingPrecision();
         end else
-            Currency.InitRoundingPrecision;
+            Currency.InitRoundingPrecision();
 
         if "Bank Currency Code" <> '' then begin
             AccountCurrencyFactor := CurrExchRate.ExchangeRate(CurrencyDate, "Bank Currency Code");
             BankAccCurrency.Get("Bank Currency Code");
-            BankAccCurrency.CheckAmountRoundingPrecision;
+            BankAccCurrency.CheckAmountRoundingPrecision();
         end else
-            BankAccCurrency.InitRoundingPrecision;
+            BankAccCurrency.InitRoundingPrecision();
 
         case CalledByFieldNo of
             // CURRENCY CODE
@@ -866,7 +691,7 @@ table 6086320 "CEM Expense"
     var
         EMReminder: Record "CEM Reminder";
     begin
-        exit(EMReminder.NextReminderDate("Continia User ID", DATABASE::"CEM Expense", 0, "Settlement No.", "Entry No.", GetEarliestDate));
+        exit(EMReminder.NextReminderDate("Continia User ID", DATABASE::"CEM Expense", 0, "Settlement No.", "Entry No.", GetEarliestDate()));
     end;
 
     procedure ShowReminders()
@@ -882,11 +707,11 @@ table 6086320 "CEM Expense"
         Sum := 0;
         Match.SetCurrentKey("Expense Entry No.");
         Match.SetRange("Expense Entry No.", "Entry No.");
-        if Match.FindFirst then
+        if Match.FindFirst() then
             repeat
                 Match.CalcFields("Transaction Amount");
                 Sum += Match."Transaction Amount";
-            until Match.Next = 0;
+            until Match.Next() = 0;
 
         exit(Sum);
     end;
@@ -933,7 +758,7 @@ table 6086320 "CEM Expense"
             exit;
 
         if MatchedExpense.Amount <> UnMatchedExpense.Amount then begin
-            GLSetup.Get;
+            GLSetup.Get();
             if MatchedExpense."Currency Code" <> '' then
                 CurrCode := MatchedExpense."Currency Code"
             else
@@ -946,10 +771,10 @@ table 6086320 "CEM Expense"
         MatchedExpense.TestField(Posted, false);
         UnMatchedExpense.TestField(Posted, false);
 
-        if MatchedExpense.AllocationExists then
+        if MatchedExpense.AllocationExists() then
             Error(UnableToMergeWithAllocErr, MatchedExpense."Entry No.");
 
-        if UnMatchedExpense.AllocationExists then
+        if UnMatchedExpense.AllocationExists() then
             if (UnMatchedExpense."Currency Code" <> MatchedExpense."Currency Code") or
               (UnMatchedExpense.Amount <> MatchedExpense.Amount) or
               (UnMatchedExpense."Amount (LCY)" <> MatchedExpense."Amount (LCY)")
@@ -957,20 +782,20 @@ table 6086320 "CEM Expense"
                 Error(UnableToMergeWithAllocErr, UnMatchedExpense."Entry No.");
 
         ExpenseMatch.SetRange("Expense Entry No.", MatchedExpense."Entry No.");
-        if ExpenseMatch.FindSet then
+        if ExpenseMatch.FindSet() then
             repeat
                 NewExpenseMatch := ExpenseMatch;
                 NewExpenseMatch."Expense Entry No." := UnMatchedExpense."Entry No.";
-                NewExpenseMatch.Insert;
-                ExpenseMatch.Delete;
-            until ExpenseMatch.Next = 0;
+                NewExpenseMatch.Insert();
+                ExpenseMatch.Delete();
+            until ExpenseMatch.Next() = 0;
 
         EMAttachment.SetCurrentKey("Table ID", "Document Type", "Document No.", "Doc. Ref. No.");
         EMAttachment.SetRange("Table ID", DATABASE::"CEM Expense");
         EMAttachment.SetRange("Document Type", 0);
         EMAttachment.SetRange("Document No.", '');
         EMAttachment.SetRange("Doc. Ref. No.", MatchedExpense."Entry No.");
-        if EMAttachment.FindLast then
+        if EMAttachment.FindLast() then
             LastEntry := EMAttachment."Entry No.";
 
         EMAttachment.SetCurrentKey("Table ID", "Document Type", "Document No.", "Doc. Ref. No.");
@@ -1005,8 +830,6 @@ table 6086320 "CEM Expense"
 
         MatchedExpense."Matched to Bank Transaction" := false;
         MatchedExpense.Delete(true);
-
-        CODEUNIT.Run(CODEUNIT::"CEM Expense-Validate", UnMatchedExpense);
     end;
 
 
@@ -1018,20 +841,12 @@ table 6086320 "CEM Expense"
 
 
     procedure HasErrorComment(ShowFirstError: Boolean; RunValidationChecks: Boolean): Boolean
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        exit(EMCmtMgt.HasErrorComments(DATABASE::"CEM Expense", 0, "Settlement No.", "Entry No.", ShowFirstError, RunValidationChecks));
     end;
-
 
     procedure HasWarningComment(ShowFirstError: Boolean): Boolean
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        exit(EMCmtMgt.HasWarningComments(DATABASE::"CEM Expense", 0, "Settlement No.", "Entry No.", ShowFirstError, true));
     end;
-
 
     procedure HasApprovalComment(): Boolean
     var
@@ -1052,49 +867,13 @@ table 6086320 "CEM Expense"
 
 
     procedure CheckUnProcessedInbox()
-    var
-        BankTransInbox: Record "CEM Bank Transaction Inbox";
-        ExpenseInbox: Record "CEM Expense Inbox";
-        ReleaseNotificationEntry: Record "CEM Release Notification Entry";
-        UserDelegation: Record "CEM User Delegation";
-        NAVversionMgt: Codeunit "CEM NAV-version Mgt.";
-        TextMessage: Text[1024];
     begin
-
-        if UserDelegation.GetDelegationFilter <> '' then
-            exit;
-
-        ExpenseInbox.SetFilter(Status, '<>%1', ExpenseInbox.Status::Accepted);
-        if not ExpenseInbox.IsEmpty then
-            TextMessage := StrSubstNo(OneOrMoreInboxError, ExpenseInbox.TableCaption);
-
-        BankTransInbox.SetFilter(Status, '<>%1', BankTransInbox.Status::Accepted);
-        BankTransInbox.SetRange("Exclude Entry", false);
-        if not BankTransInbox.IsEmpty then begin
-            if TextMessage <> '' then
-                TextMessage := TextMessage + '\\';
-            TextMessage := TextMessage + OneOrMoreBankTransError;
-        end;
-
-        if ReleaseNotificationEntry.CheckForUnprocessedEntries then begin
-            if TextMessage <> '' then
-                TextMessage := TextMessage + '\\';
-            TextMessage := TextMessage + StrSubstNo(OneOrMoreInboxError, ReleaseNotificationEntry.TableCaption);
-        end;
-
-        if ReleaseNotificationEntry.CheckForUnprocessedHistEntries then
-            NAVversionMgt.SendHistoryToCO(false);
-
-        if TextMessage <> '' then
-            Message(TextMessage + ProcessInboxAsapTxt);
     end;
-
 
     procedure SupressAllocationCheck()
     begin
         SupressAllocationsExist := true;
     end;
-
 
     procedure AllocationExists(): Boolean
     var
@@ -1163,8 +942,8 @@ table 6086320 "CEM Expense"
     procedure CheckInboxAndThrowError()
     begin
         if not SuspendInboxCheck then
-            if ExistsInInbox then
-                ThrowInboxError;
+            if ExistsInInbox() then
+                ThrowInboxError();
     end;
 
 
@@ -1209,11 +988,11 @@ table 6086320 "CEM Expense"
         if "Entry No." = 0 then
             exit;
 
-        DeleteOldDefaultDim;
+        DeleteOldDefaultDim();
 
         if ContiniaUser.Get("Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode <> '' then
-                EMDimMgt.InsertDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
+            if ContiniaUser.GetSalesPurchCode() <> '' then
+                EMDimMgt.InsertDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
 
             if ContiniaUser."Vendor No." <> '' then
                 EMDimMgt.InsertDefaultDimExpense(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
@@ -1237,8 +1016,8 @@ table 6086320 "CEM Expense"
         case ValidatedFieldNo of
             FieldNo("Continia User ID"):
                 if ContiniaUser.Get("Continia User ID") then begin
-                    if ContiniaUser.GetSalesPurchCode <> '' then
-                        EMDimMgt.InsertDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
+                    if ContiniaUser.GetSalesPurchCode() <> '' then
+                        EMDimMgt.InsertDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
 
                     if ContiniaUser."Vendor No." <> '' then
                         EMDimMgt.InsertDefaultDimExpense(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
@@ -1271,8 +1050,8 @@ table 6086320 "CEM Expense"
         EMDimMgt: Codeunit "CEM Dimension Mgt.";
     begin
         if ContiniaUser.Get(xRec."Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode <> '' then
-                EMDimMgt.DeleteDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
+            if ContiniaUser.GetSalesPurchCode() <> '' then
+                EMDimMgt.DeleteDefaultDimExpense(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
 
             if ContiniaUser."Vendor No." <> '' then
                 EMDimMgt.DeleteDefaultDimExpense(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
@@ -1300,7 +1079,7 @@ table 6086320 "CEM Expense"
         ExpenseMatch: Record "CEM Expense Match";
     begin
         ExpenseMatch.SetRange("Expense Entry No.", "Entry No.");
-        if ExpenseMatch.FindFirst then
+        if ExpenseMatch.FindFirst() then
             exit(ExpenseMatch."Transaction Entry No.");
     end;
 
@@ -1328,27 +1107,27 @@ table 6086320 "CEM Expense"
         if not ExpenseType."Attendees Required" then
             Error(ExpTypeAttNotReq, ExpenseType.TableCaption, ExpenseType.Code);
 
-        TempExpAttendee.DeleteAll;
+        TempExpAttendee.DeleteAll();
         if not Posted then begin
-            if ExpAttendee.FindSet then
+            if ExpAttendee.FindSet() then
                 repeat
                     TempExpAttendee := ExpAttendee;
-                    TempExpAttendee.Insert;
-                until ExpAttendee.Next = 0;
+                    TempExpAttendee.Insert();
+                until ExpAttendee.Next() = 0;
 
             TempExpAttendee.SetRange("Table ID", DATABASE::"CEM Expense");
             TempExpAttendee.SetRange("Doc. Ref. No.", "Entry No.");
             PAGE.RunModal(0, TempExpAttendee);
             if TempExpAttendee.AttendeesUpdated(TempExpAttendee, "Entry No.", DATABASE::"CEM Expense") then begin
-                ExpAttendee.DeleteAll;
+                ExpAttendee.DeleteAll();
 
-                if TempExpAttendee.FindSet then
+                if TempExpAttendee.FindSet() then
                     repeat
                         ExpAttendee := TempExpAttendee;
-                        ExpAttendee.Insert;
-                    until TempExpAttendee.Next = 0;
+                        ExpAttendee.Insert();
+                    until TempExpAttendee.Next() = 0;
 
-                SendToExpenseUser;
+                SendToExpenseUser();
                 CODEUNIT.Run(CODEUNIT::"CEM Expense-Validate", Rec);
             end;
         end else begin
@@ -1400,12 +1179,12 @@ table 6086320 "CEM Expense"
         EMDim.SetRange("Document No.", '');
         EMDim.SetRange("Doc. Ref. No.", "Entry No.");
 
-        if (not Posted) and StatusOrUserAllowsChange and Editable then begin
-            if EMDim.FindSet then
+        if (not Posted) and StatusOrUserAllowsChange() and Editable then begin
+            if EMDim.FindSet() then
                 repeat
                     TempEMDim := EMDim;
-                    TempEMDim.Insert;
-                until EMDim.Next = 0;
+                    TempEMDim.Insert();
+                until EMDim.Next() = 0;
 
             TempEMDim.SetRange("Table ID", DATABASE::"CEM Expense");
             TempEMDim.SetRange("Document Type", 0);
@@ -1416,14 +1195,14 @@ table 6086320 "CEM Expense"
             if EMDim.EMDimUpdated(TempEMDim, DATABASE::"CEM Expense", 0, '', "Entry No.") then begin
                 EMDim.DeleteAll(true);
 
-                if TempEMDim.FindSet then
+                if TempEMDim.FindSet() then
                     repeat
                         EMDim := TempEMDim;
                         EMDim.Insert(true);
-                    until TempEMDim.Next = 0;
+                    until TempEMDim.Next() = 0;
 
                 Get("Entry No.");
-                SendToExpenseUser;
+                SendToExpenseUser();
 
                 CODEUNIT.Run(CODEUNIT::"CEM Expense-Validate", Rec);
             end;
@@ -1462,7 +1241,7 @@ table 6086320 "CEM Expense"
     var
         ExpenseAllocation: Record "CEM Expense Allocation";
     begin
-        AddTextTo(AddInfo, GetAttendeesForDisplay);
+        AddTextTo(AddInfo, GetAttendeesForDisplay());
 
         if "No Refund" then
             AddTextTo(AddInfo, FieldCaption("No Refund"));
@@ -1501,7 +1280,7 @@ table 6086320 "CEM Expense"
         Expense.SetCurrentKey("Settlement No.");
         Expense.SetRange("Settlement No.", "Settlement No.");
         Expense.SetFilter("Entry No.", '<>%1', "Entry No.");
-        if Expense.FindLast then
+        if Expense.FindLast() then
             exit(Expense."Settlement Line No." + 10000);
 
         exit(10000);
@@ -1562,12 +1341,12 @@ table 6086320 "CEM Expense"
             ConfirmText := ConfirmDetachExpenseMultiple;
 
         if Confirm(ConfirmText, false, Expense.Count) then begin
-            Expense.FindFirst;
+            Expense.FindFirst();
             repeat
                 Expense2.Get(Expense."Entry No.");
                 Expense2.Validate("Settlement No.", '');
                 Expense2.Modify(true);
-            until Expense.Next = 0;
+            until Expense.Next() = 0;
         end;
     end;
 
@@ -1580,7 +1359,7 @@ table 6086320 "CEM Expense"
         if Expense.Count = 0 then
             Error(NoExpInSelection);
 
-        Expense.FindFirst;
+        Expense.FindFirst();
 
         ExpHeader.FilterGroup(4);
         ExpHeader.SetRange("Continia User ID", Expense."Continia User ID");
@@ -1588,11 +1367,11 @@ table 6086320 "CEM Expense"
         ExpHeader.FilterGroup(0);
         if PAGE.RunModal(PAGE::"CEM Settlement List", ExpHeader) = ACTION::LookupOK then
             repeat
-                Expense.TestStatusAllowsChange;
+                Expense.TestStatusAllowsChange();
                 Expense2.Get(Expense."Entry No.");
                 Expense2.Validate("Settlement No.", ExpHeader."No.");
                 Expense2.Modify(true);
-            until Expense.Next = 0;
+            until Expense.Next() = 0;
     end;
 
 
@@ -1628,7 +1407,7 @@ table 6086320 "CEM Expense"
     var
         Expense: Record "CEM Expense";
     begin
-        if Expense.FindLast then
+        if Expense.FindLast() then
             exit(Expense."Entry No." + 1)
         else
             exit(1);
@@ -1681,7 +1460,7 @@ table 6086320 "CEM Expense"
         if not "Matched to Bank Transaction" then
             exit;
 
-        if BankTransaction.Get(GetMatchingBankEntryNo) then
+        if BankTransaction.Get(GetMatchingBankEntryNo()) then
             exit(BankTransaction."User Paid Credit Card");
     end;
 
@@ -1729,7 +1508,7 @@ table 6086320 "CEM Expense"
     begin
         RecRef.GetTable(Rec);
         RecID := RecRef.RecordId;
-        RecRef.Close;
+        RecRef.Close();
     end;
 
 
@@ -1745,14 +1524,14 @@ table 6086320 "CEM Expense"
     var
         Expense: Record "CEM Expense";
     begin
-        Expense.Reset;
+        Expense.Reset();
         Expense.SetCurrentKey("Continia User ID", "Document Date", "Currency Code", Amount);
         Expense.SetRange("Continia User ID", Rec."Continia User ID");
         Expense.SetRange("Document Date", Rec."Document Date");
         Expense.SetRange("Currency Code", Rec."Currency Code");
         Expense.SetRange(Amount, Rec.Amount);
         Expense.SetFilter("Entry No.", '<>%1', Rec."Entry No.");
-        if Expense.FindFirst then
+        if Expense.FindFirst() then
             EntryNo := Expense."Entry No.";
 
         exit(EntryNo <> 0);
@@ -1773,12 +1552,12 @@ table 6086320 "CEM Expense"
             exit(true);
 
         // A payment will always be done if the credit card is privately invoiced
-        if IsCreditCardUserPaid then
+        if IsCreditCardUserPaid() then
             exit(true);
 
         // Only Non-refundable bank transactions will have to be paid
         if "Matched to Bank Transaction" then
-            if AllocationExists then begin
+            if AllocationExists() then begin
                 ExpenseAllocation.SetCurrentKey("Expense Entry No.");
                 ExpenseAllocation.SetRange("Expense Entry No.", "Entry No.");
                 ExpenseAllocation.SetRange("No Refund", true);
@@ -1824,7 +1603,7 @@ table 6086320 "CEM Expense"
         CompanyPolicy.GetTimeIntervalStartAndEndDate("Document Date", StartDate, EndDate);
 
         if GetExpBalanceOnUserForDateInt(StartDate, EndDate) > CompanyPolicy."Amount (LCY)" then begin
-            GLSetup.Get;
+            GLSetup.Get();
             TimeSpecified := CompanyPolicy."Period of Time" <> CompanyPolicy."Period of Time"::" ";
 
             // Limits on Expense Level
@@ -1893,7 +1672,7 @@ table 6086320 "CEM Expense"
         ExpAllocation: Record "CEM Expense Allocation";
         ExpTypeUniqueTemp: Record "CEM Expense Type" temporary;
     begin
-        if not AllocationExists then begin
+        if not AllocationExists() then begin
             if CompanyPolicy.GetRefundWithinPolicy(DATABASE::"CEM Expense", "Continia User ID", "Expense Type") then
                 if "Amount (LCY)" > CompanyPolicy."Amount (LCY)" then
                     exit(true);
@@ -1901,13 +1680,13 @@ table 6086320 "CEM Expense"
             // Load unique expense types in buffer
             ExpAllocation.SetRange("Expense Entry No.", "Entry No.");
             ExpAllocation.SetRange("No Refund", false);
-            if ExpAllocation.FindSet then
+            if ExpAllocation.FindSet() then
                 repeat
                     ExpTypeUniqueTemp.Code := ExpAllocation."Expense Type";
-                    if not ExpTypeUniqueTemp.Insert then;
-                until ExpAllocation.Next = 0;
+                    if not ExpTypeUniqueTemp.Insert() then;
+                until ExpAllocation.Next() = 0;
 
-            if ExpTypeUniqueTemp.FindSet then
+            if ExpTypeUniqueTemp.FindSet() then
                 repeat
                     if CompanyPolicy.GetRefundWithinPolicy(DATABASE::"CEM Expense", "Continia User ID", "Expense Type") then begin
                         ExpAllocation.SetRange("Expense Entry No.", "Entry No.");
@@ -1918,17 +1697,17 @@ table 6086320 "CEM Expense"
                         if ExpAllocation."Amount (LCY)" >= CompanyPolicy."Amount (LCY)" then
                             exit(true);
                     end;
-                until ExpTypeUniqueTemp.Next = 0;
+                until ExpTypeUniqueTemp.Next() = 0;
         end;
     end;
 
 
     procedure CheckRefundWithinLimitAndAlloc()
     begin
-        if not AllocationExists then
+        if not AllocationExists() then
             AllocateCurrExpToLimitAmt
         else
-            UpdateAllocationsToLimitAmount;
+            UpdateAllocationsToLimitAmount();
     end;
 
     local procedure AllocateCurrExpToLimitAmt()
@@ -1978,16 +1757,16 @@ table 6086320 "CEM Expense"
         ExpAllocation.Get(MainAllocationEntryNo);
         ExpAllocation.SetExpense(Rec); // Rec is not yet commited
         ExpAllocation.Validate(Amount, Amount - NewExpAllocation.Amount);
-        if ExpType.GetNonRefundableExpType <> '' then
-            ExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType);
+        if ExpType.GetNonRefundableExpType() <> '' then
+            ExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType());
         ExpAllocation.Validate("No Refund", true);
         ExpAllocation."Limit allocation" := true;
         ExpAllocation.SetSkipSendToUser(true); // It will be sent later, when all the allocations are changed.
         ExpAllocation.Modify(true); // Will be marked as modified and not automatically deleted
 
-        ExpAllocation.AdjustAmtsToDecAndRecalc;
+        ExpAllocation.AdjustAmtsToDecAndRecalc();
 
-        GLSetup.Get;
+        GLSetup.Get();
         AllocationMgt.InsertPolicyAllocationComment("Entry No.", StrSubstNo(ExpAutoAllocateTxt, "Expense Type", Format(CompanyPolicy."Amount (LCY)"), GLSetup."LCY Code"));
 
         // Delete the comment that says that the expense was allocated.
@@ -2002,16 +1781,16 @@ table 6086320 "CEM Expense"
     begin
         ExpAllocation.SetRange("Expense Entry No.", "Entry No.");
         ExpAllocation.SetRange("No Refund", false);
-        if ExpAllocation.FindSet then
+        if ExpAllocation.FindSet() then
             repeat
                 ExpTypeUniqueTemp.Code := ExpAllocation."Expense Type";
-                if not ExpTypeUniqueTemp.Insert then;
-            until ExpAllocation.Next = 0;
+                if not ExpTypeUniqueTemp.Insert() then;
+            until ExpAllocation.Next() = 0;
 
-        if ExpTypeUniqueTemp.FindSet then
+        if ExpTypeUniqueTemp.FindSet() then
             repeat
                 UpdateAllocationsToExpTypeLmt(ExpTypeUniqueTemp.Code);
-            until ExpTypeUniqueTemp.Next = 0;
+            until ExpTypeUniqueTemp.Next() = 0;
     end;
 
     local procedure UpdateAllocationsToExpTypeLmt(ExpenseType: Code[20])
@@ -2046,7 +1825,7 @@ table 6086320 "CEM Expense"
         ExpAllocation.SetRange("Expense Entry No.", "Entry No.");
         ExpAllocation.SetRange("Expense Type", ExpenseType);
         ExpAllocation.SetRange("No Refund", false);
-        if ExpAllocation.FindSet then
+        if ExpAllocation.FindSet() then
             repeat
                 RefundableAmount := RefundableAmount + ExpAllocation."Amount (LCY)";
 
@@ -2054,19 +1833,19 @@ table 6086320 "CEM Expense"
                     if ExpAllocation."Amount (LCY)" = (RefundableAmount - MaxRefundableAmount) then begin
                         // Avoid splitting into 0 amount. Just mark the whole allocation as Non Refundable.
                         ExpAllocation.SetExpense(Rec); // Rec is not yet commited
-                        if ExpType.GetNonRefundableExpType <> '' then
-                            ExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType);
+                        if ExpType.GetNonRefundableExpType() <> '' then
+                            ExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType());
                         ExpAllocation.Validate("No Refund", true);
                         ExpAllocation."Limit allocation" := true;
-                        ExpAllocation.Modify;
+                        ExpAllocation.Modify();
                     end else begin
                         // Create a new allocation based on the previous allocation
                         NewExpAllocation.Copy(ExpAllocation);
                         NewExpAllocation."Entry No." := 0;
                         NewExpAllocation.SetExpense(Rec); // Rec is not yet commited
                         NewExpAllocation.Validate("Amount (LCY)", RefundableAmount - MaxRefundableAmount);
-                        if ExpType.GetNonRefundableExpType <> '' then
-                            NewExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType);
+                        if ExpType.GetNonRefundableExpType() <> '' then
+                            NewExpAllocation.Validate("Expense Type", ExpType.GetNonRefundableExpType());
                         NewExpAllocation.Validate("No Refund", true);
                         NewExpAllocation."Limit allocation" := true;
                         NewExpAllocation.SetSkipSendToUser(true); // It will be sent later, when all the allocations are changed.
@@ -2075,17 +1854,17 @@ table 6086320 "CEM Expense"
                         // Lower the amount on the initial allocation
                         ExpAllocation.SetExpense(Rec); // Rec is not yet commited
                         ExpAllocation.Validate(Amount, ExpAllocation.Amount - NewExpAllocation.Amount);
-                        ExpAllocation.Modify;
+                        ExpAllocation.Modify();
 
-                        ExpAllocation.AdjustAmtsToDecAndRecalc;
+                        ExpAllocation.AdjustAmtsToDecAndRecalc();
                         ExpAllocation.Modify(true); // Will be marked as modified and not automatically deleted
 
                         RefundableAmount := MaxRefundableAmount;
                     end;
                 end;
-            until ExpAllocation.Next = 0;
+            until ExpAllocation.Next() = 0;
 
-        GLSetup.Get;
+        GLSetup.Get();
         AllocationMgt.InsertPolicyAllocationComment("Entry No.", StrSubstNo(ExpAutoAllocateTxt, "Expense Type", Format(CompanyPolicy."Amount (LCY)"), GLSetup."LCY Code"));
 
         // Delete the comment that says that the expense was allocated.
@@ -2101,22 +1880,22 @@ table 6086320 "CEM Expense"
         MatchingRequired: Boolean;
         PaidWithCompanyCreditCard: Boolean;
     begin
-        if not EMSetup.Get then
+        if not EMSetup.Get() then
             exit;
 
         MatchingRequired := EMSetup.IsMatchingRequiredOnDate("Document Date");
-        PaidWithCompanyCreditCard := ("Matched to Bank Transaction" and not IsCreditCardUserPaid) or
+        PaidWithCompanyCreditCard := ("Matched to Bank Transaction" and not IsCreditCardUserPaid()) or
           (not MatchingRequired and not "Cash/Private Card");
 
-        if not AllocationExists then
+        if not AllocationExists() then
             RefundableAmtLCY += CalcRefundableAmount("Amount (LCY)", PaidWithCompanyCreditCard, "No Refund")
         else begin
             ExpenseAllocation.SetCurrentKey("Expense Entry No.");
             ExpenseAllocation.SetRange("Expense Entry No.", "Entry No.");
-            if ExpenseAllocation.FindSet then
+            if ExpenseAllocation.FindSet() then
                 repeat
                     RefundableAmtLCY += CalcRefundableAmount(ExpenseAllocation."Amount (LCY)", PaidWithCompanyCreditCard, ExpenseAllocation."No Refund");
-                until ExpenseAllocation.Next = 0;
+                until ExpenseAllocation.Next() = 0;
         end;
     end;
 
@@ -2140,10 +1919,10 @@ table 6086320 "CEM Expense"
 
     procedure GetRfndableAmtFromFilteredExp(var Expense: Record "CEM Expense") RefundableAmtLCY: Decimal
     begin
-        if Expense.FindSet then
+        if Expense.FindSet() then
             repeat
-                RefundableAmtLCY += Expense.GetRefundableAmount;
-            until Expense.Next = 0;
+                RefundableAmtLCY += Expense.GetRefundableAmount();
+            until Expense.Next() = 0;
     end;
 
 
@@ -2157,7 +1936,7 @@ table 6086320 "CEM Expense"
         ExpenseAllocation: Record "CEM Expense Allocation";
     begin
         // Rejected is just a state in CO. An expense is considered Rejected when "No Refund" is marked.
-        if AllocationExists then begin
+        if AllocationExists() then begin
             ExpenseAllocation.SetCurrentKey("Expense Entry No.");
             ExpenseAllocation.SetRange("Expense Entry No.", "Entry No.");
             ExpenseAllocation.SetRange("No Refund", false);
@@ -2196,7 +1975,7 @@ table 6086320 "CEM Expense"
             repeat
                 Expense2 := Expense;
                 CODEUNIT.Run(CODEUNIT::"CEM Expense - Complete", Expense2);
-            until Expense.Next = 0;
+            until Expense.Next() = 0;
     end;
 
 
@@ -2218,33 +1997,33 @@ table 6086320 "CEM Expense"
         VATAmountAllocation: Decimal;
         VATPercentageAllocation: Decimal;
     begin
-        ExpenseAllocationTemp.DeleteAll;
+        ExpenseAllocationTemp.DeleteAll();
 
         BaseAmount := 0;
         VATAmount := 0;
         VATPercentage := 0;
 
-        if AllocationExists then begin
+        if AllocationExists() then begin
             ExpenseAllocation.SetRange("Expense Entry No.", "Entry No.");
-            if ExpenseAllocation.FindSet then
+            if ExpenseAllocation.FindSet() then
                 repeat
                     ExpenseAllocationTemp := ExpenseAllocation;
-                    ExpenseAllocationTemp.Insert;
-                until ExpenseAllocation.Next = 0;
+                    ExpenseAllocationTemp.Insert();
+                until ExpenseAllocation.Next() = 0;
         end else begin
             ExpenseAllocationTemp.TransferFields(Rec);
-            ExpenseAllocationTemp.Insert;
+            ExpenseAllocationTemp.Insert();
         end;
 
-        if ExpenseAllocationTemp.FindSet then
+        if ExpenseAllocationTemp.FindSet() then
             repeat
                 ExpenseAllocationTemp.RecalculateAmounts(BaseAmoutAllocation, VATAmountAllocation, VATPercentageAllocation);
                 BaseAmount += BaseAmoutAllocation;
                 VATAmount += VATAmountAllocation;
                 VATPercentage := VATPercentageAllocation;
-            until ExpenseAllocationTemp.Next = 0;
+            until ExpenseAllocationTemp.Next() = 0;
 
-        if AllocationExists then
+        if AllocationExists() then
             VATPercentage := 0;
     end;
 
@@ -2256,48 +2035,22 @@ table 6086320 "CEM Expense"
 
 
     procedure StatusOrUserAllowsChange() Condition: Boolean
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
     begin
-        Condition := StatusAllowsChange or ContiniaUserSetup.CanEditApprovedDocuments(UserId);
     end;
-
 
     procedure TestStatusAllowsChange()
     begin
-        if not StatusAllowsChange then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
-
 
     procedure TestStatusOrUserAllowsChange()
     begin
-        if not StatusOrUserAllowsChange then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
-
 
     procedure NextApprover(): Code[50]
-    var
-        ApprovalMgt: Codeunit "CEM Approval Management";
     begin
-        exit(ApprovalMgt.GetNextApprover(DATABASE::"CEM Expense", Format("Entry No.")));
     end;
-
 
     procedure CurrentUserIsNextApprover(): Boolean
     begin
-        exit(UserId = NextApprover);
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnExpenseTypeValidateBeforeExpValidation(ExpPostingSetup: Record "CEM Posting Setup"; ValidPostingSetupFound: Boolean; var Expense: Record "CEM Expense")
-    begin
-    end;
-
-    [IntegrationEvent(false, false)]
-    local procedure OnAfterNewCalculatedAccount(var Expense: Record "CEM Expense"; var NewCalculatedAccount: Code[20]; ExpPostingSetup: Record "CEM Posting Setup")
-    begin
     end;
 }
-

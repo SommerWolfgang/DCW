@@ -119,32 +119,12 @@ table 6086321 "CEM Expense Allocation"
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                GLSetup: Record "General Ledger Setup";
-                SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-            begin
-                GLSetup.Get;
-                if GLSetup."Global Dimension 1 Code" <> '' then
-                    SplitAndAllocationMgt.UpdateExpAllocDim("Entry No.", GLSetup."Global Dimension 1 Code", "Global Dimension 1 Code", '', '');
-            end;
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
             TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                GLSetup: Record "General Ledger Setup";
-                SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-            begin
-                GLSetup.Get;
-                if GLSetup."Global Dimension 2 Code" <> '' then
-                    SplitAndAllocationMgt.UpdateExpAllocDim("Entry No.", GLSetup."Global Dimension 2 Code", "Global Dimension 2 Code", '', '');
-            end;
         }
         field(28; "Amount w/o VAT"; Decimal)
         {
@@ -367,74 +347,6 @@ table 6086321 "CEM Expense Allocation"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        EMAttendee: Record "CEM Attendee";
-        ExpenseAllocation: Record "CEM Expense Allocation";
-        ExpAllocationDim: Record "CEM Expense Allocation Dim.";
-        SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-    begin
-        TestNotPosted;
-
-        ExpAllocationDim.SetRange("Expense Allocation Entry No.", "Entry No.");
-        ExpAllocationDim.DeleteAll;
-
-        ExpenseAllocation.SetCurrentKey("Expense Entry No.");
-        ExpenseAllocation.SetRange("Expense Entry No.", "Expense Entry No.");
-        ExpenseAllocation.SetFilter("Entry No.", '<>%1', "Entry No.");
-        if ExpenseAllocation.IsEmpty then
-            SplitAndAllocationMgt.RemoveAllocationComment("Expense Entry No.");
-
-        ExpenseAllocation.SetCurrentKey("Expense Entry No.");
-        ExpenseAllocation.SetRange("Expense Entry No.", "Expense Entry No.");
-        ExpenseAllocation.SetRange("Limit allocation", true);
-        ExpenseAllocation.SetFilter("Entry No.", '<>%1', "Entry No.");
-        if ExpenseAllocation.IsEmpty then
-            SplitAndAllocationMgt.RemovePolicyAllocationComment("Expense Entry No.");
-
-        EMAttendee.SetRange("Table ID", DATABASE::"CEM Expense Allocation");
-        EMAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttendee.DeleteAll;
-
-        if Modified and (not _SkipSendToExpUser) then
-            SendToExpenseUser(true);
-    end;
-
-    trigger OnInsert()
-    var
-        SplitAndAllocationMgt: Codeunit "CEM Split and Allocation Mgt.";
-    begin
-        "Entry No." := GetLastEntryNo + 1;
-
-        TestNotPosted;
-
-        GetExpense("Expense Entry No.");
-        SplitAndAllocationMgt.CopyExpDimToAllocationDim(_Expense, Rec);
-        AddDefaultDim(0);
-
-        if not ("Amount %" in [0, 100]) then
-            Modified := true;
-
-        SplitAndAllocationMgt.InsertAllocationComment("Expense Entry No.");
-        CopyAttendees(_Expense, Rec);
-
-        if Modified and (not _SkipSendToExpUser) then
-            SendToExpenseUser(false);
-    end;
-
-    trigger OnModify()
-    begin
-        TestNotPosted;
-        Modified := true;
-
-        if (not _SkipSendToExpUser) then
-            SendToExpenseUser(false);
-    end;
-
     var
         _Expense: Record "CEM Expense";
         [InDataSet]
@@ -532,199 +444,30 @@ table 6086321 "CEM Expense Allocation"
 
     procedure LookupDimensions(Editable: Boolean)
     begin
-        if "Entry No." = 0 then
-            Error(Text002, TableCaption);
-
-        DrillDownDimensions(PAGE::"CEM Expense Allocation Dim.", Editable);
     end;
-
 
     procedure LookupExtraFields(Editable: Boolean)
     begin
-        if "Entry No." = 0 then
-            Error(Text002, TableCaption);
-
-        DrillDownDimensions(PAGE::"CEM Exp. Alloc. Extra Fields", Editable);
     end;
-
 
     procedure GetLastEntryNo(): Integer
-    var
-        ExpenseAllocation: Record "CEM Expense Allocation";
     begin
-        if ExpenseAllocation.FindLast then
-            exit(ExpenseAllocation."Entry No.")
-        else
-            exit(1);
     end;
-
-    local procedure TestNotPosted()
-    begin
-        GetExpense("Expense Entry No.");
-        _Expense.TestField(Posted, false);
-    end;
-
-    local procedure DrillDownDimensions(FormID: Integer; Editable: Boolean)
-    var
-        ExpAllocDim: Record "CEM Expense Allocation Dim.";
-        TempExpAllocDim: Record "CEM Expense Allocation Dim." temporary;
-        SendToExpUser: Codeunit "CEM Expense - Send to User";
-        ExpAllocExtraFieldsForm: Page "CEM Exp. Alloc. Extra Fields";
-        ExpAllocDimForm: Page "CEM Expense Allocation Dim.";
-    begin
-        ExpAllocDim.SetRange("Expense Allocation Entry No.", "Entry No.");
-
-        _Expense.Get("Expense Entry No.");
-
-        TempExpAllocDim.DeleteAll;
-        if (not _Expense.Posted) and Editable then begin
-            if ExpAllocDim.FindSet then
-                repeat
-                    TempExpAllocDim := ExpAllocDim;
-                    TempExpAllocDim.Insert;
-                until ExpAllocDim.Next = 0;
-
-            TempExpAllocDim.SetRange("Expense Allocation Entry No.", "Entry No.");
-            PAGE.RunModal(FormID, TempExpAllocDim);
-
-            if ExpAllocDim.EMDimUpdated(TempExpAllocDim, "Entry No.") then begin
-                ExpAllocDim.DeleteAll(true);
-
-                if TempExpAllocDim.FindSet then
-                    repeat
-                        ExpAllocDim := TempExpAllocDim;
-                        ExpAllocDim.Insert(true);
-                    until TempExpAllocDim.Next = 0;
-
-                _Expense.Get("Expense Entry No.");
-                if _Expense.Status = _Expense.Status::"Pending Expense User" then
-                    SendToExpUser.UpdateWithoutFiles(_Expense);
-
-                CODEUNIT.Run(CODEUNIT::"CEM Expense-Validate", _Expense);
-            end;
-        end else
-            case FormID of
-                PAGE::"CEM Expense Allocation Dim.":
-                    begin
-                        ExpAllocDimForm.SetTableView(ExpAllocDim);
-                        ExpAllocDimForm.SetReadOnly;
-                        ExpAllocDimForm.RunModal;
-                    end;
-
-                PAGE::"CEM Exp. Alloc. Extra Fields":
-                    begin
-                        ExpAllocExtraFieldsForm.SetTableView(ExpAllocDim);
-                        ExpAllocExtraFieldsForm.SetReadOnly;
-                        ExpAllocExtraFieldsForm.RunModal;
-                    end;
-            end;
-    end;
-
 
     procedure LookupPostingAccount(var Text: Text[1024]): Boolean
-    var
-        GLAcc: Record "G/L Account";
     begin
-        case "Expense Account Type" of
-            "Expense Account Type"::"G/L Account":
-                begin
-                    if GLAcc.Get(Text) then;
-                    if PAGE.RunModal(0, GLAcc) = ACTION::LookupOK then begin
-                        Text := GLAcc."No.";
-                        exit(true);
-                    end;
-                end;
-        end;
     end;
-
 
     procedure SendToExpenseUser(ShouldDelete: Boolean)
-    var
-        EMAllocation: Record "CEM Expense Allocation";
-        EMAllocationTemp: Record "CEM Expense Allocation" temporary;
-        SendToExpUser: Codeunit "CEM Expense - Send to User";
     begin
-        _Expense.Get("Expense Entry No.");
-
-        if _Expense.Status = _Expense.Status::"Pending Expense User" then begin
-            EMAllocation.SetCurrentKey("Expense Entry No.");
-            EMAllocation.SetRange("Expense Entry No.", _Expense."Entry No.");
-            if EMAllocation.FindSet then
-                repeat
-                    EMAllocationTemp.TransferFields(EMAllocation);
-                    EMAllocationTemp.Insert;
-                until EMAllocation.Next = 0;
-
-            if ShouldDelete then begin
-                if EMAllocationTemp.Get("Entry No.") then
-                    EMAllocationTemp.Delete;
-            end else
-                if EMAllocationTemp.Get("Entry No.") then begin
-                    EMAllocationTemp := Rec;
-                    EMAllocationTemp.Modify;
-                end else begin
-                    EMAllocationTemp := Rec;
-                    EMAllocationTemp."Entry No." += 1;
-                    EMAllocationTemp.Insert;
-                end;
-
-            SendToExpUser.SetAllocation(EMAllocationTemp);
-            SendToExpUser.UpdateWithoutFiles(_Expense);
-        end;
     end;
-
 
     procedure DrillDownAttendees()
-    var
-        ExpAttendee: Record "CEM Attendee";
-        TempExpAttendee: Record "CEM Attendee" temporary;
-        ExpenseType: Record "CEM Expense Type";
-        ExpAttendees: Page "CEM Expense Attendees";
     begin
-        ExpAttendee.SetRange("Table ID", DATABASE::"CEM Expense Allocation");
-        ExpAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-
-        TestField("Expense Type");
-        ExpenseType.Get("Expense Type");
-        if not ExpenseType."Attendees Required" then
-            Error(ExpTypeAttNotReq, ExpenseType.TableCaption, ExpenseType.Code);
-
-        _Expense.Get("Expense Entry No.");
-        if not _Expense.Posted then begin
-            if ExpAttendee.FindSet then
-                repeat
-                    TempExpAttendee := ExpAttendee;
-                    TempExpAttendee.Insert;
-                until ExpAttendee.Next = 0;
-
-            TempExpAttendee.SetRange("Table ID", DATABASE::"CEM Expense Allocation");
-            TempExpAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-            PAGE.RunModal(0, TempExpAttendee);
-            if TempExpAttendee.AttendeesUpdated(TempExpAttendee, "Entry No.", DATABASE::"CEM Expense Allocation") then begin
-                ExpAttendee.DeleteAll;
-
-                if TempExpAttendee.FindSet then
-                    repeat
-                        ExpAttendee := TempExpAttendee;
-                        ExpAttendee.Insert;
-                    until TempExpAttendee.Next = 0;
-
-                _Expense.SendToExpenseUser;
-                CODEUNIT.Run(CODEUNIT::"CEM Expense-Validate", _Expense);
-            end;
-        end else begin
-            ExpAttendees.SetTableView(ExpAttendee);
-            ExpAttendees.Editable := false;
-            ExpAttendees.RunModal;
-        end;
     end;
 
-
     procedure GetAttendeesForDisplay() DisplayTxt: Text[150]
-    var
-        ExpAttendee: Record "CEM Attendee";
     begin
-        exit(ExpAttendee.GetAttendeesForDisplay(DATABASE::"CEM Expense Allocation", "Entry No."));
     end;
 
 

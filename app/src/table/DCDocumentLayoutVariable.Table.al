@@ -1,8 +1,5 @@
 table 12032006 "DC - Document Layout Variable"
 {
-    // Copyright (Exclusive Rights): COSMO CONSULT Licensing GmbH, Sarnen, Switzerland
-    // cc|document configurator (CCDC)
-
     Caption = 'Document Layout Variable';
 
     fields
@@ -10,12 +7,10 @@ table 12032006 "DC - Document Layout Variable"
         field(1; "Layout No."; Code[10])
         {
             Caption = 'Layout No.';
-            TableRelation = "DC - Document Layout"."No.";
         }
         field(2; "Layout Line No."; Integer)
         {
             Caption = 'Layout Line No.';
-            TableRelation = "DC - Document Layout Line"."Line No." WHERE("Layout No." = FIELD("Layout No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -26,49 +21,10 @@ table 12032006 "DC - Document Layout Variable"
             Caption = 'Type';
             OptionCaption = 'Value,Caption,Formula,System,Record ID,Text';
             OptionMembers = Value,Caption,Formula,System,"Record ID",Text;
-
-            trigger OnValidate()
-            begin
-                if Type = Type::Value then
-                    Formula := '';
-
-                if Type = Type::Caption then
-                    Formula := '';
-
-                if Type = Type::Formula then begin
-                    "Table No." := 0;
-                    "Field No." := 0;
-                    CalcFields("Table Name");
-                    CalcFields("Field Name");
-                end;
-
-                if Type = Type::Text then begin
-                    "Table No." := 0;
-                    "Field No." := 0;
-                    CalcFields("Table Name");
-                    CalcFields("Field Name");
-                end;
-            end;
         }
         field(5; "Table No."; Integer)
         {
             Caption = 'Table No.';
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                ObjectID: Integer;
-            begin
-                ObjectID := ConfiguratorDocMng.LookupObject('T');
-
-                if ObjectID <> 0 then
-                    Validate("Table No.", ObjectID);
-            end;
-
-            trigger OnValidate()
-            begin
-                CalcFields("Table Name");
-            end;
         }
         field(6; "Table Name"; Text[30])
         {
@@ -82,22 +38,6 @@ table 12032006 "DC - Document Layout Variable"
         {
             Caption = 'Field No.';
             NotBlank = true;
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                FieldID: Integer;
-            begin
-                FieldID := ConfiguratorDocMng.LookupField("Table No.");
-
-                if FieldID <> 0 then
-                    Validate("Field No.", FieldID);
-            end;
-
-            trigger OnValidate()
-            begin
-                CalcFields("Field Name");
-            end;
         }
         field(8; "Field Name"; Text[30])
         {
@@ -178,74 +118,11 @@ table 12032006 "DC - Document Layout Variable"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        DocumentLayoutCriteria: Record "DC - Document Layout Criterion";
-        DocumentLayoutFilter: Record "DC - Document Layout Filter";
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnDeleteCode("Layout No.");
-
-        DocumentLayoutFilter.SetRange("Layout No.", "Layout No.");
-        DocumentLayoutFilter.SetRange("Layout Line No.", "Layout Line No.");
-        DocumentLayoutFilter.SetRange("Layout Field Line No.", 0);
-        DocumentLayoutFilter.SetRange("Layout Variable Line No.", "Line No.");
-        DocumentLayoutFilter.SetRange("Layout Codeunit Line No.", 0);
-        DocumentLayoutFilter.DeleteAll(true);
-
-        DocumentLayoutCriteria.SetRange("Layout No.", "Layout No.");
-        DocumentLayoutCriteria.SetRange("Layout Line No.", "Layout Line No.");
-        DocumentLayoutCriteria.SetRange("Layout Field Line No.", 0);
-        DocumentLayoutCriteria.SetRange("Layout Variable Line No.", "Line No.");
-        DocumentLayoutCriteria.SetRange("Layout Codeunit Line No.", 0);
-        DocumentLayoutCriteria.DeleteAll(true);
-    end;
-
-    trigger OnInsert()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnInsertCode("Layout No.");
-    end;
-
-    trigger OnModify()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnModifyCode("Layout No.");
-    end;
-
-
     procedure Caption(): Text[120]
-    var
-        DocumentLayoutLine: Record "DC - Document Layout Line";
     begin
-        if GetFilters = '' then
-            exit('');
-
-        if not DocumentLayoutLine.Get("Layout No.", "Layout Line No.") then
-            exit('');
-
-        exit(StrSubstNo('%1 %2', "Layout No.", DocumentLayoutLine.Description));
     end;
-
 
     procedure IsNumeric(): Boolean
-    var
-        DCMgt: Codeunit "DC - Management";
     begin
-        case Type of
-            Type::Formula:
-                exit(true);
-            Type::Value:
-                exit(DCMgt.CheckIfTableFieldIsNumeric("Table No.", "Field No."));
-            else
-                exit(false);
-        end;
     end;
 }
-
