@@ -2,7 +2,743 @@
 <xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en-US" target-language="en-US" original="DCW">
     <body>
-      <group id="body" />
+      <group id="body">
+        <trans-unit id="Table 2757488516 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Document Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3671587721 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Bottom</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Bottom - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3004954119 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Code</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Code - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 486908828 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Document No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Document No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 202173808 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Is Valid</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Is Valid - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1482030883 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Is Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Is Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3206779141 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Left</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Left - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3320823955 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Line No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Line No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 338367360 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Lookup Table</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Lookup Table - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 338367360 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,Vendor,Contact,Customer,Job,Item,Fixed Asset,Employee,Dimension Value,Field Specific Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Lookup Table - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 643268232 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Page No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Page No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1644645076 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Right</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Right - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1768249233 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Template No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Template No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1576686437 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Top</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Top - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1878130204 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1878130204 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Header,Line</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 2348117841 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Updated By User</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Updated By User - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1598220475 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Blob)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Blob) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3794647714 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Boolean)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Boolean) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 3376358770 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Date)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Date) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 2063853619 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Decimal)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Decimal) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1188379828 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Lookup)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Lookup) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1221124819 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Record ID Tree ID)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Record ID Tree ID) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 903818894 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Rel. Code)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Rel. Code) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2757488516 - Field 1815233705 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value (Text)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Document Value - Field Value (Text) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Temp. Document Line</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1171156985 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Create Comment</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Create Comment - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 486908828 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Document No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Document No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 546715564 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 1</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 1 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2975310180 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 10</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 10 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2337613563 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 11</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 11 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 4250703414 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 12</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 12 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3613006797 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 13</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 13 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 424523712 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 14</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 14 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 4081794391 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 15</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 15 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1699916946 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 16</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 16 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1062220329 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 17</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 17 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2168704540 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 18</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 18 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1531007923 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 19</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 19 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1184412181 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 2</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 2 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3251842453 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 20</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 20 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1822108798 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 3</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 3 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1653199775 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 4</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 4 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2290896392 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 5</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 5 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2928593009 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 6</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 6 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3566289626 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 7</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 7 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 715624587 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 8</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 8 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1353321204 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Value 9</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Field Value 9 - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3320823955 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Line No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Line No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 2079045816 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>OK</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field OK - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 643268232 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Page No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Page No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 343736747 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Skip</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Skip - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 1768249233 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Template No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Template No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3353471502 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Translate to No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Translate to No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3623139495 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Translate to Type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Translate to Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 2926166417 - Field 3623139495 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,G/L Account,Item,Resource,Fixed Asset,Charge (Item)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Temp. Document Line - Field Translate to Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Template Field</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3024729169 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Advanced Line Recognition Type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Advanced Line Recognition Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3024729169 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Standard,Anchor linked field,Field search with caption,Field search with column heading</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Advanced Line Recognition Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3500245166 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Width</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field ALR Typical Value Field Width - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 911104209 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Offset X</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field ALR Value Caption Offset X - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1548800826 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Offset Y</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field ALR Value Caption Offset Y - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3647097316 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Auto Update Caption</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Auto Update Caption - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3224481493 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Auto Update Field Height</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Auto Update Field Height - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1744846110 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Auto Update Field Width</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Auto Update Field Width - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3837934460 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Blank Zero</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Blank Zero - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2309892813 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Calculate Date (Date Formula)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Calculate Date (Date Formula) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2125878339 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Is Part Of Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Caption Is Part Of Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 69521667 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Mandatory</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Caption Mandatory - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3187869109 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Offset X</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Caption Offset X - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3825565726 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Caption Offset Y</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Caption Offset Y - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2440610119 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Change Sign</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Change Sign - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3004954119 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Code</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Code - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 4248292557 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Codeunit ID: Capture Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Codeunit ID: Capture Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3610765006 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Codeunit ID: Is OK</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Codeunit ID: Is OK - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3073217818 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Codeunit ID: Lookup</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Codeunit ID: Lookup - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2297975710 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Codeunit ID: Validate</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Codeunit ID: Validate - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3090058030 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Copy value from previous value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Copy Value from Previous Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2145620180 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Data Type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Data Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2145620180 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Text,Number,Date,Boolean,,,,,Lookup</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Data Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1342876022 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>ALR Data version</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Data version - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 902669161 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Date Format</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Date Format - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 902669161 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,Day / Month / Year,Month / Day / Year,Year / Day / Month,Year / Month / Day,Day / Year / Month,Month / Year / Day</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Date Format - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 4057086957 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Decimal Places</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Decimal Places - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1429945287 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Default Page Source</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Default Page Source - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1429945287 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>First Page,Last Page</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Default Page Source - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 679324740 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Delete Blanks</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Delete Blanks - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2374910106 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Destination Header Field No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Destination Header Field No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3173545057 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Destination Line Field No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Destination Line Field No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 687642483 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Enable Rule Generation</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Enable Rule Generation - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3070320983 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Name</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Field Name - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3800550788 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field position</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Field value position - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3800550788 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,Above standard line,Below standard line</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Field value position - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1831634694 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Value search direction</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Field value search direction - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1831634694 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Downwards,Upwards</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Field value search direction - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 527272036 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Boolean)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Boolean) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1882305188 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Date)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Date) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3103032273 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Decimal)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Decimal) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2174144834 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Lookup)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Lookup) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3349006796 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Rec. ID Tree ID)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Rec. ID Tree ID) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 763922555 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Fixed Value (Text)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Fixed Value (Text) - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3304877602 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Formula</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Formula - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3170118878 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>G/L Account Field Code</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field G/L Account Field Code - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1177049883 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Insert on new Templates</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Insert on new Templates - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2273653569 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Language Code</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Language Code - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3878945789 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Anchor Field</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Linked Field - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 117728910 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Relation Code</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Lookup Rel. Code - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 338367360 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Lookup Table</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Lookup Table - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 338367360 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,Vendor,Contact,Customer,Job,Item,Fixed Asset,Employee,Dimension Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Lookup Table - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 4117194 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Make Absolute Number</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Make Absolute Number - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2572413993 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Multiline</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Multiline - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 768604593 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Never use Global Captions</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Never use Global Captions - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 340328899 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Number Has Decimals</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Number Has Decimals - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3134861838 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Offset Height</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Offset Bottom - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 130122036 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Offset DPI</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Offset DPI - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 170820834 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Offset Left</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Offset Left - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2719260903 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Offset Width</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Offset Right - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3315964426 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Offset Top</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Offset Top - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 687990397 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Purch. Alloc. G/L Account No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Purch. Alloc. G/L Account No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3200689824 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Substitution Field</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Replacement Field - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3015600400 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Replacement field type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Replacement Field Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3015600400 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Header,Line</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Replacement Field Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1513426459 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Required</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Required - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2365719562 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Search for Value</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Search for Value - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1639684163 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Show Field</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Show Field - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1639684163 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Never,If it has a value,Always</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Show Field - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3915705456 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sort Order</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Sort Order - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3299771246 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Sorting</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Sorting - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3160832348 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Source Field No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Source Field No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2202804688 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Source Table Filter GUID</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Source Table Filter GUID - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 76420432 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Source Table No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Source Table No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 726706510 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Stop Lines Recognition</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Stop Lines Recognition - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 726706510 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,If Caption is on same line,If Value is on same line,If Caption or Value is on same line,If Caption is on same line (continue on next page),If Value is on same line (continue on next page),If Caption or Value is on same line (continue on next page)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Stop Lines Recognition - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1631192072 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Subtract from Amount Field (on registration)</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Subtract from Amount Field - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1768249233 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Template No.</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Template No. - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 691972269 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Transfer Amount to Document</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Transfer Amount to Document - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 691972269 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source> ,If lines are not recognised,Always</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Transfer Amount to Document - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 832861107 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Transfer Blank Values</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Transfer Blank Values - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1878130204 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Type</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Type - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1878130204 - Property 62802879" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Header,Line</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Type - Property OptionCaption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3395350367 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Typical Field DPI</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Typical Field DPI - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3749328993 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Height</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Typical Field Height - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 2123222186 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Field Width</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Typical Field Width - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1821498126 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Use as Document Separator</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Use as Doc. Separator - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 892532521 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Validation Dateformula From</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Validation Dateformula From - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 1269102886 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>Validation Dateformula To</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field Validation Dateformula To - Property Caption</note>
+        </trans-unit>
+        <trans-unit id="Table 4237587410 - Field 3488907168 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
+          <source>XML Path</source>
+          <note from="Developer" annotates="general" priority="2"></note>
+          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Template Field - Field XML Path - Property Caption</note>
+        </trans-unit>
+      </group>
     </body>
   </file>
 </xliff>
