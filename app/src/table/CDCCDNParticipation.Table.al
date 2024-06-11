@@ -77,24 +77,4 @@ table 6086208 "CDC CDN Participation"
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        DeleteParticipantProfileRel();
-    end;
-
-    local procedure DeleteParticipantProfileRel()
-    var
-        CDNParticipProfileRel: Record "CDC CDN Particip. Profile Rel.";
-    begin
-        CDNParticipProfileRel.SetRange("Network Name", "Network Name");
-        CDNParticipProfileRel.SetRange("Participation Identifier Type", "Identifier Type ID");
-        CDNParticipProfileRel.SetRange("Participation Identifier Value", "Identifier Value");
-        CDNParticipProfileRel.DeleteAll();
-    end;
 }
-

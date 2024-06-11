@@ -1568,21 +1568,6 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table CDC Delegation Sharing - Property Caption</note>
         </trans-unit>
-        <trans-unit id="Table 663911002 - NamedType 617573470" size-unit="char" translate="yes" xml:space="preserve">
-          <source>%1 (%3) must not be equal to %2 (%3).</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Delegation Sharing - NamedType OwnerEqualSharedToErr</note>
-        </trans-unit>
-        <trans-unit id="Table 663911002 - NamedType 3752334001" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Do you want to delete this %1 from all other companies?</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Delegation Sharing - NamedType Text002</note>
-        </trans-unit>
-        <trans-unit id="Table 663911002 - NamedType 754410896" size-unit="char" translate="yes" xml:space="preserve">
-          <source>%1 is higher than %2.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CDC Delegation Sharing - NamedType ValidDatesErr</note>
-        </trans-unit>
         <trans-unit id="Table 663911002 - Field 3832664610 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Copy to All Companies</source>
           <note from="Developer" annotates="general" priority="2"></note>
@@ -14663,101 +14648,6 @@
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - Property Caption</note>
         </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 4282782696" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Conflicting dependency expects the %1 %2 to have a value.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType ConflictDetectedAnyValueMsg</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 1793560173" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Conflicting dependency expects the %1 %2 to have no value.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType ConflictDetectedNoValueMsg</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 2929960769" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Conflicting expectations to %1 %2. Specific values %3.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType ConflictingRuleDetectedMsg</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 1759761666" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Data type %1 is currently not supported in field dependencies. %2: %3.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType DataTypeNotSupportedErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 121457587" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Consistency check of dependencies was successful. </source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType DependenciesConsistencyCheck</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 3889832207" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Default dimensions and attendees on expense types have been set as system dependencies.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType DependenciesUpdatedMsg</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 913556060" size-unit="char" translate="yes" xml:space="preserve">
-          <source>You are not allowed to change a system created dependency.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType DontChangeSystemDependencyErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 2992102089" size-unit="char" translate="yes" xml:space="preserve">
-          <source>You are not allowed to delete a system created dependency.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType DontDeleteSystemDependencyErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 1731153522" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Could not add the element (%1) to the list (%2). Element contains the separator (%3).</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType ElementContainSeparatorErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 850263114" size-unit="char" translate="yes" xml:space="preserve">
-          <source>%1 and %2 are never configured together on the same document type.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType FieldsAreNotConfigured</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 1263416954" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Issues detected for dependencies for the following fields: %1.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType IssuesDetectedForDependencies</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 2000991048" size-unit="char" translate="yes" xml:space="preserve">
-          <source>%1 and %2</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType LastElementAdded</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 902293108" size-unit="char" translate="yes" xml:space="preserve">
-          <source>The field type %1 is mandatory. Expecting it to have no value is conflicting.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType MandatoryFieldTypeErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 1373648753" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Circular dependencies detected for field types %1.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType RecursionDetectedMsg</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 4267158395" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Run the Consistency Check action to enable this dependency.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType RunConsistencyCheck</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 780878407" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Specific values can only be specified for Field Types of data type Code. %1 has data type %2.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType SpecificValuesDataTypeErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 314360720" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Specific values can only be specified for Field Types that have Lookup Values. %1 has no lookup values.</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType SpecificValuesNoValuesErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 897148599" size-unit="char" translate="yes" xml:space="preserve">
-          <source>The following user groups don't have access to value %2 in the field %3:\%1</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType UserGrpWithourLookupAccessErr</note>
-        </trans-unit>
-        <trans-unit id="Table 1111797122 - NamedType 2941972157" size-unit="char" translate="yes" xml:space="preserve">
-          <source>The following users don't have access to value %2 in the field %3:\%1</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table CEM Field Type Dependency - NamedType UsersWithourLookupAccessErr</note>
-        </trans-unit>
         <trans-unit id="Table 1111797122 - Field 696389717 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Condition</source>
           <note from="Developer" annotates="general" priority="2"></note>
@@ -19877,21 +19767,6 @@
           <source>Show Design Marks</source>
           <note from="Developer" annotates="general" priority="2"></note>
           <note from="Xliff Generator" annotates="general" priority="3">Table DC - Setup - Field Show Design Marks - Property Caption</note>
-        </trans-unit>
-        <trans-unit id="Table 4215854241 - NamedType 572346905" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Download File</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table Email Distribution Attachment - NamedType TextDownloadFileDialog</note>
-        </trans-unit>
-        <trans-unit id="Table 4215854241 - NamedType 936930483" size-unit="char" translate="yes" xml:space="preserve">
-          <source>All Files|*.*</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table Email Distribution Attachment - NamedType TextFilterAllFiles</note>
-        </trans-unit>
-        <trans-unit id="Table 4215854241 - NamedType 771111348" size-unit="char" translate="yes" xml:space="preserve">
-          <source>Upload File</source>
-          <note from="Developer" annotates="general" priority="2"></note>
-          <note from="Xliff Generator" annotates="general" priority="3">Table Email Distribution Attachment - NamedType TextUploadFileDialog</note>
         </trans-unit>
         <trans-unit id="Table 4215854241 - Field 3461834954 - Property 2879900210" size-unit="char" translate="yes" xml:space="preserve">
           <source>Description</source>

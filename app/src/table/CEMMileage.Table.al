@@ -884,40 +884,16 @@ table 6086338 "CEM Mileage"
 
 
     procedure ReopenMileage(var Mileage: Record "CEM Mileage")
-    var
-        Mileage2: Record "CEM Mileage";
-        PendingExpUserFound: Boolean;
-        Question: Text[1024];
     begin
-        // Do we have pending expense user records?
-        Mileage.SetRange(Status, Mileage.Status::"Pending Expense User");
-        PendingExpUserFound := not Mileage.IsEmpty;
-        Mileage.SetRange(Status);
-
-
-        if not Confirm(Question, true) then
-            exit;
-
-        if Mileage.FindSet(true, false) then
-            repeat
-                Mileage2 := Mileage;
-            until Mileage.Next() = 0;
     end;
-
 
     procedure StatusAllowsChange() Condition: Boolean
     begin
-        Condition := Status in [Status::Open, Status::"Pending Expense User"];
     end;
-
 
     procedure StatusOrUserAllowsChange() Condition: Boolean
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
     begin
-        Condition := StatusAllowsChange() or ContiniaUserSetup.CanEditApprovedDocuments(UserId);
     end;
-
 
     procedure TestStatusAllowsChange()
     begin

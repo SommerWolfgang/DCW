@@ -150,20 +150,10 @@ table 6086410 "CEM Transaction Journal"
         field(140; "First Name"; Text[50])
         {
             Caption = 'First Name';
-
-            trigger OnValidate()
-            begin
-                "Card Name" := "First Name" + ' ' + "Last Name";
-            end;
         }
         field(141; "Last Name"; Text[50])
         {
             Caption = 'Last Name';
-
-            trigger OnValidate()
-            begin
-                "Card Name" := "First Name" + ' ' + "Last Name";
-            end;
         }
         field(150; "Template Code"; Code[20])
         {

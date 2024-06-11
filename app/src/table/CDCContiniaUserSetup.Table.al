@@ -293,25 +293,6 @@ table 6086002 "CDC Continia User Setup"
     begin
     end;
 
-    local procedure GetIsStandardApprovalAdminUser(): Boolean
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
-        "Field": Record "Field";
-        UserSetup: Record "User Setup";
-        RecRef: RecordRef;
-        FieldRef: FieldRef;
-    begin
-        if not Field.Get(DATABASE::"User Setup", ContiniaUserSetup.FieldNo("Approval Administrator")) then
-            exit(false);
-
-        if not UserSetup.Get("Continia User ID") then
-            exit(false);
-
-        RecRef.GetTable(UserSetup);
-        FieldRef := RecRef.Field(ContiniaUserSetup.FieldNo("Approval Administrator"));
-        exit(FieldRef.Value);
-    end;
-
     procedure GetNoOfAppvlShareToThisUser(): Integer
     begin
     end;
@@ -350,6 +331,17 @@ table 6086002 "CDC Continia User Setup"
 
     procedure SetControlAppearance(var CEMEnabled: Boolean; var DCEnabled: Boolean; var CEMEnabledApp: Boolean; var CEMMatchingNotRequired: Boolean; var CEMShowEmployeeNo: Boolean; var CEMShowAddressSetup: Boolean; var ShowApproval: Boolean; var ShowDCOnlyApproval: Boolean; var ShowWebApproval: Boolean; var ShowApprovalClientApp: Boolean; var ShowApprovalClient: Boolean)
     begin
+        CEMEnabled := false;
+        DCEnabled := false;
+        CEMEnabledApp := false;
+        CEMMatchingNotRequired := false;
+        CEMShowEmployeeNo := false;
+        CEMShowAddressSetup := false;
+        ShowApproval := false;
+        ShowDCOnlyApproval := false;
+        ShowWebApproval := false;
+        ShowApprovalClientApp := false;
+        ShowApprovalClient := false;
     end;
 
     procedure CanEditPendingDocuments(InputUserID: Code[50]): Boolean
