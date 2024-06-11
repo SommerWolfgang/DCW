@@ -293,66 +293,18 @@ table 6086354 "CEM Continia User Statistics"
 
 
     procedure GetPerDiemAmtOpen(ContiniaUserID: Code[50]) "Sum": Decimal
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        PerDiem.SetRange("Continia User ID", ContiniaUserID);
-        PerDiem.SetRange(Status, PerDiem.Status::Open);
-        PerDiem.SetRange(Posted, false);
-        PerDiem.SetRange("Settlement No.", '');
-        if PerDiem.FindSet() then
-            repeat
-                PerDiem.CalcFields("Amount (LCY)");
-                Sum += PerDiem."Amount (LCY)";
-            until PerDiem.Next() = 0;
     end;
-
 
     procedure GetPerDiemAmtPendingUser(ContiniaUserID: Code[50]) "Sum": Decimal
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        PerDiem.SetRange("Continia User ID", ContiniaUserID);
-        PerDiem.SetRange(Status, PerDiem.Status::"Pending Expense User");
-        PerDiem.SetRange(Posted, false);
-        PerDiem.SetRange("Settlement No.", '');
-        if PerDiem.FindSet() then
-            repeat
-                PerDiem.CalcFields("Amount (LCY)");
-                Sum += PerDiem."Amount (LCY)";
-            until PerDiem.Next() = 0;
     end;
-
 
     procedure GetPerDiemAmtPendingApproval(ContiniaUserID: Code[50]) "Sum": Decimal
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        PerDiem.SetRange("Continia User ID", ContiniaUserID);
-        PerDiem.SetRange(Status, PerDiem.Status::"Pending Approval");
-        PerDiem.SetRange(Posted, false);
-        PerDiem.SetRange("Settlement No.", '');
-        if PerDiem.FindSet() then
-            repeat
-                PerDiem.CalcFields("Amount (LCY)");
-                Sum += PerDiem."Amount (LCY)";
-            until PerDiem.Next() = 0;
     end;
-
 
     procedure GetPerDiemAmtPendingPosting(ContiniaUserID: Code[50]) "Sum": Decimal
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        PerDiem.SetRange("Continia User ID", ContiniaUserID);
-        PerDiem.SetRange(Status, PerDiem.Status::Released);
-        PerDiem.SetRange(Posted, false);
-        PerDiem.SetRange("Settlement No.", '');
-        if PerDiem.FindSet() then
-            repeat
-                PerDiem.CalcFields("Amount (LCY)");
-                Sum += PerDiem."Amount (LCY)";
-            until PerDiem.Next() = 0;
     end;
 }
-

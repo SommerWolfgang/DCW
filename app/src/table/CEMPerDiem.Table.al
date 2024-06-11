@@ -12,39 +12,6 @@ table 6086387 "CEM Per Diem"
         field(2; "Continia User ID"; Code[50])
         {
             Caption = 'Continia User ID';
-            TableRelation = "CDC Continia User Setup";
-
-            trigger OnValidate()
-            var
-                UserDelegation: Record "CEM User Delegation";
-                EmptyGuid: Guid;
-            begin
-                if "Settlement No." <> '' then
-                    Error(CannotChangeWhenSttl, FieldCaption("Continia User ID"));
-
-                if "Continia User ID" = xRec."Continia User ID" then
-                    exit;
-
-                Validate("Reimbursement Method", GetReimbursMethodForRecUsr());
-
-                UserDelegation.VerifyUser("Continia User ID");
-
-                TestField(Status, Status::Open);
-
-                if xRec."Continia User ID" <> "Continia User ID" then begin
-                    CheckInboxAndThrowError();
-
-                    if "Per Diem GUID" <> EmptyGuid then
-                        "Per Diem GUID" := EmptyGuid;
-                end;
-
-                Validate("Per Diem Group Code");
-                SetDefaultPostingSetup();
-
-                CalcFields("Continia User Name");
-
-                AddDefaultDim(CurrFieldNo);
-            end;
         }
         field(3; "Continia User Name"; Text[50])
         {
@@ -65,28 +32,10 @@ table 6086387 "CEM Per Diem"
         {
             Caption = 'Departure Date/Time';
             NotBlank = true;
-
-            trigger OnValidate()
-            begin
-                TestStatusAllowsChange();
-                "Departure Date/Time" := RoundDateTime("Departure Date/Time", 60000L);
-                ValidateDates();
-                PerDiemValidate.Run(Rec);
-            end;
         }
         field(7; "Return Date/Time"; DateTime)
         {
             Caption = 'Return Date/Time';
-
-            trigger OnValidate()
-            begin
-                TestStatusAllowsChange();
-                "Return Date/Time" := RoundDateTime("Return Date/Time", 60000L);
-                ValidateDates();
-                "Posting Date" := DT2Date("Return Date/Time");
-
-                PerDiemValidate.Run(Rec);
-            end;
         }
         field(8; "Date Created"; Date)
         {
@@ -118,14 +67,6 @@ table 6086387 "CEM Per Diem"
             AutoFormatType = 1;
             CalcFormula = sum("CEM Per Diem Detail".Amount where("Per Diem Entry No." = field("Entry No.")));
             Caption = 'Amount';
-            Editable = false;
-            FieldClass = FlowField;
-        }
-        field(12; "Amount (LCY)"; Decimal)
-        {
-            AutoFormatType = 1;
-            CalcFormula = sum("CEM Per Diem Detail"."Amount (LCY)" where("Per Diem Entry No." = field("Entry No.")));
-            Caption = 'Amount (LCY)';
             Editable = false;
             FieldClass = FlowField;
         }
@@ -304,21 +245,6 @@ table 6086387 "CEM Per Diem"
         {
             Caption = 'Per Diem Group Code';
             TableRelation = "CEM Per Diem Group";
-
-            trigger OnValidate()
-            var
-                BankTransaction: Record "CEM Bank Transaction";
-                EMSetup: Record "CEM Expense Management Setup";
-                ExpenseType: Record "CEM Expense Type";
-                ExpPostingSetup: Record "CEM Posting Setup";
-            begin
-                AddDefaultDim(CurrFieldNo);
-
-                if Description = '' then
-                    Description := ExpenseType.Description;
-
-                SetDefaultPostingSetup();
-            end;
         }
         field(44; "Response from Dataloen"; Text[100])
         {
@@ -328,12 +254,6 @@ table 6086387 "CEM Per Diem"
         {
             Caption = 'Posted';
             Editable = false;
-
-            trigger OnValidate()
-            begin
-                "Posted Date/Time" := CurrentDateTime;
-                "Posted by User ID" := UserId;
-            end;
         }
         field(46; "Posted Date/Time"; DateTime)
         {
@@ -481,124 +401,19 @@ table 6086387 "CEM Per Diem"
 
     procedure SetSkipSendToExpUser(NewSkipSendToExpUser: Boolean)
     begin
-        SkipSendToExpUser := NewSkipSendToExpUser;
     end;
-
 
     procedure CheckUnProcessedInbox()
-    var
-        PerDiemInbox: Record "CEM Per Diem Inbox";
-        ReleaseNotificationEntry: Record "CEM Release Notification Entry";
-        UserDelegation: Record "CEM User Delegation";
-        NAVversionMgt: Codeunit "CEM NAV-version Mgt.";
-        TextMessage: Text[1024];
     begin
-        if UserDelegation.GetDelegationFilter() <> '' then
-            exit;
-
-        PerDiemInbox.SetFilter(Status, '<>%1', PerDiemInbox.Status::Accepted);
-        if not PerDiemInbox.IsEmpty then
-            TextMessage := StrSubstNo(OneOrMoreInboxError, PerDiemInbox.TableCaption);
-
-        if ReleaseNotificationEntry.CheckForUnprocessedEntries() then begin
-            if TextMessage <> '' then
-                TextMessage := TextMessage + '\\';
-            TextMessage := TextMessage + StrSubstNo(OneOrMoreInboxError, ReleaseNotificationEntry.TableCaption);
-        end;
-
-        if ReleaseNotificationEntry.CheckForUnprocessedHistEntries() then
-            NAVversionMgt.SendHistoryToCO(false);
-
-        if TextMessage <> '' then
-            Message(TextMessage + '\\' + ProcessInboxAsapTxt);
     end;
-
 
     procedure AddDefaultDim(ValidatedFieldNo: Integer)
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
     begin
-        if "Entry No." = 0 then
-            exit;
-
-        DeleteOldDefaultDim();
-
-        if ContiniaUser.Get("Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode() <> '' then
-                EMDimMgt.InsertDefaultDimPerDiem(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-            if ContiniaUser."Employee No." <> '' then;
-            EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-        end;
-
-        if "Job No." <> '' then
-            EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Job, "Job No.", Rec);
-
-        if "Job Task No." <> '' then
-            EMDimMgt.InsertDefaultDimPerDiem(DATABASE::"Job Task", "Job Task No.", Rec);
-
-        case ValidatedFieldNo of
-            FieldNo("Continia User ID"):
-                if ContiniaUser.Get("Continia User ID") then begin
-                    if ContiniaUser.GetSalesPurchCode() <> '' then
-                        EMDimMgt.InsertDefaultDimPerDiem(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-                    if ContiniaUser."Vendor No." <> '' then
-                        EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-                    if ContiniaUser."Employee No." <> '' then;
-                    EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-                end;
-
-            FieldNo("Job No."):
-                if "Job No." <> '' then
-                    EMDimMgt.InsertDefaultDimPerDiem(DATABASE::Job, "Job No.", Rec);
-
-            FieldNo("Job Task No."):
-                if "Job Task No." <> '' then
-                    EMDimMgt.InsertDefaultDimPerDiem(DATABASE::"Job Task", "Job Task No.", Rec);
-        end;
     end;
-
-    local procedure DeleteOldDefaultDim()
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
-    begin
-        if ContiniaUser.Get(xRec."Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode() <> '' then
-                EMDimMgt.DeleteDefaultDimPerDiem(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.DeleteDefaultDimPerDiem(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-            if ContiniaUser."Employee No." <> '' then;
-            EMDimMgt.DeleteDefaultDimPerDiem(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-        end;
-
-        if xRec."Job No." <> '' then
-            EMDimMgt.DeleteDefaultDimPerDiem(DATABASE::Job, xRec."Job No.", Rec);
-
-        if xRec."Job Task No." <> '' then
-            EMDimMgt.DeleteDefaultDimPerDiem(DATABASE::"Job Task", xRec."Job Task No.", Rec);
-    end;
-
 
     procedure SendToExpenseUser()
-    var
-        SendToExpUser: Codeunit "CEM Per Diem - Send to User";
     begin
-        if SkipSendToExpUser then
-            exit;
-
-        if Status = Status::"Pending Expense User" then
-            SendToExpUser.Update(Rec);
     end;
-
 
     procedure GetReimbursMethodForRecUsr(): Integer
     var
@@ -607,189 +422,38 @@ table 6086387 "CEM Per Diem"
         exit(DefaultUserSetup.GetPerDReimbursMethodForUser("Continia User ID"));
     end;
 
-
     procedure SetSuspendInboxCheck(NewSuspend: Boolean)
     begin
-        SuspendInboxCheck := NewSuspend;
     end;
-
 
     procedure GetOverviewDetails() AddInfo: Text[250]
-    var
-        CountryRegion: Record "CEM Country/Region";
-        PerDiemDetail: Record "CEM Per Diem Detail";
-        NoOfBreakfast: Integer;
-        NoOfDinner: Integer;
-        NoOfLunch: Integer;
     begin
-        if CountryRegion.Get("Destination Country/Region") then
-            AddTextTo(AddInfo, CountryRegion.Name);
-
-        PerDiemDetail.SetRange("Per Diem Entry No.", "Entry No.");
-        if PerDiemDetail.FindSet() then begin
-            repeat
-                if PerDiemDetail.Breakfast then
-                    NoOfBreakfast := NoOfBreakfast + 1;
-                if PerDiemDetail.Lunch then
-                    NoOfLunch := NoOfLunch + 1;
-                if PerDiemDetail.Dinner then
-                    NoOfDinner := NoOfDinner + 1;
-            until PerDiemDetail.Next() = 0;
-
-            AddTextTo(AddInfo, StrSubstNo('(%1:%2', PerDiemDetail.FieldCaption(Breakfast), NoOfBreakfast));
-            AddTextTo(AddInfo, StrSubstNo('%1:%2', PerDiemDetail.FieldCaption(Lunch), NoOfLunch));
-            AddTextTo(AddInfo, StrSubstNo('%1:%2)', PerDiemDetail.FieldCaption(Dinner), NoOfDinner));
-        end;
     end;
-
-    local procedure AddTextTo(var ReturnTxt: Text[250]; TxtToAdd: Text[250])
-    begin
-        if TxtToAdd = '' then
-            exit;
-
-        if (StrLen(TxtToAdd) + StrLen(ReturnTxt)) > MaxStrLen(ReturnTxt) then
-            exit;
-
-        if ReturnTxt = '' then
-            ReturnTxt := TxtToAdd
-        else
-            ReturnTxt := ReturnTxt + ',' + TxtToAdd;
-    end;
-
 
     procedure GetDepartureDate(): Date
     begin
         exit(DT2Date("Departure Date/Time"));
     end;
 
-
     procedure LookupDimensions(Editable: Boolean)
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        if PerDiem.Get("Entry No.") then
-            DrillDownDimensions(PAGE::"CEM Dimensions", Editable);
     end;
-
 
     procedure LookupExtraFields(Editable: Boolean)
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        if PerDiem.Get("Entry No.") then
-            DrillDownDimensions(PAGE::"CEM Extra Fields", Editable);
     end;
-
-    local procedure DrillDownDimensions(FormID: Integer; Editable: Boolean)
-    var
-        EMDim: Record "CEM Dimension";
-        TempEMDim: Record "CEM Dimension" temporary;
-        ExpDim: Page "CEM Dimensions";
-        ExpExtraFields: Page "CEM Extra Fields";
-    begin
-        EMDim.SetRange("Table ID", DATABASE::"CEM Per Diem");
-        EMDim.SetRange("Document Type", 0);
-        EMDim.SetRange("Document No.", '');
-        EMDim.SetRange("Doc. Ref. No.", "Entry No.");
-
-        if (not Posted) and StatusOrUserAllowsChange() and Editable then begin
-            if EMDim.FindSet() then
-                repeat
-                    TempEMDim := EMDim;
-                    TempEMDim.Insert();
-                until EMDim.Next() = 0;
-
-            TempEMDim.SetRange("Table ID", DATABASE::"CEM Per Diem");
-            TempEMDim.SetRange("Document Type", 0);
-            TempEMDim.SetRange("Document No.", '');
-            TempEMDim.SetRange("Doc. Ref. No.", "Entry No.");
-            PAGE.RunModal(FormID, TempEMDim);
-
-            if EMDim.EMDimUpdated(TempEMDim, DATABASE::"CEM Per Diem", 0, '', "Entry No.") then begin
-                EMDim.DeleteAll(true);
-
-                if TempEMDim.FindSet() then
-                    repeat
-                        EMDim := TempEMDim;
-                        EMDim.Insert(true);
-                    until TempEMDim.Next() = 0;
-
-                Get("Entry No.");
-                SendToExpenseUser();
-
-                CODEUNIT.Run(CODEUNIT::"CEM Per Diem-Validate", Rec);
-            end;
-        end else
-            case FormID of
-                PAGE::"CEM Dimensions":
-                    begin
-                        ExpDim.SetTableView(EMDim);
-                        ExpDim.SetReadOnly;
-                        ExpDim.RunModal;
-                    end;
-
-                PAGE::"CEM Extra Fields":
-                    begin
-                        ExpExtraFields.SetTableView(EMDim);
-                        ExpExtraFields.SetReadOnly;
-                        ExpExtraFields.RunModal;
-                    end;
-            end;
-    end;
-
 
     procedure IsSyncRequired(): Boolean
-    var
-        EMOnlineMgt: Codeunit "CEM Online Synch. Mgt.";
     begin
     end;
-
 
     procedure AttachPerDiemToSettlement(var PerDiem: Record "CEM Per Diem")
-    var
-        PerDiem2: Record "CEM Per Diem";
     begin
-        if PerDiem.Count = 0 then
-            Error(NoPerDiemInSelection);
-
-        PerDiem.FindFirst();
-
-        _ExpHeader.FilterGroup(4);
-        _ExpHeader.SetRange("Continia User ID", PerDiem."Continia User ID");
-        _ExpHeader.SetFilter(Status, '%1|%2', _ExpHeader.Status::Open, _ExpHeader.Status::"Pending Expense User");
-        _ExpHeader.FilterGroup(0);
-        if PAGE.RunModal(PAGE::"CEM Settlement List", _ExpHeader) = ACTION::LookupOK then
-            repeat
-                PerDiem.TestStatusAllowsChange();
-                PerDiem2.Get(PerDiem."Entry No.");
-                PerDiem2.Validate("Settlement No.", _ExpHeader."No.");
-                PerDiem2.Modify(true);
-            until PerDiem.Next() = 0;
     end;
-
 
     procedure DetachPerDiemFromSettlement(var PerDiem: Record "CEM Per Diem")
-    var
-        PerDiem2: Record "CEM Per Diem";
-        ConfirmText: Text[1024];
     begin
-        if PerDiem.Count = 0 then
-            Error(NoPerDiemInSelection);
-
-        if PerDiem.Count = 1 then
-            ConfirmText := ConfirmDetachPerDiemSingle
-        else
-            ConfirmText := StrSubstNo(ConfirmDetachPerDiemMultiple, PerDiem.Count);
-
-        if Confirm(ConfirmText) then
-            if PerDiem.FindSet() then
-                repeat
-                    PerDiem2.Get(PerDiem."Entry No.");
-                    PerDiem2.Validate("Settlement No.", '');
-                    PerDiem2.Modify(true);
-                until PerDiem.Next() = 0;
     end;
-
 
     procedure NextReminderDate(): Date
     var
@@ -820,132 +484,52 @@ table 6086387 "CEM Per Diem"
 
 
     procedure ShowReminders()
-    var
-        Reminders: Page "CEM Reminders";
     begin
-        Reminders.SetRecordFilter(DATABASE::"CEM Per Diem", 0, '', "Entry No.");
-        Reminders.RunModal;
     end;
-
 
     procedure Navigate()
-    var
-        NavigatePerDiem: Codeunit "CEM Navigate Per Diem - Find";
     begin
-        NavigatePerDiem.NavigatePerDiem(Rec);
     end;
-
 
     procedure LookupPerDiemDetails()
-    var
-        PerDiemDetails: Record "CEM Per Diem Detail";
-        PerDiemDetailsPage: Page "CEM Per Diem Details";
     begin
-        PerDiemDetails.SetRange("Per Diem Entry No.", "Entry No.");
-        PerDiemDetailsPage.SetTableView(PerDiemDetails);
-        PerDiemDetailsPage.SetRecord(PerDiemDetails);
-        if Rec.Posted then
-            PerDiemDetailsPage.Editable(false);
-
-        PerDiemDetailsPage.RunModal;
     end;
-
 
     procedure ShowPerDiem()
     begin
-        // Deprecated
-
-        if _ExpHeader.Get(_ExpHeader."Document Type"::Settlement, Rec."Settlement No.") then
-            if _ExpHeader.Posted then
-                PAGE.RunModal(PAGE::"CEM Posted Settlement Card", _ExpHeader)
-            else
-                PAGE.RunModal(PAGE::"CEM Settlement Card", _ExpHeader)
-        else
-            if Posted then
-                PAGE.RunModal(PAGE::"CEM Posted Per Diem Card", Rec)
-            else
-                PAGE.RunModal(PAGE::"CEM Per Diem Card", Rec);
     end;
-
 
     procedure FindPerDiemPostingGroup(PerDiemPostingGroupCode: Code[20]; DestinationCountryRegion: Code[20]; var PerDiemPostingGroup: Record "CEM Per Diem Posting Group")
     begin
-        Clear(PerDiemPostingGroup);
-        PerDiemPostingGroup.SetRange("Per Diem Group Code", PerDiemPostingGroupCode);
-        PerDiemPostingGroup.SetRange("Destination Country/Region", DestinationCountryRegion);
-        PerDiemPostingGroup.FindFirst();
     end;
-
 
     procedure GetPstSetupForAllowanceCode(PerDiem: Record "CEM Per Diem"; AllowanceCode: Code[20]; var PostingSetup: Record "CEM Posting Setup")
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
     begin
-        Clear(PostingSetup);
-        if AllowanceCode = '' then
-            exit;
-
-        ContiniaUserSetup.Get(PerDiem."Continia User ID");
-        PostingSetup.FindPostingSetup(DATABASE::"CEM Per Diem", AllowanceCode, PerDiem."Destination Country/Region",
-          ContiniaUserSetup."Continia User ID", ContiniaUserSetup."Expense User Group", true)
     end;
-
 
     procedure LookupComments()
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        EMCmtMgt.LookupComments(DATABASE::"CEM Per Diem", 0, '', "Entry No.");
     end;
-
 
     procedure ShowDetails()
-    var
-        PerDiemDetail: Record "CEM Per Diem Detail";
     begin
-        PerDiemDetail.SetRange(PerDiemDetail."Per Diem Entry No.", "Entry No.");
-        PAGE.Run(PAGE::"CEM Per Diem Details", PerDiemDetail);
     end;
-
 
     procedure OpenDocumentCard()
-    var
-        Settlement: Record "CEM Expense Header";
-        PerDiemCard: Page "CEM Per Diem Card";
-        PostedPerDiemCard: Page "CEM Posted Per Diem Card";
     begin
-        if Settlement.Get(Settlement."Document Type"::Settlement, "Settlement No.") then
-            Settlement.OpenDocumentCard
-        else
-            if Posted then begin
-                PostedPerDiemCard.SetRecord(Rec);
-                PostedPerDiemCard.LockToSpecificDocumentNo("Entry No.");
-                PostedPerDiemCard.Run;
-            end else begin
-                PerDiemCard.SetRecord(Rec);
-                PerDiemCard.LockToSpecificDocumentNo("Entry No.");
-                PerDiemCard.Run;
-            end;
     end;
-
 
     procedure SplitAndAllocate()
     begin
-        Error(SplitNotAllowdErr, TableCaption);
     end;
-
 
     procedure DrillDownAttendees()
     begin
-        Error(DrillDownNotAllowdErr, TableCaption);
     end;
-
 
     procedure ShowAttachments()
     begin
-        Error(AttachmentsNotAllowdErr, TableCaption);
     end;
-
 
     procedure PostingSetupUsesExternalAccNo() ExternalAccountUsed: Boolean
     var
@@ -970,49 +554,16 @@ table 6086387 "CEM Per Diem"
 
     procedure GetTableCaptionPlural(): Text[250]
     begin
-        exit(PerDiemsPlural);
     end;
-
 
     procedure GetRecordID(var RecID: RecordID)
-    var
-        RecRef: RecordRef;
     begin
-        RecRef.GetTable(Rec);
-        RecID := RecRef.RecordId;
-        RecRef.Close();
     end;
-
 
     procedure FindOverlapingPerdiemEntryNo(var EntryNo: Integer): Boolean
-    var
-        PerDiem: Record "CEM Per Diem";
     begin
-        PerDiem.Reset();
-        PerDiem.SetCurrentKey("Continia User ID", "Departure Date/Time");
-        PerDiem.SetRange("Continia User ID", "Continia User ID");
-        PerDiem.SetFilter("Entry No.", '<>%1', "Entry No.");
-        PerDiem.SetRange("Departure Date/Time", "Departure Date/Time", "Return Date/Time");
-        if PerDiem.FindFirst() then begin
-            EntryNo := PerDiem."Entry No.";
-            exit(true);
-        end;
-
-        PerDiem.SetRange("Departure Date/Time");
-        PerDiem.SetRange("Return Date/Time", "Departure Date/Time", "Return Date/Time");
-        if PerDiem.FindFirst() then begin
-            EntryNo := PerDiem."Entry No.";
-            exit(true);
-        end;
-
-        PerDiem.SetFilter("Departure Date/Time", '<=%1', "Return Date/Time");
-        PerDiem.SetFilter("Return Date/Time", '>=%1', "Return Date/Time");
-        if PerDiem.FindFirst() then begin
-            EntryNo := PerDiem."Entry No.";
-            exit(true);
-        end;
+        EntryNo := 0;
     end;
-
 
     procedure EmployeeReimbExpectedInBC(): Boolean
     begin
@@ -1022,7 +573,6 @@ table 6086387 "CEM Per Diem"
 
     procedure GetExternalDocNo(): Code[20]
     begin
-        exit(StrSubstNo('%1 %2', TableCaption, Format("Entry No.")));
     end;
 
 
@@ -1036,37 +586,8 @@ table 6086387 "CEM Per Diem"
 
 
     procedure ReopenPerDiems(var PerDiem: Record "CEM Per Diem")
-    var
-        PerDiem2: Record "CEM Per Diem";
-        PendingExpUserFound: Boolean;
-        Question: Text[1024];
     begin
-        // Do we have pending expense user records?
-        PerDiem.SetRange(Status, PerDiem.Status::"Pending Expense User");
-        PendingExpUserFound := not PerDiem.IsEmpty;
-        PerDiem.SetRange(Status);
-
-        if PerDiem.Count = 1 then begin
-            if PendingExpUserFound then
-                Question := ReopenSinglePendExpUsrQst
-            else
-                Question := ReopenSingleQst;
-        end else
-            if PendingExpUserFound then
-                Question := StrSubstNo(ReopenMultiplePendExpUsrQst, PerDiem.Count)
-            else
-                Question := StrSubstNo(ReopenMultipleQst, PerDiem.Count);
-
-        if not Confirm(Question, true) then
-            exit;
-
-        if PerDiem.FindSet(true, false) then
-            repeat
-                PerDiem2 := PerDiem;
-                CODEUNIT.Run(CODEUNIT::"CEM Per Diem - Complete", PerDiem2);
-            until PerDiem.Next() = 0;
     end;
-
 
     procedure StatusAllowsChange() Condition: Boolean
     begin
@@ -1075,76 +596,26 @@ table 6086387 "CEM Per Diem"
 
 
     procedure StatusOrUserAllowsChange() Condition: Boolean
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
     begin
-        Condition := StatusAllowsChange() or ContiniaUserSetup.CanEditApprovedDocuments(UserId);
     end;
-
 
     procedure TestStatusAllowsChange()
     begin
-        if not StatusAllowsChange() then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
-
 
     procedure TestStatusOrUserAllowsChange()
     begin
-        if not StatusOrUserAllowsChange() then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
-
 
     procedure ShouldHandleCASalesTax(): Boolean
-    var
-        SalesTaxInterface: Codeunit "CEM Sales Tax Interface";
     begin
-        // Control fields visibility inside EM
-        // In this way the users cannot add the irrelevant fields in other localizations
-        exit(SalesTaxInterface.ShouldHandleCASalesTax);
     end;
-
-    local procedure SetDefaultPostingSetup()
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
-        PerDiemPostingGroup: Record "CEM Per Diem Posting Group";
-        PostingSetup: Record "CEM Posting Setup";
-        AllowanceCodes: array[5] of Code[20];
-        i: Integer;
-    begin
-        if not ContiniaUserSetup.Get("Continia User ID") then
-            Clear(ContiniaUserSetup);
-
-        if "Tax Group Code" <> '' then
-            exit;
-
-        // Just take a default Tax Group Code.
-        if PerDiemPostingGroup.Get("Per Diem Group Code", Rec."Destination Country/Region") then begin
-            if PerDiemPostingGroup.LoadAllowanceInArrayAndCheck(AllowanceCodes) then
-                for i := 1 to ArrayLen(AllowanceCodes) do
-                    if AllowanceCodes[i] <> '' then begin
-                        PerDiemPostingGroup.GetAllowancePostingSetup("Continia User ID", AllowanceCodes[i], PostingSetup, true);
-                        if PostingSetup."Tax Group Code" <> '' then
-                            "Tax Group Code" := PostingSetup."Tax Group Code";
-                    end;
-        end;
-
-        PerDiemValidate.Run(Rec);
-    end;
-
 
     procedure NextApprover(): Code[50]
-    var
-        ApprovalMgt: Codeunit "CEM Approval Management";
     begin
-        exit(ApprovalMgt.GetNextApprover(DATABASE::"CEM Per Diem", Format("Entry No.")));
     end;
-
 
     procedure CurrentUserIsNextApprover(): Boolean
     begin
-        exit(UserId = NextApprover());
     end;
 }
-

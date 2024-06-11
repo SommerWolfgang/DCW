@@ -54,29 +54,6 @@ table 6086338 "CEM Mileage"
         {
             Caption = 'Total Distance';
             DecimalPlaces = 0 : 2;
-
-            trigger OnValidate()
-            var
-                MileageRate: Record "CEM Mileage Rate";
-                Vehicle: Record "CEM Vehicle";
-            begin
-                TestField("Registration Date");
-                TestStatusAllowsChange();
-
-                if "Vehicle Code" = '' then
-                    Validate("Vehicle Code", Vehicle.GetUserVehicle("Continia User ID"));
-
-                if xRec."Total Distance" <> "Total Distance" then
-                    if not (Status in [Status::Open, Status::"Pending Expense User"]) then
-                        Error(ModifyNotAllowed, FieldCaption(Status), GetStatusCaption(Status::Open), GetStatusCaption(Status::"Pending Expense User"));
-
-                if not HomeOfficeDistanceDeducted() then begin
-                    "Original Total Distance" := "Total Distance";
-                    DeductOfficeDistanceOrRevert(true);
-                end;
-
-                CalculateMileageDetails();
-            end;
         }
         field(11; "Amount (LCY)"; Decimal)
         {
@@ -156,22 +133,6 @@ table 6086338 "CEM Mileage"
             Caption = 'Posted';
             Editable = false;
 
-            trigger OnValidate()
-            var
-                MileageDetails: Record "CEM Mileage Detail";
-            begin
-                "Posted Date/Time" := CurrentDateTime;
-                "Posted by User ID" := UserId;
-
-                MileageDetails.SetRange("Mileage Entry No.", "Entry No.");
-                if MileageDetails.FindSet() then
-                    repeat
-                        MileageDetails.Posted := Posted;
-                        MileageDetails."Posted Date/Time" := "Posted Date/Time";
-                        MileageDetails."Posted by User ID" := "Posted by User ID";
-                        MileageDetails.Modify();
-                    until MileageDetails.Next() = 0;
-            end;
         }
         field(24; "Posted Date/Time"; DateTime)
         {
@@ -485,32 +446,6 @@ table 6086338 "CEM Mileage"
         }
     }
 
-    var
-        SkipSendToExpUser: Boolean;
-        SuspendInboxCheck: Boolean;
-        CannotChangeWhenSttl: Label '%1 cannot be changed when assigned to a settlement.';
-        ConfirmDetachMileageMultiple: Label 'Do you want to detach %1 mileage from this settlement?';
-        ConfirmDetachMileageSingle: Label 'Do you want to detach the mileage from this settlement?';
-        DelegateUpdateTxt: Label 'Updated by delegated user %1.';
-        EMInboxFoundErr: Label '%1 %2 cannot be updated as there are one or more unprocessed lines in the %3.\\Please process the related lines in the %3 before making changes to this %1.';
-        FileAlreadyExistErr: Label 'The file name ''%1'' already exists for this mileage and cannot be imported.\\Please rename it before importing.';
-        ModifyNotAllowed: Label '%1 must be %2 or %3.';
-        NoMilInSelection: Label 'Please select one or more mileage to detach.';
-        OneOrMoreInboxError: Label 'There are one or more unprocessed entries in the %1.';
-        ProcessInboxAsapTxt: Label '\\You should process these as soon as possible.';
-        RenameNotAllowed: Label 'You cannot rename a %1.';
-        ReopenMultiplePendExpUsrQst: Label 'This will reopen %1 mileage entries.\Reopening a document can discard user''s changes when the Mobile App doesn''t have internet connection.\\Are you sure you want to continue?';
-        ReopenMultipleQst: Label 'This will reopen %1 mileage entries.\Are you sure you want to continue?';
-        ReopenSinglePendExpUsrQst: Label 'Reopening a document can discard user''s changes when the Mobile App doesn''t have internet connection.\\Are you sure you want to continue?';
-        ReopenSingleQst: Label 'This will reopen this mileage entry.\Are you sure you want to continue?';
-        SettlementReleasedErr: Label 'The settlement cannot be released.';
-        SplitNotAllowdErr: Label 'Split and allocate is not supported for %1.';
-        StatusNotAllowed: Label 'Status must be Open or Pending Expense User in %1 %2.';
-        VehicleLimitTimedTxt: Label 'Your company policy defines a limit of %2 %3 per %4 for Vehicle %1.';
-        VehicleLimitTxt: Label 'Your company policy defines a limit of %2 %3 per document for Vehicle %1.';
-        WrongReimbursementMethod: Label '%1 should be %2 or %3, when %4 is used.';
-
-
     procedure NextReminderDate(): Date
     var
         EMReminder: Record "CEM Reminder";
@@ -523,12 +458,9 @@ table 6086338 "CEM Mileage"
     begin
     end;
 
-
     procedure SetSuspendInboxCheck(NewSuspend: Boolean)
     begin
-        SuspendInboxCheck := NewSuspend;
     end;
-
 
     procedure ExistsInInbox(): Boolean
     var
@@ -544,25 +476,15 @@ table 6086338 "CEM Mileage"
 
     procedure CheckInboxAndThrowError()
     begin
-        if not SuspendInboxCheck then
-            if ExistsInInbox() then
-                ThrowInboxError();
     end;
-
 
     procedure ThrowInboxError()
-    var
-        MileageInbox: Record "CEM Mileage Inbox";
     begin
-        Error(EMInboxFoundErr, TableCaption, "Entry No.", MileageInbox.TableCaption);
     end;
-
 
     procedure SetSkipSendToExpUser(NewSkipSendToExpUser: Boolean)
     begin
-        SkipSendToExpUser := NewSkipSendToExpUser;
     end;
-
 
     procedure AddDefaultDim(ValidatedFieldNo: Integer)
     begin
@@ -594,104 +516,17 @@ table 6086338 "CEM Mileage"
 
 
     procedure CheckUnProcessedInbox()
-    var
-        MileageInbox: Record "CEM Mileage Inbox";
-        ReleaseNotificationEntry: Record "CEM Release Notification Entry";
-        UserDelegation: Record "CEM User Delegation";
-        NAVversionMgt: Codeunit "CEM NAV-version Mgt.";
-        TextMessage: Text[1024];
     begin
-        if UserDelegation.GetDelegationFilter() <> '' then
-            exit;
-
-        MileageInbox.SetFilter(Status, '<>%1', MileageInbox.Status::Accepted);
-        if not MileageInbox.IsEmpty then
-            TextMessage := StrSubstNo(OneOrMoreInboxError, MileageInbox.TableCaption);
-
-        if ReleaseNotificationEntry.CheckForUnprocessedEntries() then begin
-            if TextMessage <> '' then
-                TextMessage := TextMessage + '\\';
-            TextMessage := TextMessage + StrSubstNo(OneOrMoreInboxError, ReleaseNotificationEntry.TableCaption);
-        end;
-
-        if ReleaseNotificationEntry.CheckForUnprocessedHistEntries() then
-            NAVversionMgt.SendHistoryToCO(false);
-
-        if TextMessage <> '' then
-            Message(TextMessage + ProcessInboxAsapTxt);
     end;
-
-    local procedure GetStatusCaption(StatusAsInt: Integer): Text[30]
-    var
-        Mileage: Record "CEM Mileage";
-    begin
-        Mileage.Status := StatusAsInt;
-        exit(Format(Mileage.Status));
-    end;
-
 
     procedure PostingSetupChanged(var NewCalculatedAccount: Code[20]): Boolean
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
-        ExpensePostingSetup: Record "CEM Posting Setup";
     begin
-        if "Mil. Account Manually Changed" then
-            exit(false);
-
-        if not ContiniaUserSetup.Get("Continia User ID") then
-            exit(false);
-
-        ExpensePostingSetup.FindPostingSetup(DATABASE::"CEM Mileage", "Vehicle Code", '', "Continia User ID",
-          ContiniaUserSetup."Expense User Group", false);
-        NewCalculatedAccount := ExpensePostingSetup."Posting Account No.";
-        exit("Mileage Account" <> NewCalculatedAccount);
+        NewCalculatedAccount := '';
     end;
-
-    local procedure SetAccount()
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
-        ExpPostingSetup: Record "CEM Posting Setup";
-    begin
-        if not ContiniaUserSetup.Get("Continia User ID") then
-            Clear(ContiniaUserSetup);
-
-        if ExpPostingSetup.FindPostingSetup(DATABASE::"CEM Mileage", "Vehicle Code", '', "Continia User ID",
-          ContiniaUserSetup."Expense User Group", false)
-        then begin
-            "Mileage Account Type" := ExpPostingSetup."Posting Account Type";
-            "Mileage Account" := ExpPostingSetup."Posting Account No.";
-            "External Posting Account Type" := ExpPostingSetup."External Posting Account Type";
-            "External Posting Account No." := ExpPostingSetup."External Posting Account No.";
-            "Gen. Prod. Posting Group" := ExpPostingSetup."Gen. Prod. Posting Group";
-            "VAT Prod. Posting Group" := ExpPostingSetup."VAT Prod. Posting Group";
-            "Gen. Bus. Posting Group" := ExpPostingSetup."Gen. Bus. Posting Group";
-            "VAT Bus. Posting Group" := ExpPostingSetup."VAT Bus. Posting Group";
-            "Tax Group Code" := ExpPostingSetup."Tax Group Code";
-        end else begin
-            Clear("Mileage Account Type");
-            Clear("Mileage Account");
-            Clear("External Posting Account Type");
-            Clear("External Posting Account No.");
-            Clear("Gen. Prod. Posting Group");
-            Clear("VAT Prod. Posting Group");
-            Clear("Gen. Bus. Posting Group");
-            Clear("VAT Bus. Posting Group");
-            Clear("Tax Group Code");
-        end;
-
-        "Mil. Account Manually Changed" := false;
-
-        MilValidate.Run(Rec);
-    end;
-
 
     procedure Navigate()
-    var
-        NavigateMileage: Codeunit "CEM Navigate Mileage - Find";
     begin
-        NavigateMileage.NavigateMileage(Rec);
     end;
-
 
     procedure GetEntryNo(): Integer
     var
@@ -702,18 +537,6 @@ table 6086338 "CEM Mileage"
         else
             exit(1);
     end;
-
-    local procedure InitMileage()
-    begin
-        if "Continia User ID" = '' then
-            "Continia User ID" := UserId;
-
-        if "Registration Date" = 0D then
-            "Registration Date" := WorkDate();
-
-        Validate("Reimbursement Method", GetReimbursMethodForRecUsr());
-    end;
-
 
     procedure MileageBetweenVarianceLimits(): Boolean
     var
@@ -731,94 +554,17 @@ table 6086338 "CEM Mileage"
         exit(("Total Distance" >= LowVarianceAllowed) and ("Total Distance" <= HighVarianceAllowed));
     end;
 
-
     procedure SendToExpenseUser()
-    var
-        SendToExpUser: Codeunit "CEM Mileage - Send to User";
     begin
-        if SkipSendToExpUser then
-            exit;
-
-        if Status = Status::"Pending Expense User" then
-            SendToExpUser.UpdateWithoutFiles(Rec);
     end;
-
 
     procedure LookupDimensions(Editable: Boolean)
-    var
-        Mileage: Record "CEM Mileage";
     begin
-        if Mileage.Get("Entry No.") then
-            DrillDownDimensions(PAGE::"CEM Dimensions", Editable);
     end;
-
 
     procedure LookupExtraFields(Editable: Boolean)
-    var
-        Mileage: Record "CEM Mileage";
     begin
-        if Mileage.Get("Entry No.") then
-            DrillDownDimensions(PAGE::"CEM Extra Fields", Editable);
     end;
-
-    local procedure DrillDownDimensions(FormID: Integer; Editable: Boolean)
-    var
-        EMDim: Record "CEM Dimension";
-        TempEMDim: Record "CEM Dimension" temporary;
-        ExpDim: Page "CEM Dimensions";
-        ExpExtraFields: Page "CEM Extra Fields";
-    begin
-        EMDim.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMDim.SetRange("Document Type", 0);
-        EMDim.SetRange("Document No.", '');
-        EMDim.SetRange("Doc. Ref. No.", "Entry No.");
-
-        if (not Posted) and StatusOrUserAllowsChange() and Editable then begin
-            if EMDim.FindSet() then
-                repeat
-                    TempEMDim := EMDim;
-                    TempEMDim.Insert();
-                until EMDim.Next() = 0;
-
-            TempEMDim.SetRange("Table ID", DATABASE::"CEM Mileage");
-            TempEMDim.SetRange("Document Type", 0);
-            TempEMDim.SetRange("Document No.", '');
-            TempEMDim.SetRange("Doc. Ref. No.", "Entry No.");
-
-            PAGE.RunModal(FormID, TempEMDim);
-
-            if EMDim.EMDimUpdated(TempEMDim, DATABASE::"CEM Mileage", 0, '', "Entry No.") then begin
-                EMDim.DeleteAll(true);
-
-                if TempEMDim.FindSet() then
-                    repeat
-                        EMDim := TempEMDim;
-                        EMDim.Insert(true);
-                    until TempEMDim.Next() = 0;
-
-                Get("Entry No.");
-                SendToExpenseUser();
-
-                CODEUNIT.Run(CODEUNIT::"CEM Mileage-Validate", Rec);
-            end;
-        end else
-            case FormID of
-                PAGE::"CEM Dimensions":
-                    begin
-                        ExpDim.SetTableView(EMDim);
-                        ExpDim.SetReadOnly;
-                        ExpDim.RunModal;
-                    end;
-
-                PAGE::"CEM Extra Fields":
-                    begin
-                        ExpExtraFields.SetTableView(EMDim);
-                        ExpExtraFields.SetReadOnly;
-                        ExpExtraFields.RunModal;
-                    end;
-            end;
-    end;
-
 
     procedure ShowAttachments()
     var
@@ -831,33 +577,9 @@ table 6086338 "CEM Mileage"
         PAGE.RunModal(0, EMAttachment);
     end;
 
-
     procedure GetOverviewDetails() AddInfo: Text[250]
     begin
-        if "From Address" <> '' then
-            AddTextTo(AddInfo, FieldCaption("From Address") + ': ' + "From Address");
-
-        if "To Address" <> '' then
-            AddTextTo(AddInfo, FieldCaption("To Address") + ': ' + "To Address");
-
-        if "No Refund" then
-            AddTextTo(AddInfo, FieldCaption("No Refund"));
     end;
-
-    local procedure AddTextTo(var ReturnTxt: Text[250]; TxtToAdd: Text[250])
-    begin
-        if TxtToAdd = '' then
-            exit;
-
-        if (StrLen(TxtToAdd) + StrLen(ReturnTxt)) > MaxStrLen(ReturnTxt) then
-            exit;
-
-        if ReturnTxt = '' then
-            ReturnTxt := TxtToAdd
-        else
-            ReturnTxt := ReturnTxt + ',' + TxtToAdd;
-    end;
-
 
     procedure GetNextDocumentLineNo() LineNo: Integer
     var
@@ -872,187 +594,50 @@ table 6086338 "CEM Mileage"
         exit(10000);
     end;
 
-
     procedure OpenDocumentCard()
-    var
-        Settlement: Record "CEM Expense Header";
-        MileageCard: Page "CEM Mileage Card";
-        PostedMileageCard: Page "CEM Posted Mileage Card";
     begin
-        if Settlement.Get(Settlement."Document Type"::Settlement, "Settlement No.") then
-            Settlement.OpenDocumentCard
-        else
-            if Posted then begin
-                PostedMileageCard.SetRecord(Rec);
-                PostedMileageCard.LockToSpecificDocumentNo("Entry No.");
-                PostedMileageCard.Run;
-            end else begin
-                MileageCard.SetRecord(Rec);
-                MileageCard.LockToSpecificDocumentNo("Entry No.");
-                MileageCard.Run;
-            end;
     end;
-
 
     procedure LookupComments()
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        EMCmtMgt.LookupComments(DATABASE::"CEM Mileage", 0, '', "Entry No.");
     end;
-
 
     procedure DetachMilFromSettlement(var Mileage: Record "CEM Mileage")
-    var
-        Mileage2: Record "CEM Mileage";
-        ConfirmText: Text[1024];
     begin
-        if Mileage.Count = 0 then
-            Error(NoMilInSelection);
-
-        if Mileage.Count = 1 then
-            ConfirmText := ConfirmDetachMileageSingle
-        else
-            ConfirmText := StrSubstNo(ConfirmDetachMileageMultiple, Mileage.Count);
-
-        if Confirm(ConfirmText) then
-            if Mileage.FindSet() then
-                repeat
-                    Mileage2.Get(Mileage."Entry No.");
-                    Mileage2.Validate("Settlement No.", '');
-                    Mileage2.Modify(true);
-                until Mileage.Next() = 0;
     end;
-
 
     procedure AttachMilToSettlement(var Mileage: Record "CEM Mileage")
-    var
-        ExpHeader: Record "CEM Expense Header";
-        Mileage2: Record "CEM Mileage";
     begin
-        if Mileage.Count = 0 then
-            Error(NoMilInSelection);
-
-        Mileage.FindFirst();
-
-        ExpHeader.FilterGroup(4);
-        ExpHeader.SetRange("Continia User ID", Mileage."Continia User ID");
-        ExpHeader.SetFilter(Status, '%1|%2', ExpHeader.Status::Open, ExpHeader.Status::"Pending Expense User");
-        ExpHeader.FilterGroup(0);
-        if PAGE.RunModal(PAGE::"CEM Settlement List", ExpHeader) = ACTION::LookupOK then
-            repeat
-                Mileage.TestStatusAllowsChange();
-                Mileage2.Get(Mileage."Entry No.");
-                Mileage2.Validate("Settlement No.", ExpHeader."No.");
-                Mileage2.Modify(true);
-            until Mileage.Next() = 0;
     end;
-
 
     procedure LookupExternalPostingAccount(var Text: Text[1024]): Boolean
-    var
-        DataloenIntegration: Codeunit "CEM Dataloen Integration";
-        LessorIntegration: Codeunit "CEM Lessor Integration";
     begin
-        TestField("External Posting Account Type");
-        case "External Posting Account Type" of
-            "External Posting Account Type"::"Lessor Pay Type":
-                exit(LessorIntegration.LookupPayType(Text));
-
-            "External Posting Account Type"::"Dataloen Pay Type":
-                exit(DataloenIntegration.LookupPayType(Text));
-        end;
+        Text := '';
     end;
-
 
     procedure GetEarliestDate(): Date
     begin
-        //BETWEEN DOCUMENT DATE AND DATE CREATED
-
-        if "Registration Date" = 0D then
-            exit("Date Created");
-
-        if "Date Created" = 0D then
-            exit("Registration Date");
-
-        if "Date Created" < "Registration Date" then
-            exit("Date Created")
-        else
-            exit("Registration Date");
     end;
-
 
     procedure DrillDownAttendees()
-    var
-        ExpAttendee: Record "CEM Attendee";
-        TempExpAttendee: Record "CEM Attendee" temporary;
-        MileageRate: Record "CEM Mileage Rate";
-        ExpAttendees: Page "CEM Mileage Attendees";
     begin
-        ExpAttendee.SetRange("Table ID", DATABASE::"CEM Mileage");
-        ExpAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-
-        if not Posted then begin
-            if ExpAttendee.FindSet() then
-                repeat
-                    TempExpAttendee := ExpAttendee;
-                    TempExpAttendee.Insert();
-                until ExpAttendee.Next() = 0;
-
-            TempExpAttendee.SetRange("Table ID", DATABASE::"CEM Mileage");
-            TempExpAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-            PAGE.RunModal(6086334, TempExpAttendee);
-            if TempExpAttendee.AttendeesUpdated(TempExpAttendee, "Entry No.", DATABASE::"CEM Mileage") then begin
-                ExpAttendee.DeleteAll();
-
-                if TempExpAttendee.FindSet() then
-                    repeat
-                        ExpAttendee := TempExpAttendee;
-                        ExpAttendee.Insert();
-                    until TempExpAttendee.Next() = 0;
-
-                Get("Entry No.");
-                SendToExpenseUser();
-
-                CODEUNIT.Run(CODEUNIT::"CEM Mileage-Validate", Rec);
-                CalculateMileageDetails();
-            end;
-        end else begin
-            ExpAttendees.SetTableView(ExpAttendee);
-            ExpAttendees.Editable := false;
-            ExpAttendees.RunModal;
-        end;
     end;
-
 
     procedure GetAttendeesForDisplay() DisplayTxt: Text[150]
-    var
-        ExpAttendee: Record "CEM Attendee";
     begin
-        exit(ExpAttendee.GetAttendeesForDisplay(DATABASE::"CEM Mileage", "Entry No."));
     end;
-
 
     procedure GetTableCaptionPlural(): Text[250]
     begin
-        exit(TableCaption);
     end;
-
 
     procedure SplitAndAllocate()
     begin
-        Error(SplitNotAllowdErr, TableCaption);
     end;
-
 
     procedure DroveInCompanyCar(): Boolean
-    var
-        Vehicle: Record "CEM Vehicle";
     begin
-        if Vehicle.Get("Vehicle Code") then
-            exit(Vehicle."Company Car");
     end;
-
 
     procedure CalculateMileageDetails()
     var
@@ -1081,8 +666,6 @@ table 6086338 "CEM Mileage"
         EMAttachment.SetRange("Document No.", '');
         EMAttachment.SetRange("Doc. Ref. No.", "Entry No.");
         EMAttachment.SetRange("File Name", TempFile.Name);
-        if not EMAttachment.IsEmpty then
-            Error(FileAlreadyExistErr, TempFile.Name);
 
         EMAttachment.SetRange("File Name");
 
@@ -1097,7 +680,6 @@ table 6086338 "CEM Mileage"
         EMAttachment.SetAttachment(TempFile, true);
         EMAttachment.ConvertToPagesAndStore();
 
-        MilValidate.Run(Rec);
     end;
 
 
@@ -1106,7 +688,6 @@ table 6086338 "CEM Mileage"
         MilDetail: Record "CEM Mileage Detail";
     begin
         MilDetail.SetRange(MilDetail."Mileage Entry No.", "Entry No.");
-        PAGE.Run(PAGE::"CEM Mileage Details", MilDetail);
     end;
 
 
@@ -1169,17 +750,6 @@ table 6086338 "CEM Mileage"
             GLSetup.Get();
             TimeSpecified := CompanyPolicy."Period of Time" <> CompanyPolicy."Period of Time"::" ";
 
-            // Limits on an Vehicle level
-            if (CompanyPolicy."Document Type" <> CompanyPolicy."Document Type"::" ") and
-              (CompanyPolicy."Document Account No." <> '') then begin
-                if TimeSpecified then
-                    CommentTxt := StrSubstNo(VehicleLimitTxt, "Vehicle Code", CompanyPolicy.Distance,
-                      Format(EMSetup."Distance Unit"), LowerCase(Format(CompanyPolicy."Period of Time")))
-                else
-                    CommentTxt := StrSubstNo(VehicleLimitTxt, "Vehicle Code", CompanyPolicy.Distance, Format(EMSetup."Distance Unit"));
-
-                exit(true);
-            end;
         end;
     end;
 
@@ -1243,7 +813,6 @@ table 6086338 "CEM Mileage"
         ContiniaUserSetup: Record "CDC Continia User Setup";
         EMSetup: Record "CEM Expense Management Setup";
         Vehicle: Record "CEM Vehicle";
-        Math: Codeunit "CEM Math";
     begin
         if not (Rec."From Home" or Rec."To Home") then
             exit;
@@ -1260,42 +829,12 @@ table 6086338 "CEM Mileage"
         if Vehicle."Company Car" then
             exit;
 
-        exit(Rec."Total Distance" = Math.Max(0, Rec."Original Total Distance" - ContiniaUserSetup."Distance from home to office"));
     end;
 
 
     procedure DeductOfficeDistanceOrRevert(SkipValidate: Boolean)
-    var
-        ContiniaUserSetup: Record "CDC Continia User Setup";
-        EMSetup: Record "CEM Expense Management Setup";
-        Vehicle: Record "CEM Vehicle";
-        Math: Codeunit "CEM Math";
     begin
-        EMSetup.Get();
-
-        if not EMSetup."Deduct home-office distance" then
-            exit;
-
-        if not ContiniaUserSetup.Get(Rec."Continia User ID") then
-            exit;
-
-        if not Vehicle.Get("Vehicle Code") then
-            exit;
-
-        if (Rec."From Home" or Rec."To Home") and (not Vehicle."Company Car") and (ContiniaUserSetup."Distance from home to office" > 0) then begin
-            if Rec."Total Distance" = Rec."Original Total Distance" then
-                if SkipValidate then
-                    Rec."Total Distance" := Math.Max(0, Rec."Original Total Distance" - ContiniaUserSetup."Distance from home to office")
-                else
-                    Rec.Validate("Total Distance", Math.Max(0, Rec."Original Total Distance" - ContiniaUserSetup."Distance from home to office"));
-        end else
-            if Rec."Total Distance" <> Rec."Original Total Distance" then
-                if SkipValidate then
-                    Rec."Total Distance" := Rec."Original Total Distance"
-                else
-                    Rec.Validate("Total Distance", Rec."Original Total Distance");
     end;
-
 
     procedure GetRefundableDistance() RefundableDistance: Decimal
     var
@@ -1355,16 +894,6 @@ table 6086338 "CEM Mileage"
         PendingExpUserFound := not Mileage.IsEmpty;
         Mileage.SetRange(Status);
 
-        if Mileage.Count = 1 then begin
-            if PendingExpUserFound then
-                Question := ReopenSinglePendExpUsrQst
-            else
-                Question := ReopenSingleQst;
-        end else
-            if PendingExpUserFound then
-                Question := StrSubstNo(ReopenMultiplePendExpUsrQst, Mileage.Count)
-            else
-                Question := StrSubstNo(ReopenMultipleQst, Mileage.Count);
 
         if not Confirm(Question, true) then
             exit;
@@ -1372,7 +901,6 @@ table 6086338 "CEM Mileage"
         if Mileage.FindSet(true, false) then
             repeat
                 Mileage2 := Mileage;
-                CODEUNIT.Run(CODEUNIT::"CEM Mileage - Complete", Mileage2);
             until Mileage.Next() = 0;
     end;
 
@@ -1393,33 +921,22 @@ table 6086338 "CEM Mileage"
 
     procedure TestStatusAllowsChange()
     begin
-        if not StatusAllowsChange() then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
 
 
     procedure TestStatusOrUserAllowsChange()
     begin
-        if not StatusOrUserAllowsChange() then
-            Error(StatusNotAllowed, TableCaption, "Entry No.");
     end;
 
 
     procedure ShouldHandleCASalesTax(): Boolean
     var
-        SalesTaxInterface: Codeunit "CEM Sales Tax Interface";
     begin
-        // Control fields visibility inside EM
-        // In this way the users cannot add the irrelevant fields in other localizations
-        exit(SalesTaxInterface.ShouldHandleCASalesTax);
     end;
 
 
     procedure NextApprover(): Code[50]
-    var
-        ApprovalMgt: Codeunit "CEM Approval Management";
     begin
-        exit(ApprovalMgt.GetNextApprover(DATABASE::"CEM Mileage", Format("Entry No.")));
     end;
 
 

@@ -89,35 +89,10 @@ table 6086390 "CEM Per Diem Inbox"
         field(26; "Settlement No."; Code[20])
         {
             Caption = 'Settlement No.';
-            TableRelation = "CEM Expense Header"."No." where("Document Type" = const(Settlement),
-                                                              "Continia User ID" = field("Continia User ID"));
-
-            trigger OnLookup()
-            var
-                Settlement: Record "CEM Expense Header";
-            begin
-            end;
-
-            trigger OnValidate()
-            var
-                ExpHeader: Record "CEM Expense Header";
-            begin
-            end;
         }
         field(28; "Per Diem Group Code"; Code[20])
         {
             Caption = 'Per Diem Group Code';
-            TableRelation = "CEM Per Diem Group";
-
-            trigger OnValidate()
-            var
-                ContiniaUserSetup: Record "CDC Continia User Setup";
-                BankTransaction: Record "CEM Bank Transaction";
-                EMSetup: Record "CEM Expense Management Setup";
-                ExpenseType: Record "CEM Expense Type";
-                ExpPostingSetup: Record "CEM Posting Setup";
-            begin
-            end;
         }
         field(29; "Per Diem Completed"; Boolean)
         {
@@ -161,11 +136,6 @@ table 6086390 "CEM Per Diem Inbox"
             Caption = 'Status';
             OptionCaption = 'Pending,Error,Accepted';
             OptionMembers = Pending,Error,Accepted;
-
-            trigger OnValidate()
-            begin
-                CheckChangeAndConfirm();
-            end;
         }
         field(39; "Updated By Delegation User"; Code[50])
         {
@@ -200,23 +170,9 @@ table 6086390 "CEM Per Diem Inbox"
         {
         }
     }
-
-    var
-        CannotModifyErr: Label 'You cannot modify %1 %2, because it is already accepted.';
-        CannotRenameErr: Label 'You cannot rename a %1.';
-        StatusChangeQst: Label 'Status changes will lead to version conflicts.\Do you want to continue?';
-
-
     procedure GetEntryNo(): Integer
-    var
-        PerDiemInbox: Record "CEM Per Diem Inbox";
     begin
-        if PerDiemInbox.FindLast() then
-            exit(PerDiemInbox."Entry No." + 1)
-        else
-            exit(1);
     end;
-
 
     procedure GetNoOfEntriesWithError(): Integer
     var
@@ -226,19 +182,4 @@ table 6086390 "CEM Per Diem Inbox"
         PerDiemInbox.SetRange(Status, PerDiemInbox.Status::Error);
         exit(PerDiemInbox.Count);
     end;
-
-    local procedure CheckChangeAndConfirm()
-    var
-        UserSetup: Record "CDC Continia User Setup";
-    begin
-        if not UserSetup.Get(UserId) then
-            Error('');
-
-        if not UserSetup."Approval Administrator" then
-            Error('');
-
-        if not Confirm(StatusChangeQst) then
-            Error('');
-    end;
 }
-

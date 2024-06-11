@@ -326,19 +326,7 @@ table 6086339 "CEM Expense Header"
     end;
 
     procedure GetPerDiemTotalLCY(): Decimal
-    var
-        PerDiem: Record "CEM Per Diem";
-        PerDiemLCY: Decimal;
     begin
-        PerDiem.SetCurrentKey("Settlement No.");
-        PerDiem.SetRange("Settlement No.", Rec."No.");
-        if PerDiem.FindSet() then
-            repeat
-                PerDiem.CalcFields("Amount (LCY)");
-                PerDiemLCY := PerDiemLCY + PerDiem."Amount (LCY)";
-            until PerDiem.Next() = 0;
-
-        exit(PerDiemLCY);
     end;
 
     procedure GetAmountLCY(): Decimal
