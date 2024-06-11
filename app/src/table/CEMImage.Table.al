@@ -1,7 +1,6 @@
 table 6086400 "CEM Image"
 {
     Caption = 'Image';
-    LookupPageID = "CEM Image List";
 
     fields
     {
@@ -19,12 +18,6 @@ table 6086400 "CEM Image"
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
-
-
     procedure InsertDefaultImages()
     var
         Image: Record "CEM Image";
@@ -36,7 +29,7 @@ table 6086400 "CEM Image"
                     Image.Description := '0' + Format(i)
                 else
                     Image.Description := Format(i);
-                Image.Insert;
+                Image.Insert();
             end;
     end;
 }

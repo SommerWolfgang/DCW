@@ -18,11 +18,11 @@ table 6085584 "CDC Data Translation"
         field(3; "Field Code"; Code[20])
         {
             Caption = 'Field Code';
-            TableRelation = IF (Type = CONST("Header Field")) "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                                                             Type = FIELD(Type))
-            ELSE
-            IF (Type = CONST("Line Field")) "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                                                                                                                                 Type = FIELD(Type));
+            TableRelation = if (Type = const("Header Field")) "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                                                             Type = field(Type))
+            else
+            if (Type = const("Line Field")) "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                                                                                                                                 Type = field(Type));
         }
         field(5; "Translate From"; Code[150])
         {
@@ -31,16 +31,16 @@ table 6085584 "CDC Data Translation"
         field(6; "Field Code / Formula"; Text[250])
         {
             Caption = 'Field Code / Formula';
-            TableRelation = "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                             Type = CONST(Header),
-                                                             "Data Type" = CONST(Number));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = const(Header),
+                                                             "Data Type" = const(Number));
             ValidateTableRelation = false;
         }
         field(10; "Field Description"; Text[50])
         {
-            CalcFormula = Lookup("CDC Template Field"."Field Name" WHERE("Template No." = FIELD("Template No."),
-                                                                          Type = FIELD(Type),
-                                                                          Code = FIELD("Field Code")));
+            CalcFormula = lookup("CDC Template Field"."Field Name" where("Template No." = field("Template No."),
+                                                                          Type = field(Type),
+                                                                          Code = field("Field Code")));
             Caption = 'Field Description';
             Editable = false;
             FieldClass = FlowField;
@@ -70,7 +70,7 @@ table 6085584 "CDC Data Translation"
         field(102; "Translate to UOM Code"; Code[10])
         {
             Caption = 'Translate to UOM Code';
-            TableRelation = IF ("Translate to Type" = CONST(Item)) "Item Unit of Measure".Code WHERE("Item No." = FIELD("Translate to No."));
+            TableRelation = if ("Translate to Type" = const(Item)) "Item Unit of Measure".Code where("Item No." = field("Translate to No."));
         }
         field(103; "Translate to (Text)"; Text[250])
         {
@@ -79,7 +79,7 @@ table 6085584 "CDC Data Translation"
         field(104; "Translate to Variant Code"; Code[10])
         {
             Caption = 'Translate to Variant Code';
-            TableRelation = "Item Variant".Code WHERE("Item No." = FIELD("Translate to No."));
+            TableRelation = "Item Variant".Code where("Item No." = field("Translate to No."));
         }
     }
 
@@ -97,7 +97,7 @@ table 6085584 "CDC Data Translation"
 
     trigger OnDelete()
     begin
-        DeleteDims;
+        DeleteDims();
     end;
 
     var
@@ -111,7 +111,7 @@ table 6085584 "CDC Data Translation"
     var
         i: Integer;
     begin
-        GetGLSetup;
+        GetGLSetup();
         for i := 1 to 8 do
             ShortcutDimCode[i] := GetDimValue(GLSetupShortcutDimCode[i]);
     end;
@@ -119,7 +119,7 @@ table 6085584 "CDC Data Translation"
     local procedure GetGLSetup()
     begin
         if not HasGotGLSetup then begin
-            GLSetup.Get;
+            GLSetup.Get();
             GLSetupShortcutDimCode[1] := GLSetup."Shortcut Dimension 1 Code";
             GLSetupShortcutDimCode[2] := GLSetup."Shortcut Dimension 2 Code";
             GLSetupShortcutDimCode[3] := GLSetup."Shortcut Dimension 3 Code";
@@ -160,7 +160,7 @@ table 6085584 "CDC Data Translation"
     var
         DataTranslDim: Record "CDC Data Translation Dimension";
     begin
-        GetGLSetup;
+        GetGLSetup();
 
         if ValueCode = '' then begin
             if DataTranslDim.Get("Template No.", Type, "Field Code", "Translate From", GLSetupShortcutDimCode[DimensionNo]) then

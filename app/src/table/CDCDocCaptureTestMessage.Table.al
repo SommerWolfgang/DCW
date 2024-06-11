@@ -41,7 +41,7 @@ table 6085755 "CDC Doc. Capture Test Message"
         TestMessage: Record "CDC Doc. Capture Test Message";
     begin
         TestMessage.SetRange("Test Type", "Test Type");
-        if TestMessage.FindLast then
+        if TestMessage.FindLast() then
             "Entry No." := TestMessage."Entry No." + 1
         else
             "Entry No." := 1;

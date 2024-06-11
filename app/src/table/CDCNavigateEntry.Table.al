@@ -7,7 +7,7 @@ table 6086014 "CDC Navigate Entry"
         field(1; "Table ID"; Integer)
         {
             Caption = 'Table ID';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type" = CONST (Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
         }
         field(2; "No. of Records"; Integer)
         {

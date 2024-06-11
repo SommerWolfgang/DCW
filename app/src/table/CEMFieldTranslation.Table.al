@@ -36,17 +36,17 @@ table 6086352 "CEM Field Translation"
 
     trigger OnDelete()
     begin
-        UpdateFieldType;
+        UpdateFieldType();
     end;
 
     trigger OnInsert()
     begin
-        UpdateFieldType;
+        UpdateFieldType();
     end;
 
     trigger OnModify()
     begin
-        UpdateFieldType;
+        UpdateFieldType();
     end;
 
     local procedure UpdateFieldType()
@@ -55,7 +55,7 @@ table 6086352 "CEM Field Translation"
     begin
         if FieldType.Get("Field Type Code") then begin
             FieldType."Last Update Date/Time" := CurrentDateTime;
-            FieldType.Modify;
+            FieldType.Modify();
         end;
     end;
 }

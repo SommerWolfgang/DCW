@@ -57,7 +57,7 @@ table 6086399 "CEM Assisted Setup"
             if not Confirm(RunSetupAgainQst, false, Name) then
                 exit;
 
-        Commit;
+        Commit();
         PAGE.RunModal("Page ID");
         OnUpdateAssistedSetupStatus(Rec);
     end;
@@ -76,8 +76,8 @@ table 6086399 "CEM Assisted Setup"
         AssisteSetup.Name := PageName;
         AssisteSetup.Order := OrderNo;
         AssisteSetup.Status := SetupStatus;
-        if not AssisteSetup.Insert then
-            AssisteSetup.Modify;
+        if not AssisteSetup.Insert() then
+            AssisteSetup.Modify();
     end;
 }
 

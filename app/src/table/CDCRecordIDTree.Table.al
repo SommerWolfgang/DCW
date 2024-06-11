@@ -88,7 +88,7 @@ table 6085763 "CDC Record ID Tree"
     var
         RecIDTree: Record "CDC Record ID Tree";
     begin
-        if RecIDTree.FindLast then
+        if RecIDTree.FindLast() then
             ID := RecIDTree.ID + 1
         else
             ID := 1;

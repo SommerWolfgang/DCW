@@ -81,7 +81,7 @@ table 6085730 "CDC Purch. Allocation Header"
             Caption = 'Shortcut Dimension 1 Code';
             CaptionClass = '1,2,1';
             Editable = false;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(19; "Shortcut Dimension 2 Code"; Code[20])
         {

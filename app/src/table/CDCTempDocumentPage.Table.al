@@ -60,18 +60,18 @@ table 6085599 "CDC Temp. Document Page"
         DocumentPage: Record "CDC Document Page";
         i: Integer;
     begin
-        Reset;
-        DeleteAll;
+        Reset();
+        DeleteAll();
         Document.SetCurrentKey("Document Category Code", Status);
         if DocCatCode <> '' then
             Document.SetRange("Document Category Code", DocCatCode);
         Document.SetRange(Status, Document.Status::Open);
         Document.SetFilter("File Type", StrSubstNo('%1|%2', Document."File Type"::XML, Document."File Type"::OCR));
-        if Document.FindSet then
+        if Document.FindSet() then
             repeat
                 "Display Document No." := Document."No.";
-                "Source ID" := Document.GetSourceID;
-                Name := Document.GetSourceName;
+                "Source ID" := Document.GetSourceID();
+                Name := Document.GetSourceName();
 
                 Document.CalcFields("No. of Pages");
                 for i := 1 to Document."No. of Pages" do begin
@@ -81,15 +81,15 @@ table 6085599 "CDC Temp. Document Page"
                     "Document Category Code" := Document."Document Category Code";
                     if DocumentPage.Get("Document No.", Page) then
                         "Original Filename" := CopyStr(DocumentPage."Original Filename", 1, MaxStrLen("Original Filename"));
-                    Insert;
+                    Insert();
                     "Display Document No." := '';
                 end;
-            until Document.Next = 0;
+            until Document.Next() = 0;
 
         if ("Entry No." <> 0) and (Page = 0) then
-            Delete;
+            Delete();
 
-        if FindFirst then;
+        if FindFirst() then;
     end;
 }
 

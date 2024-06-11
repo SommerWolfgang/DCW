@@ -23,13 +23,13 @@ table 6085594 "CDC Document Comment"
             Caption = 'Field Type';
             OptionCaption = 'Header,Line';
             OptionMembers = Header,Line;
-            TableRelation = "CDC Template Field".Type WHERE("Template No." = FIELD("Template No."));
+            TableRelation = "CDC Template Field".Type where("Template No." = field("Template No."));
         }
         field(5; "Field Code"; Code[20])
         {
             Caption = 'Field Code';
-            TableRelation = "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                             Type = FIELD("Field Type"));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = field("Field Type"));
         }
         field(6; "Line No."; Integer)
         {

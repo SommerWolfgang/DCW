@@ -43,16 +43,16 @@ table 6085757 "CDC Record Barcode"
         RecBarcode: Record "CDC Record Barcode";
         NoSeriesMgt: Codeunit NoSeriesManagement;
     begin
-        RecBarcode.LockTable;
-        if RecBarcode.FindLast then
+        RecBarcode.LockTable();
+        if RecBarcode.FindLast() then
             "Entry No." := RecBarcode."Entry No." + 1
         else
             "Entry No." := 1;
 
         if Barcode = '' then begin
-            DCSetup.Get;
+            DCSetup.Get();
             DCSetup.TestField("Barcode Nos.");
-            NoSeriesMgt.InitSeries(DCSetup."Barcode Nos.", DCSetup."Barcode Nos.", WorkDate, Barcode, DCSetup."Barcode Nos.");
+            NoSeriesMgt.InitSeries(DCSetup."Barcode Nos.", DCSetup."Barcode Nos.", WorkDate(), Barcode, DCSetup."Barcode Nos.");
         end;
     end;
 

@@ -61,7 +61,7 @@ table 6086301 "CEM Synchronization Log"
     var
         SynchronizationLog: Record "CEM Synchronization Log";
     begin
-        SynchronizationLog."Entry No." := GetLastEntryNo;
+        SynchronizationLog."Entry No." := GetLastEntryNo();
         SynchronizationLog.Insert(true);
         exit(SynchronizationLog."Entry No.");
     end;
@@ -84,7 +84,7 @@ table 6086301 "CEM Synchronization Log"
     begin
         SynchronizationLog.Get(EntryNo);
         SynchronizationLog."End CO Synch. Date/Time" := CurrentDateTime;
-        SynchronizationLog.Modify;
+        SynchronizationLog.Modify();
     end;
 
 
@@ -94,7 +94,7 @@ table 6086301 "CEM Synchronization Log"
     begin
         if SynchronizationLog.Get(EntryNo) then begin
             SynchronizationLog."End Date/Time" := CurrentDateTime;
-            SynchronizationLog.Modify;
+            SynchronizationLog.Modify();
         end;
     end;
 
@@ -104,7 +104,7 @@ table 6086301 "CEM Synchronization Log"
         SynchronizationLog: Record "CEM Synchronization Log";
     begin
         if EntryNo = 0 then begin
-            SynchronizationLog."Entry No." := GetLastEntryNo;
+            SynchronizationLog."Entry No." := GetLastEntryNo();
             SynchronizationLog."Field Synch." := true;
             SynchronizationLog."End Date/Time" := CurrentDateTime;
             SynchronizationLog.Insert(true);
@@ -119,7 +119,7 @@ table 6086301 "CEM Synchronization Log"
     begin
         SynchronizationLog.SetCurrentKey("Field Synch.");
         SynchronizationLog.SetRange("Field Synch.", true);
-        if SynchronizationLog.FindLast then
+        if SynchronizationLog.FindLast() then
             exit(SynchronizationLog."Start Date/Time");
     end;
 
@@ -127,7 +127,7 @@ table 6086301 "CEM Synchronization Log"
     var
         SynchronizationLog: Record "CEM Synchronization Log";
     begin
-        if SynchronizationLog.FindLast then
+        if SynchronizationLog.FindLast() then
             exit(SynchronizationLog."Entry No." + 1)
         else
             exit(1);

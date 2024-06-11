@@ -21,9 +21,9 @@ table 6086362 "CEM Dimension Inbox"
         field(4; "Doc. Ref. No."; Integer)
         {
             Caption = 'Doc. Ref. No.';
-            TableRelation = IF ("Table ID" = CONST(6086323)) "CEM Expense Inbox"
-            ELSE
-            IF ("Table ID" = CONST(6086353)) "CEM Mileage Inbox";
+            TableRelation = if ("Table ID" = const(6086323)) "CEM Expense Inbox"
+            else
+            if ("Table ID" = const(6086353)) "CEM Mileage Inbox";
         }
         field(10; "Dimension Code"; Code[20])
         {
@@ -35,7 +35,7 @@ table 6086362 "CEM Dimension Inbox"
         {
             Caption = 'Dimension Value Code';
             NotBlank = true;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
             ValidateTableRelation = false;
         }
         field(12; "Field Code"; Code[20])
@@ -47,7 +47,7 @@ table 6086362 "CEM Dimension Inbox"
         field(13; "Field Value"; Text[250])
         {
             Caption = 'Field Value';
-            TableRelation = "CEM Lookup Value".Code WHERE("Field Type Code" = FIELD("Field Code"));
+            TableRelation = "CEM Lookup Value".Code where("Field Type Code" = field("Field Code"));
             ValidateTableRelation = false;
         }
     }
@@ -66,22 +66,22 @@ table 6086362 "CEM Dimension Inbox"
 
     trigger OnDelete()
     begin
-        TestStatusOpen;
-        ClearError;
+        TestStatusOpen();
+        ClearError();
         UpdateRecordGlobalDimValue("Table ID", "Document Type", "Document No.", "Doc. Ref. No.", "Dimension Code", '');
     end;
 
     trigger OnInsert()
     begin
-        TestStatusOpen;
-        ClearError;
+        TestStatusOpen();
+        ClearError();
         UpdateRecordGlobalDimValue("Table ID", "Document Type", "Document No.", "Doc. Ref. No.", "Dimension Code", "Dimension Value Code");
     end;
 
     trigger OnModify()
     begin
-        TestStatusOpen;
-        ClearError;
+        TestStatusOpen();
+        ClearError();
         UpdateRecordGlobalDimValue("Table ID", "Document Type", "Document No.", "Doc. Ref. No.", "Dimension Code", "Dimension Value Code");
     end;
 
@@ -139,7 +139,7 @@ table 6086362 "CEM Dimension Inbox"
                     ExpenseInbox.Get("Doc. Ref. No.");
                     if ExpenseInbox.Status = ExpenseInbox.Status::Error then begin
                         ExpenseInbox.Status := ExpenseInbox.Status::Pending;
-                        ExpenseInbox.Modify;
+                        ExpenseInbox.Modify();
                     end;
                 end;
 
@@ -148,7 +148,7 @@ table 6086362 "CEM Dimension Inbox"
                     MileageInbox.Get("Doc. Ref. No.");
                     if MileageInbox.Status = MileageInbox.Status::Error then begin
                         MileageInbox.Status := MileageInbox.Status::Pending;
-                        MileageInbox.Modify;
+                        MileageInbox.Modify();
                     end;
                 end;
 
@@ -157,7 +157,7 @@ table 6086362 "CEM Dimension Inbox"
                     PerDiemInbox.Get("Doc. Ref. No.");
                     if PerDiemInbox.Status = PerDiemInbox.Status::Error then begin
                         PerDiemInbox.Status := PerDiemInbox.Status::Pending;
-                        PerDiemInbox.Modify;
+                        PerDiemInbox.Modify();
                     end;
                 end;
 
@@ -166,7 +166,7 @@ table 6086362 "CEM Dimension Inbox"
                     ExpHeaderInbox.Get("Doc. Ref. No.");
                     if ExpHeaderInbox.Status = ExpHeaderInbox.Status::Error then begin
                         ExpHeaderInbox.Status := ExpHeaderInbox.Status::Pending;
-                        ExpHeaderInbox.Modify;
+                        ExpHeaderInbox.Modify();
                     end;
                 end;
         end;
@@ -177,19 +177,19 @@ table 6086362 "CEM Dimension Inbox"
     var
         xEMDimInbox: Record "CEM Dimension Inbox";
     begin
-        EMDimInbox.Reset;
+        EMDimInbox.Reset();
         EMDimInbox.SetRange("Table ID", TableID);
         EMDimInbox.SetRange("Document Type", DocType);
         EMDimInbox.SetRange("Document No.", DocNo);
         EMDimInbox.SetRange("Doc. Ref. No.", DocRefNo);
 
-        xEMDimInbox.Reset;
+        xEMDimInbox.Reset();
         xEMDimInbox.SetRange("Table ID", TableID);
         xEMDimInbox.SetRange("Document Type", DocType);
         xEMDimInbox.SetRange("Document No.", DocNo);
         xEMDimInbox.SetRange("Doc. Ref. No.", DocRefNo);
 
-        if EMDimInbox.FindSet then
+        if EMDimInbox.FindSet() then
             repeat
                 if not xEMDimInbox.Get(TableID, DocType, DocNo, DocRefNo, EMDimInbox."Dimension Code", EMDimInbox."Field Code") then
                     exit(true);
@@ -198,13 +198,13 @@ table 6086362 "CEM Dimension Inbox"
                    (EMDimInbox."Field Value" <> xEMDimInbox."Field Value")
                 then
                     exit(true);
-            until EMDimInbox.Next = 0;
+            until EMDimInbox.Next() = 0;
 
-        if xEMDimInbox.FindSet then
+        if xEMDimInbox.FindSet() then
             repeat
                 if not EMDimInbox.Get(TableID, DocType, DocNo, DocRefNo, xEMDimInbox."Dimension Code", xEMDimInbox."Field Code") then
                     exit(true);
-            until xEMDimInbox.Next = 0;
+            until xEMDimInbox.Next() = 0;
     end;
 
     local procedure UpdateRecordGlobalDimValue(TableID: Integer; DocumentType: Integer; DocumentNo: Code[20]; DocRefNo: Integer; DimCode: Code[20]; DimValCode: Code[20])
@@ -216,7 +216,7 @@ table 6086362 "CEM Dimension Inbox"
         PerDiemInbox: Record "CEM Per Diem Inbox";
         GLSetup: Record "General Ledger Setup";
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         if not (DimCode in [GLSetup."Global Dimension 1 Code", GLSetup."Global Dimension 2 Code"]) then
             exit;
 
@@ -228,7 +228,7 @@ table 6086362 "CEM Dimension Inbox"
                         ExpInbox."Global Dimension 1 Code" := DimValCode;
                     if DimCode = GLSetup."Global Dimension 2 Code" then
                         ExpInbox."Global Dimension 2 Code" := DimValCode;
-                    ExpInbox.Modify;
+                    ExpInbox.Modify();
                 end;
 
             DATABASE::"CEM Mileage Inbox":
@@ -238,7 +238,7 @@ table 6086362 "CEM Dimension Inbox"
                         MilInbox."Global Dimension 1 Code" := DimValCode;
                     if DimCode = GLSetup."Global Dimension 2 Code" then
                         MilInbox."Global Dimension 2 Code" := DimValCode;
-                    MilInbox.Modify;
+                    MilInbox.Modify();
                 end;
 
             DATABASE::"CEM Per Diem Inbox":
@@ -248,7 +248,7 @@ table 6086362 "CEM Dimension Inbox"
                         PerDiemInbox."Global Dimension 1 Code" := DimValCode;
                     if DimCode = GLSetup."Global Dimension 2 Code" then
                         PerDiemInbox."Global Dimension 2 Code" := DimValCode;
-                    PerDiemInbox.Modify;
+                    PerDiemInbox.Modify();
                 end;
 
             DATABASE::"CEM Expense Header Inbox":
@@ -258,7 +258,7 @@ table 6086362 "CEM Dimension Inbox"
                         ExpHeaderInbox."Global Dimension 1 Code" := DimValCode;
                     if DimCode = GLSetup."Global Dimension 2 Code" then
                         ExpHeaderInbox."Global Dimension 2 Code" := DimValCode;
-                    ExpHeaderInbox.Modify;
+                    ExpHeaderInbox.Modify();
                 end;
 
             DATABASE::"CEM Expense Allocation Inbox":
@@ -268,7 +268,7 @@ table 6086362 "CEM Dimension Inbox"
                         ExpAllocInbox."Global Dimension 1 Code" := DimValCode;
                     if DimCode = GLSetup."Global Dimension 2 Code" then
                         ExpAllocInbox."Global Dimension 2 Code" := DimValCode;
-                    ExpAllocInbox.Modify;
+                    ExpAllocInbox.Modify();
                 end;
         end;
     end;

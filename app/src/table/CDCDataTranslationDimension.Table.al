@@ -19,15 +19,15 @@ table 6085586 "CDC Data Translation Dimension"
         {
             Caption = 'Field Code';
             NotBlank = true;
-            TableRelation = "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                             Type = FIELD("Field Type"));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = field("Field Type"));
         }
         field(4; "Translate From"; Code[150])
         {
             Caption = 'Translate From';
-            TableRelation = "CDC Data Translation"."Translate From" WHERE("Template No." = FIELD("Template No."),
-                                                                           Type = FIELD("Field Type"),
-                                                                           "Field Code" = FIELD("Field Code"));
+            TableRelation = "CDC Data Translation"."Translate From" where("Template No." = field("Template No."),
+                                                                           Type = field("Field Type"),
+                                                                           "Field Code" = field("Field Code"));
         }
         field(5; "Dimension Code"; Code[20])
         {
@@ -39,7 +39,7 @@ table 6085586 "CDC Data Translation Dimension"
         {
             Caption = 'Dimension Value Code';
             NotBlank = true;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
         }
     }
 

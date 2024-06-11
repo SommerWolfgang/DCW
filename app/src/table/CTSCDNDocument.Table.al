@@ -107,21 +107,21 @@ table 6086229 "CTS-CDN Document"
         }
         field(41; "Network Profile Desc"; Text[250])
         {
-            CalcFormula = Lookup("CTS-CDN Network Profile".Description WHERE("System ID" = FIELD("Network Profile ID")));
+            CalcFormula = lookup("CTS-CDN Network Profile".Description where("System ID" = field("Network Profile ID")));
             Caption = 'Network Profile';
             Editable = false;
             FieldClass = FlowField;
         }
         field(42; "Receiver Scheme ID"; Text[50])
         {
-            CalcFormula = Lookup("CTS-CDN Participation ID Type"."Scheme ID" WHERE("System ID" = FIELD("Receiver ID Type ID")));
+            CalcFormula = lookup("CTS-CDN Participation ID Type"."Scheme ID" where("System ID" = field("Receiver ID Type ID")));
             Caption = 'Receiver Type ID';
             Editable = false;
             FieldClass = FlowField;
         }
         field(43; "Sender Scheme ID"; Text[50])
         {
-            CalcFormula = Lookup("CTS-CDN Participation ID Type"."Scheme ID" WHERE("System ID" = FIELD("Sender ID Type ID")));
+            CalcFormula = lookup("CTS-CDN Participation ID Type"."Scheme ID" where("System ID" = field("Sender ID Type ID")));
             Caption = 'Sender Type ID';
             Editable = false;
             FieldClass = FlowField;
@@ -152,19 +152,13 @@ table 6086229 "CTS-CDN Document"
     procedure FindDocumentByGUID(CDNGUID: Guid): Boolean
     begin
         SetRange("CDN GUID", CDNGUID);
-        exit(FindFirst);
+        exit(FindFirst());
     end;
 
 
-    procedure SetElectronicXmlDoc(var XmlDoc: Codeunit "CSC XML Document")
-    var
-        WriteStream: OutStream;
-    begin
-        Clear("XML File");
-        "XML File".CreateOutStream(WriteStream);
-        XmlDoc.SaveToStream(WriteStream);
-    end;
-
+    // procedure SetElectronicXmlDoc(var XmlDoc: Codeunit "CSC XML Document")
+    // begin
+    // end;
 
     procedure GetParticipProfileRelationId(): Guid
     var
@@ -174,7 +168,7 @@ table 6086229 "CTS-CDN Document"
         CDNParticipProfileRel.SetRange("Participation Identifier Type", "Sender ID Type ID");
         CDNParticipProfileRel.SetRange("Participation Identifier Value", "Sender ID Value");
         CDNParticipProfileRel.SetRange("Profile System ID", "Network Profile ID");
-        CDNParticipProfileRel.FindFirst;
+        CDNParticipProfileRel.FindFirst();
         exit(CDNParticipProfileRel."CDN GUID");
     end;
 
@@ -193,32 +187,19 @@ table 6086229 "CTS-CDN Document"
     begin
         Rec.CalcFields("XML File");
         if not Rec."XML File".HasValue then
-            DownloadXmlFileFromUrl;
+            DownloadXmlFileFromUrl();
 
         Rec."XML File".CreateInStream(ReadStream);
     end;
 
 
     procedure DownloadXmlFileFromUrl()
-    var
-        CDNFileMgt: Codeunit "CTS-CDN File Management";
-        WriteStream: OutStream;
-        BaseUrl: Text[1024];
-    begin
-        Rec."XML File".CreateOutStream(WriteStream);
-        CDNFileMgt.DownloadToStream(Rec."XML File Base Url" + Rec."XML File Token", WriteStream);
-        Rec.Modify(true);
-    end;
-
-    local procedure GetTransportXMLFromUrl()
     begin
     end;
 
     procedure GetGUIDAsText(): Text[36]
     begin
-        exit(DelChr(Rec."CDN GUID", '<>', '{}'))
     end;
-
 
     procedure ValidateCDNStatus(CDNStatusEnum: Text[1024])
     begin
@@ -247,15 +228,7 @@ table 6086229 "CTS-CDN Document"
 
 
     procedure OpenXmlFile()
-    var
-        TempBlob: Record "CSC Temp Blob" temporary;
-        CDNFileMgt: Codeunit "CTS-CDN File Management";
-        Success: Boolean;
     begin
-        TempBlob.Init;
-        Rec.CalcFields("XML File");
-        TempBlob.Blob := Rec."XML File";
-        CDNFileMgt.SaveFileWithDialog(TempBlob, GetGUIDAsText + '.xml', 'Download', 'File (*.xml)|*.xml', Success);
     end;
 
     procedure GetNetworkProfileDesc(): Text[250]
@@ -269,7 +242,6 @@ table 6086229 "CTS-CDN Document"
 
     procedure GetGUIDFilename(): Text[1024]
     begin
-        exit(StrSubstNo('%1.xml', GetGUIDAsText));
     end;
 
 
@@ -283,7 +255,7 @@ table 6086229 "CTS-CDN Document"
 
         SetRange("Source Record ID", RecId);
         SetRange(Direction, Direction::Outgoing);
-        exit(FindLast);
+        exit(FindLast());
     end;
 }
 

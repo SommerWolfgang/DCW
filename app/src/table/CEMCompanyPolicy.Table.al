@@ -12,11 +12,11 @@ table 6086403 "CEM Company Policy"
         field(2; "Document Account No."; Code[20])
         {
             Caption = 'Document Account No.';
-            TableRelation = IF ("Document Type" = CONST(Expense)) "CEM Expense Type"
-            ELSE
-            IF ("Document Type" = CONST(Mileage)) "CEM Vehicle"
-            ELSE
-            IF ("Document Type" = CONST("Per Diem")) "CEM Allowance";
+            TableRelation = if ("Document Type" = const(Expense)) "CEM Expense Type"
+            else
+            if ("Document Type" = const(Mileage)) "CEM Vehicle"
+            else
+            if ("Document Type" = const("Per Diem")) "CEM Allowance";
         }
         field(3; "User Type"; Option)
         {
@@ -27,9 +27,9 @@ table 6086403 "CEM Company Policy"
         {
             Caption = 'User Code';
             NotBlank = true;
-            TableRelation = IF ("User Type" = CONST(User)) "CDC Continia User Setup"
-            ELSE
-            IF ("User Type" = CONST("User Group")) "CEM Expense User Group";
+            TableRelation = if ("User Type" = const(User)) "CDC Continia User Setup"
+            else
+            if ("User Type" = const("User Group")) "CEM Expense User Group";
         }
         field(5; "Action"; Option)
         {
@@ -195,21 +195,21 @@ table 6086403 "CEM Company Policy"
     begin
         LimitSetup.SetRange("User Type", LimitSetup."User Type"::User);
         LimitSetup.SetRange("User Code", ContiniaUserID);
-        if LimitSetup.FindSet then
+        if LimitSetup.FindSet() then
             repeat
                 LimitSetupTemp.Copy(LimitSetup);
-                LimitSetupTemp.Insert;
-            until LimitSetup.Next = 0;
+                LimitSetupTemp.Insert();
+            until LimitSetup.Next() = 0;
 
         // Find Limit Setup on a User Group level but do not overwrite
         if ContiniaUserSetup.Get(ContiniaUserID) then begin
             LimitSetup.SetRange("User Type", LimitSetup."User Type"::"User Group");
             LimitSetup.SetRange("User Code", ContiniaUserSetup."Expense User Group");
-            if LimitSetup.FindSet then
+            if LimitSetup.FindSet() then
                 repeat
                     LimitSetupTemp.Copy(LimitSetup);
-                    if not LimitSetupTemp.Insert then; // If the limit already exists, do not alter it.
-                until LimitSetup.Next = 0;
+                    if not LimitSetupTemp.Insert() then; // If the limit already exists, do not alter it.
+                until LimitSetup.Next() = 0;
         end;
     end;
 

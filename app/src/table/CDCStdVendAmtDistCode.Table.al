@@ -17,14 +17,14 @@ table 6085777 "CDC Std. Vend. Amt. Dist. Code"
         }
         field(3; "Vendor Name"; Text[100])
         {
-            CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD("Vendor No.")));
+            CalcFormula = lookup(Vendor.Name where("No." = field("Vendor No.")));
             Caption = 'Vendor Name';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "Amount Distribution Desc."; Text[50])
         {
-            CalcFormula = Lookup("CDC Std. Amt Distribution Code".Description WHERE(Code = FIELD("Amount Distribution Code")));
+            CalcFormula = lookup("CDC Std. Amt Distribution Code".Description where(Code = field("Amount Distribution Code")));
             Caption = 'Amount Distribution Description';
             Editable = false;
             FieldClass = FlowField;

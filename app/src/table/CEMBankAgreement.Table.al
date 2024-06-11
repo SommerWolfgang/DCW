@@ -17,7 +17,7 @@ table 6086315 "CEM Bank Agreement"
         }
         field(3; "Bank Name"; Text[30])
         {
-            CalcFormula = Lookup("CEM Bank".Name WHERE(Code = FIELD("Bank Code")));
+            CalcFormula = lookup("CEM Bank".Name where(Code = field("Bank Code")));
             Caption = 'Bank Name';
             Editable = false;
             FieldClass = FlowField;
@@ -25,7 +25,7 @@ table 6086315 "CEM Bank Agreement"
         field(20; "Country/Region Code"; Code[10])
         {
             Caption = 'Country/Region Code';
-            TableRelation = "CEM Bank"."Country/Region Code" WHERE(Code = FIELD("Bank Code"));
+            TableRelation = "CEM Bank"."Country/Region Code" where(Code = field("Bank Code"));
         }
         field(30; "Activation Status"; Option)
         {

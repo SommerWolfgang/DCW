@@ -57,31 +57,31 @@ table 6086314 "CEM Bank"
         BankCurrencyMap.SetRange("Bank Code", Code);
         BankCurrencyMap.SetRange("Bank Country/Region Code", "Country/Region Code");
 
-        if BankCurrencyMap.FindFirst then
+        if BankCurrencyMap.FindFirst() then
             repeat
                 BankCurrencyMapTemp := BankCurrencyMap;
-                BankCurrencyMapTemp.Insert;
-            until BankCurrencyMap.Next = 0;
+                BankCurrencyMapTemp.Insert();
+            until BankCurrencyMap.Next() = 0;
 
         BankTransInbox.SetCurrentKey("Bank Code", "Bank Country/Region", Status);
         BankTransInbox.SetRange("Bank Code", Code);
         BankTransInbox.SetRange("Bank Country/Region", "Country/Region Code");
         BankTransInbox.SetFilter(Status, '%1|%2', BankTransInbox.Status::Pending, BankTransInbox.Status::Error);
-        if BankTransInbox.FindFirst then
+        if BankTransInbox.FindFirst() then
             repeat
                 if not BankCurrencyMapTemp.Get(BankTransInbox."Bank Code",
                   BankTransInbox."Bank Country/Region", BankTransInbox."Currency Code")
                 then begin
-                    BankCurrencyMapTemp.Init;
+                    BankCurrencyMapTemp.Init();
                     BankCurrencyMapTemp."Bank Code" := BankTransInbox."Bank Code";
                     BankCurrencyMapTemp."Bank Country/Region Code" := BankTransInbox."Bank Country/Region";
                     BankCurrencyMapTemp."Currency Code (Bank)" := BankTransInbox."Currency Code";
 
                     if Currency.Get(BankTransInbox."Currency Code") then
                         BankCurrencyMapTemp."Currency Code (NAV)" := BankTransInbox."Currency Code";
-                    BankCurrencyMapTemp.Insert;
+                    BankCurrencyMapTemp.Insert();
                 end;
-            until BankTransInbox.Next = 0;
+            until BankTransInbox.Next() = 0;
 
         BankCurrencyMapTemp.SetRange("Bank Code", Code);
         BankCurrencyMapTemp.SetRange("Bank Country/Region Code", "Country/Region Code");
@@ -89,13 +89,13 @@ table 6086314 "CEM Bank"
 
         BankCurrencyMap.DeleteAll(true);
 
-        if BankCurrencyMapTemp.FindFirst then
+        if BankCurrencyMapTemp.FindFirst() then
             repeat
                 if BankCurrencyMapTemp."Currency Code (Bank)" <> BankCurrencyMapTemp."Currency Code (NAV)" then begin
                     BankCurrencyMap := BankCurrencyMapTemp;
-                    BankCurrencyMap.Insert;
+                    BankCurrencyMap.Insert();
                 end;
-            until BankCurrencyMapTemp.Next = 0;
+            until BankCurrencyMapTemp.Next() = 0;
     end;
 
 
@@ -108,22 +108,22 @@ table 6086314 "CEM Bank"
     begin
         BankCountryRegionMap.SetRange("Bank Code", Code);
         BankCountryRegionMap.SetRange("Bank Country/Region Code", "Country/Region Code");
-        if BankCountryRegionMap.FindFirst then
+        if BankCountryRegionMap.FindFirst() then
             repeat
                 BankCountryRegionMapTemp := BankCountryRegionMap;
-                BankCountryRegionMapTemp.Insert;
-            until BankCountryRegionMap.Next = 0;
+                BankCountryRegionMapTemp.Insert();
+            until BankCountryRegionMap.Next() = 0;
 
         BankTransInbox.SetCurrentKey("Bank Code", "Bank Country/Region", Status);
         BankTransInbox.SetRange("Bank Code", Code);
         BankTransInbox.SetRange("Bank Country/Region", "Country/Region Code");
         BankTransInbox.SetFilter(Status, '%1|%2', BankTransInbox.Status::Pending, BankTransInbox.Status::Error);
-        if BankTransInbox.FindFirst then
+        if BankTransInbox.FindFirst() then
             repeat
                 if not BankCountryRegionMapTemp.Get(BankTransInbox."Bank Code",
                    BankTransInbox."Bank Country/Region", BankTransInbox."Business Country/Region")
                 then begin
-                    BankCountryRegionMapTemp.Init;
+                    BankCountryRegionMapTemp.Init();
                     BankCountryRegionMapTemp."Bank Code" := BankTransInbox."Bank Code";
                     BankCountryRegionMapTemp."Bank Country/Region Code" := BankTransInbox."Bank Country/Region";
                     BankCountryRegionMapTemp."Country/Region Code (Bank)" := BankTransInbox."Business Country/Region";
@@ -131,9 +131,9 @@ table 6086314 "CEM Bank"
                     if StrLen(BankTransInbox."Business Country/Region") <= 10 then
                         if CountryRegion.Get(BankTransInbox."Business Country/Region") then
                             BankCountryRegionMapTemp."Country/Region Code (NAV)" := CountryRegion.Code;
-                    BankCountryRegionMapTemp.Insert;
+                    BankCountryRegionMapTemp.Insert();
                 end;
-            until BankTransInbox.Next = 0;
+            until BankTransInbox.Next() = 0;
 
         BankCountryRegionMapTemp.SetRange("Bank Code", Code);
         BankCountryRegionMapTemp.SetRange("Bank Country/Region Code", "Country/Region Code");
@@ -141,13 +141,13 @@ table 6086314 "CEM Bank"
 
         BankCountryRegionMap.DeleteAll(true);
 
-        if BankCountryRegionMapTemp.FindFirst then
+        if BankCountryRegionMapTemp.FindFirst() then
             repeat
                 if BankCountryRegionMapTemp."Country/Region Code (Bank)" <> BankCountryRegionMapTemp."Country/Region Code (NAV)" then begin
                     BankCountryRegionMap := BankCountryRegionMapTemp;
-                    BankCountryRegionMap.Insert;
+                    BankCountryRegionMap.Insert();
                 end;
-            until BankCountryRegionMapTemp.Next = 0;
+            until BankCountryRegionMapTemp.Next() = 0;
     end;
 }
 

@@ -81,55 +81,34 @@ table 6086222 "CTS-CDN Network Profile"
 
 
     procedure FindNetworkProfile(NetworkName: Text[30]; ProcessIdentifier: Text[250]; DocumentIdentifier: Text[250])
-    var
-        Core: Codeunit "CSC Core";
-        EmptyGUID: Guid;
     begin
-        SetRange("Network Name", NetworkName);
-        SetRange("Process Identifier", ProcessIdentifier);
-        SetRange("Document Identifier", DocumentIdentifier);
-        if not Core.IsDemo then
-            SetFilter("CDN GUID", '<>%1', EmptyGUID);
-        FindFirst;
     end;
-
 
     procedure GetDocumentRootNamespaceUrl() RootNamespaceUrl: Text[1024]
     begin
-        RootNamespaceUrl := CopyStr("Document Identifier", 1, StrPos("Document Identifier", '::') - 1);
     end;
-
 
     procedure GetDocumentRootNodeName() RootNodeName: Text[1024]
     begin
-        RootNodeName := CopyStr("Document Identifier", StrPos("Document Identifier", '::') + 2);
-        RootNodeName := CopyStr(RootNodeName, 1, StrPos(RootNodeName, '##') - 1);
     end;
-
 
     procedure GetDocumentCustomizationId() CustomizationId: Text[1024]
     begin
-        CustomizationId := CopyStr("Document Identifier", StrPos("Document Identifier", '##') + 2);
-        CustomizationId := CopyStr(CustomizationId, 1, StrPos(CustomizationId, '::') - 1);
     end;
-
 
     procedure GetDocumentVersion() Version: Text[1024]
     begin
-        Version := CopyStr("Document Identifier", StrPos("Document Identifier", '##') + 2);
-        Version := CopyStr(Version, StrPos(Version, '::') + 2);
     end;
 
     procedure IsInvoice(): Boolean
     begin
-        if LowerCase(GetDocumentRootNodeName) = 'invoice' then
+        if LowerCase(GetDocumentRootNodeName()) = 'invoice' then
             exit(true);
     end;
 
     procedure IsCreditNote(): Boolean
     begin
-        if LowerCase(GetDocumentRootNodeName) = 'creditnote' then
+        if LowerCase(GetDocumentRootNodeName()) = 'creditnote' then
             exit(true);
     end;
 }
-

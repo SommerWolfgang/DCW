@@ -41,12 +41,12 @@ table 6086408 "CEM Transaction Template Rules"
     var
         TemplateRules: Record "CEM Transaction Template Rules";
     begin
-        if RuleRequiresTxt then
+        if RuleRequiresTxt() then
             TestField(Text);
 
         if "Rule No." = 0 then begin
             TemplateRules.SetRange("Template Code", "Template Code");
-            if TemplateRules.FindLast then
+            if TemplateRules.FindLast() then
                 "Rule No." := TemplateRules."Rule No." + 1
             else
                 "Rule No." := 1;
@@ -57,7 +57,7 @@ table 6086408 "CEM Transaction Template Rules"
     var
         TemplateRules: Record "CEM Transaction Template Rules";
     begin
-        if RuleRequiresTxt then
+        if RuleRequiresTxt() then
             TestField(Text);
     end;
 

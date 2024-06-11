@@ -46,7 +46,7 @@ table 6086230 "CTS-CDN XML Export Namespace"
 
     procedure AddNamespace(NamespaceName: Text[1024]; NamespaceUri: Text[1024])
     begin
-        Init;
+        Init();
 
         if NamespaceName = '' then
             Validate(XMLNS, true)

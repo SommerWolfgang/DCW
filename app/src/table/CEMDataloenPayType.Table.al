@@ -1,7 +1,6 @@
 table 6086343 "CEM Dataloen Pay Type"
 {
     Caption = 'Dataloen Pay Type';
-    LookupPageID = "CEM Dataloen Pay Types";
 
     fields
     {
@@ -24,9 +23,4 @@ table 6086343 "CEM Dataloen Pay Type"
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
 }
-

@@ -8,7 +8,7 @@ table 6086344 "CEM Credit Card User Mapping"
         field(2; "Card No."; Code[20])
         {
             Caption = 'Card No.';
-            TableRelation = "CEM Continia User Credit Card"."Card No." WHERE("Continia User ID" = FIELD("Continia User ID"));
+            TableRelation = "CEM Continia User Credit Card"."Card No." where("Continia User ID" = field("Continia User ID"));
         }
         field(3; "Continia User ID"; Code[50])
         {
@@ -18,7 +18,7 @@ table 6086344 "CEM Credit Card User Mapping"
         field(4; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = "CEM Credit Card Mapping"."Field No." WHERE("Field No." = FIELD("Field No."));
+            TableRelation = "CEM Credit Card Mapping"."Field No." where("Field No." = field("Field No."));
 
             trigger OnValidate()
             var
@@ -34,8 +34,8 @@ table 6086344 "CEM Credit Card User Mapping"
         }
         field(6; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = CONST(6086330),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = const(6086330),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -71,15 +71,15 @@ table 6086344 "CEM Credit Card User Mapping"
         if CardMappingFields < 2 then
             exit;
 
-        if ContiniaUserCreditCard.FindSet then
+        if ContiniaUserCreditCard.FindSet() then
             repeat
                 CreditCardUserMapping.SetRange("Card No.", ContiniaUserCreditCard."Card No.");
                 CreditCardUserMapping.SetRange("Continia User ID", ContiniaUserCreditCard."Continia User ID");
                 CreditCardFields := CreditCardUserMapping.Count;
 
                 if (CreditCardFields > 0) and (CreditCardFields <> CardMappingFields) then
-                    Error(CreditCardMappingNotConsistent, CreditCardMapping.GetListOfAllRequiredFields);
-            until ContiniaUserCreditCard.Next = 0;
+                    Error(CreditCardMappingNotConsistent, CreditCardMapping.GetListOfAllRequiredFields());
+            until ContiniaUserCreditCard.Next() = 0;
     end;
 }
 

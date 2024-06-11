@@ -31,7 +31,7 @@ table 6085754 "CDC Document Capture Test"
         field(9; "No. of Messages"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count ("CDC Doc. Capture Test Message" WHERE ("Test Type" = FIELD (Type)));
+            CalcFormula = count("CDC Doc. Capture Test Message" where("Test Type" = field(Type)));
             Caption = 'No. of Messages';
             Editable = false;
             FieldClass = FlowField;

@@ -43,7 +43,7 @@ table 6086409 "CEM Data Formats"
     var
         TempDateFormats: Record "CEM Data Formats" temporary;
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
 
         CreateDateLookupValue(Rec, 'yyyy-MM-dd', '2020-06-03', '');
         CreateDateLookupValue(Rec, 'yy-MM-dd', '20-06-03', '');
@@ -75,7 +75,7 @@ table 6086409 "CEM Data Formats"
 
         CreateDateLookupValue(Rec, 'M/d/yyyy', '6/3/20', '');
 
-        Rec.FindFirst; // Set point to first value
+        Rec.FindFirst(); // Set point to first value
     end;
 
     local procedure CreateDateLookupValue(var TempDateFormats: Record "CEM Data Formats" temporary; Pattern: Text[30]; Example: Text[30]; "Code": Text[10])
@@ -84,7 +84,7 @@ table 6086409 "CEM Data Formats"
         Rec.Pattern := Pattern;
         Rec.Example := Example;
         Rec.Code := Code;
-        Rec.Insert;
+        Rec.Insert();
     end;
 
 
@@ -93,7 +93,7 @@ table 6086409 "CEM Data Formats"
         TempDecimalFormats: Record "CEM Data Formats" temporary;
         Apostrophe: Char;
     begin
-        Rec.DeleteAll;
+        Rec.DeleteAll();
 
         Apostrophe := 39;
 
@@ -115,7 +115,7 @@ table 6086409 "CEM Data Formats"
         CreateDecimalLookupValue(Rec, 'es-ES', 'Spanish (Spain)', '1.234,56');
         CreateDecimalLookupValue(Rec, 'sv-SE', 'Swedish (Sweden)', '1.234,56');
 
-        Rec.FindFirst; // Set point to first value
+        Rec.FindFirst(); // Set point to first value
     end;
 
     local procedure CreateDecimalLookupValue(var TempDecimalFormats: Record "CEM Data Formats" temporary; "Code": Text; Description: Text; Example: Text)
@@ -125,7 +125,7 @@ table 6086409 "CEM Data Formats"
         Rec.Description := Description;
         Rec.Example := Example;
 
-        Rec.Insert;
+        Rec.Insert();
     end;
 }
 

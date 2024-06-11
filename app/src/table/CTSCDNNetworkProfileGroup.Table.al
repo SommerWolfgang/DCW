@@ -22,8 +22,8 @@ table 6086223 "CTS-CDN Network Profile Group"
         }
         field(5; "No. of Profiles"; Integer)
         {
-            CalcFormula = Count("CTS-CDN Network Profile" WHERE("Network Name" = FIELD("Network Name"),
-                                                                 "Network Profile Group Code" = FIELD(Code)));
+            CalcFormula = count("CTS-CDN Network Profile" where("Network Name" = field("Network Name"),
+                                                                 "Network Profile Group Code" = field(Code)));
             Caption = 'No. of Network Profiles';
             Editable = false;
             FieldClass = FlowField;

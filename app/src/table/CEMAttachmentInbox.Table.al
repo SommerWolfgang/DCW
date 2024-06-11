@@ -24,9 +24,9 @@ table 6086363 "CEM Attachment Inbox"
         field(4; "Doc. Ref. No."; Integer)
         {
             Caption = 'Doc. Ref. No.';
-            TableRelation = IF ("Table ID" = CONST(6086323)) "CEM Expense Inbox"
-            ELSE
-            IF ("Table ID" = CONST(6086353)) "CEM Mileage Inbox";
+            TableRelation = if ("Table ID" = const(6086323)) "CEM Expense Inbox"
+            else
+            if ("Table ID" = const(6086353)) "CEM Mileage Inbox";
         }
         field(10; "Entry No."; Integer)
         {
@@ -78,7 +78,7 @@ table 6086363 "CEM Attachment Inbox"
     begin
         if "Table ID" = DATABASE::"CEM Expense" then begin
             GetAttachmentServerFile(TempFile);
-            TempFile.DeleteFile;
+            TempFile.DeleteFile();
         end;
     end;
 
@@ -90,12 +90,12 @@ table 6086363 "CEM Attachment Inbox"
         EMAttachmentInbox.SetRange("Document Type", "Document Type");
         EMAttachmentInbox.SetRange("Document No.", "Document No.");
         EMAttachmentInbox.SetRange("Doc. Ref. No.", "Doc. Ref. No.");
-        if EMAttachmentInbox.FindLast then
+        if EMAttachmentInbox.FindLast() then
             "Entry No." := EMAttachmentInbox."Entry No." + 1
         else
             "Entry No." := 1;
 
-        "Attachment GUID" := CreateGuid;
+        "Attachment GUID" := CreateGuid();
     end;
 
     var
@@ -140,11 +140,11 @@ table 6086363 "CEM Attachment Inbox"
     var
         TempFile: Record "CDC Temp File" temporary;
     begin
-        if InboxAccepted then
+        if InboxAccepted() then
             Error(FileMove);
 
         if GetAttachmentServerFile(TempFile) then
-            TempFile.Open;
+            TempFile.Open();
     end;
 
 

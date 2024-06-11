@@ -24,24 +24,10 @@ table 12032000 "DC - Setup"
         field(4; "Font Family"; Text[30])
         {
             Caption = 'Font Family';
-
-            trigger OnLookup()
-            var
-                DocumentConfigMng: Codeunit "DC - Management";
-            begin
-                DocumentConfigMng.SelectFont("Font Family", "Font Size");
-            end;
         }
         field(5; "Font Size"; Integer)
         {
             Caption = 'Font Size';
-
-            trigger OnLookup()
-            var
-                DocumentConfigMng: Codeunit "DC - Management";
-            begin
-                DocumentConfigMng.SelectFont("Font Family", "Font Size");
-            end;
         }
         field(6; "Max Pages per Document"; Integer)
         {

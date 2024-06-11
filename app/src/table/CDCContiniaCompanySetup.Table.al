@@ -31,15 +31,15 @@ table 6192773 "CDC Continia Company Setup"
             var
                 ContiniaUserSetup: Record "CDC Continia User Setup";
             begin
-                Modify;
+                Modify();
 
                 if (xRec."Web Portal Code" <> '') and ("Web Portal Code" = '') then begin
                     ContiniaUserSetup.SetRange("Approval Client", ContiniaUserSetup."Approval Client"::"Continia Web Approval Portal");
                     if ContiniaUserSetup.FindSet(true, false) then
                         repeat
                             ContiniaUserSetup.SetApprovalClient(true);
-                            ContiniaUserSetup.Modify;
-                        until ContiniaUserSetup.Next = 0;
+                            ContiniaUserSetup.Modify();
+                        until ContiniaUserSetup.Next() = 0;
                 end;
             end;
         }

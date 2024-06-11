@@ -9,19 +9,6 @@ table 6086405 "CEM Field Type Dependency"
             Caption = 'Field Type Code';
             TableRelation = "CEM Field Type";
 
-            trigger OnLookup()
-            var
-                LookupValue: Code[20];
-            begin
-                LookupValue := LookupFieldType(false);
-                if LookupValue <> '' then
-                    "Field Type Code" := LookupValue;
-            end;
-
-            trigger OnValidate()
-            begin
-                Validate(Condition, Condition::"Has any value");
-            end;
         }
         field(11; Condition; Option)
         {
@@ -42,7 +29,7 @@ table 6086405 "CEM Field Type Dependency"
         field(12; Value; Code[50])
         {
             Caption = 'Value';
-            TableRelation = "CEM Lookup Value".Code WHERE("Field Type Code" = FIELD("Field Type Code"));
+            TableRelation = "CEM Lookup Value".Code where("Field Type Code" = field("Field Type Code"));
 
             trigger OnValidate()
             begin
@@ -53,21 +40,6 @@ table 6086405 "CEM Field Type Dependency"
         field(20; "Reference Field Type Code"; Code[20])
         {
             Caption = 'Reference Field Type Code';
-            TableRelation = "CEM Field Type";
-
-            trigger OnLookup()
-            var
-                LookupValue: Code[20];
-            begin
-                LookupValue := LookupFieldType(true);
-                if LookupValue <> '' then
-                    "Reference Field Type Code" := LookupValue;
-            end;
-
-            trigger OnValidate()
-            begin
-                Validate(Expectation, Expectation::"Must have a value");
-            end;
         }
         field(21; Expectation; Option)
         {
@@ -89,7 +61,7 @@ table 6086405 "CEM Field Type Dependency"
         field(22; "Expected Value"; Code[50])
         {
             Caption = 'Expected Value';
-            TableRelation = "CEM Lookup Value".Code WHERE("Field Type Code" = FIELD("Reference Field Type Code"));
+            TableRelation = "CEM Lookup Value".Code where("Field Type Code" = field("Reference Field Type Code"));
 
             trigger OnValidate()
             begin
@@ -178,18 +150,18 @@ table 6086405 "CEM Field Type Dependency"
         FieldTypeDependency: Record "CEM Field Type Dependency";
     begin
         SuccessStatus := true;
-        if FieldTypeDependency.FindSet then
+        if FieldTypeDependency.FindSet() then
             repeat
                 FieldDependencySecondCheck(FieldTypeDependency);
                 IterativelyBuildConflictingSet(FieldTypeDependency);
                 IterativelyBuildDependencySet(FieldTypeDependency);
-                FieldTypeDependency.Modify;
+                FieldTypeDependency.Modify();
 
                 if FieldTypeDependency.Disabled then
                     AddKeyToFilter(ErrorCollector, FieldTypeDependency."Field Type Code");
 
                 SuccessStatus := SuccessStatus and not FieldTypeDependency.Disabled;
-            until (FieldTypeDependency.Next = 0);
+            until (FieldTypeDependency.Next() = 0);
 
         ConvertFilterToList(ErrorCollector);
     end;
@@ -209,7 +181,7 @@ table 6086405 "CEM Field Type Dependency"
         Clear(DetectedConflictMessage);
 
         FieldTypeDependency.SetRange(Disabled, true);
-        if FieldTypeDependency.FindFirst then begin
+        if FieldTypeDependency.FindFirst() then begin
             DetectedConflictMessage := FieldTypeDependency."Detected Conflicts";
             exit(true);
         end;
@@ -374,7 +346,7 @@ table 6086405 "CEM Field Type Dependency"
             exit;
 
         LookupValueAccess.SetRange("Field Type Code", FieldTypeDependency."Reference Field Type Code");
-        if LookupValueAccess.FindFirst then
+        if LookupValueAccess.FindFirst() then
             repeat
                 if RestrictedAccessDetected(
                   FieldTypeDependency."Reference Field Type Code",
@@ -386,7 +358,7 @@ table 6086405 "CEM Field Type Dependency"
                         AddKeyToFilter(ListOfGroups, LookupValueAccess.Code)
                     else
                         AddKeyToFilter(ListOfUsers, LookupValueAccess.Code);
-            until LookupValueAccess.Next = 0;
+            until LookupValueAccess.Next() = 0;
 
         if ListOfUsers <> '' then begin
             FieldTypeDependency.Disabled := true;
@@ -456,9 +428,9 @@ table 6086405 "CEM Field Type Dependency"
             exit;
 
         if FieldTypeDependency.Get(FieldTypeCode, Condition, Value, RefFieldTypeCode) then
-            FieldTypeDependency.Delete;
+            FieldTypeDependency.Delete();
 
-        FieldTypeDependency.Init;
+        FieldTypeDependency.Init();
         FieldTypeDependency."Field Type Code" := FieldTypeCode;
         FieldTypeDependency.Condition := Condition;
         if Condition = Condition::"Has a specific value" then
@@ -469,234 +441,48 @@ table 6086405 "CEM Field Type Dependency"
             FieldTypeDependency."Expected Value" := ExpectedValue;
         FieldTypeDependency."System Created Dependency" := SystemCreatedDependency;
         FieldDependencyFirstCheck(FieldTypeDependency);
-        FieldTypeDependency.Insert;
+        FieldTypeDependency.Insert();
     end;
 
 
     procedure SetupFieldDependencies()
     begin
-        UpdateSystemDependencies;
+        UpdateSystemDependencies();
         Message(DependenciesUpdatedMsg);
     end;
 
 
     procedure UpdateSystemDependencies()
-    var
-        DefaultDimTemp: Record "CEM Default Dimension" temporary;
-        AttendeeFieldType: Record "CEM Field Type";
-        FieldType: Record "CEM Field Type";
-        FieldTypeDependency: Record "CEM Field Type Dependency";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
-        ExpenseTypeFieldTypeCode: Code[20];
-        FieldTypeCode: Code[20];
-        RefFieldTypeCode: Code[20];
-        DocumentType: Option Expense,Mileage,Settlement,"Per Diem";
     begin
-        FieldTypeDependency.SetRange("System Created Dependency", true);
-        FieldTypeDependency.DeleteAll;
-
-        // Default Dimensions
-        EMDimMgt.GetAllDefaultDimensions(DefaultDimTemp);
-        DefaultDimTemp.SetFilter("Value Posting", '>%1', 0);
-        if DefaultDimTemp.FindSet then
-            repeat
-                FieldTypeCode := FieldType.GetFieldTypeCodeForTableID(DefaultDimTemp."Table ID");
-                RefFieldTypeCode := FieldType.GetFieldFromDim(DefaultDimTemp."Dimension Code");
-
-                AddDefaultDimDependency(FieldTypeCode, RefFieldTypeCode, DefaultDimTemp);
-            until DefaultDimTemp.Next = 0;
-
-        // Expense Type with Attendees
-        AttendeeFieldType.SetRange(Type, FieldType.Type::Attendees);
-        if AttendeeFieldType.FindFirst then begin
-            ExpenseTypeFieldTypeCode := FieldType.GetFieldTypeCodeForTableID(DATABASE::"CEM Expense Type");
-            AddAttendeesDependency(ExpenseTypeFieldTypeCode, AttendeeFieldType.Code);
-        end;
     end;
-
-    local procedure AddDefaultDimDependency(FieldTypeCode: Code[20]; RefFieldTypeCode: Code[20]; DefaultDimTemp: Record "CEM Default Dimension")
-    var
-        FieldType: Record "CEM Field Type";
-        RefFieldType: Record "CEM Field Type";
-        FieldTypeDependency: Record "CEM Field Type Dependency";
-        LookupValue: Record "CEM Lookup Value";
-        FieldDependencyIsConfigured: Boolean;
-        DimensionValueCode: Code[20];
-        ParentFieldTypeCode: Code[20];
-        DimensionCodeExpectation: Option "Must have a value","Must have a specific value","Value not allowed";
-    begin
-        FieldDependencyIsConfigured := FieldDependencyConfigured(FieldTypeCode, RefFieldTypeCode);
-        if not FieldDependencyIsConfigured then
-            exit;
-        if not RefFieldType.Get(RefFieldTypeCode) then
-            exit;
-        if not FieldType.Get(FieldTypeCode) then
-            exit;
-        ParentFieldTypeCode := FieldType.GetParentFieldTypeCode;
-        if not LookupValue.Get(FieldType.Code, ParentFieldTypeCode, DefaultDimTemp."No.") then
-            exit;
-
-        case DefaultDimTemp."Value Posting" of
-            DefaultDimTemp."Value Posting"::"Code Mandatory":
-                begin
-                    DimensionCodeExpectation := DimensionCodeExpectation::"Must have a value";
-                    DimensionValueCode := '';
-                end;
-            DefaultDimTemp."Value Posting"::"No Code":
-                begin
-                    DimensionCodeExpectation := DimensionCodeExpectation::"Value not allowed";
-                    DimensionValueCode := '';
-                end;
-            DefaultDimTemp."Value Posting"::"Same Code":
-                begin
-                    DimensionCodeExpectation := DimensionCodeExpectation::"Must have a specific value";
-                    if DefaultDimTemp."Dimension Value Code" <> '' then
-                        DimensionValueCode := DefaultDimTemp."Dimension Value Code"
-                    else
-                        exit;
-                end;
-            else
-                exit;
-        end;
-
-        AddFieldDependency(
-          FieldTypeCode,
-          FieldTypeDependency.Condition::"Has a specific value",
-          DefaultDimTemp."No.",
-          RefFieldTypeCode,
-          DimensionCodeExpectation,
-          DimensionValueCode,
-          true);
-    end;
-
-    local procedure AddAttendeesDependency(FieldTypeCode: Code[20]; RefFieldTypeCode: Code[20])
-    var
-        ExpenseType: Record "CEM Expense Type";
-        FieldType: Record "CEM Field Type";
-        RefFieldType: Record "CEM Field Type";
-        FieldTypeDependency: Record "CEM Field Type Dependency";
-        LookupValue: Record "CEM Lookup Value";
-        FieldDependencyIsConfigured: Boolean;
-        ParentFieldTypeCode: Code[20];
-        DocumentType: Option Expense,Mileage,Settlement,"Per Diem";
-    begin
-        FieldDependencyIsConfigured := FieldDependencyConfigured(FieldTypeCode, RefFieldTypeCode);
-        if not FieldDependencyIsConfigured then
-            exit;
-        if not RefFieldType.Get(RefFieldTypeCode) then
-            exit;
-        if not FieldType.Get(FieldTypeCode) then
-            exit;
-
-        ExpenseType.SetRange("Attendees Required", true);
-        if ExpenseType.FindSet then
-            repeat
-                AddFieldDependency(
-                  FieldTypeCode,
-                  FieldTypeDependency.Condition::"Has a specific value",
-                  ExpenseType.Code,
-                  RefFieldTypeCode,
-                  FieldTypeDependency.Expectation::"Must have a value",
-                  '',
-                  true);
-            until ExpenseType.Next = 0;
-    end;
-
 
     procedure FieldDependencyConfigured(FieldTypeCode: Code[20]; RefFieldTypeCode: Code[20]): Boolean
-    var
-        Dependency: Record "CEM Field Type Dependency";
     begin
-        Dependency."Field Type Code" := FieldTypeCode;
-        Dependency."Reference Field Type Code" := RefFieldTypeCode;
-        exit(DependencyIsUsed(Dependency));
     end;
-
 
     procedure MutuallyExclusiveDependencies(Dependency1: Record "CEM Field Type Dependency"; Dependency2: Record "CEM Field Type Dependency") MutuallyExclusive: Boolean
     begin
-        if not OnSameDocumentType(Dependency1, Dependency2) then
-            exit(true);
-
-        if Dependency1."Field Type Code" <> Dependency2."Field Type Code" then
-            exit(false);
-
-        if Dependency1.Condition <> Dependency1.Condition::"Has a specific value" then
-            exit(false);
-
-        if Dependency1.Condition <> Dependency2.Condition then
-            exit(false);
-
-        if IdenticalDependencies(Dependency1, Dependency2) then
-            exit(false);
-
-        exit(Dependency1.Value <> Dependency2.Value);
     end;
-
 
     procedure IdenticalDependencies(Dependency1: Record "CEM Field Type Dependency"; Dependency2: Record "CEM Field Type Dependency"): Boolean
     begin
-        if Dependency1."Field Type Code" <> Dependency2."Field Type Code" then
-            exit(false);
-        if Dependency1.Condition <> Dependency2.Condition then
-            exit(false);
-        if Dependency1.Value <> Dependency2.Value then
-            exit(false);
-        if Dependency1."Reference Field Type Code" <> Dependency2."Reference Field Type Code" then
-            exit(false);
-
-        exit(true);
     end;
-
 
     procedure OnSameDocumentType(Dependency1: Record "CEM Field Type Dependency"; Dependency2: Record "CEM Field Type Dependency"): Boolean
     begin
-        if IsExpenseDependency(Dependency1) and IsExpenseDependency(Dependency2) then
-            exit(true);
-
-        if IsMileageDependency(Dependency1) and IsMileageDependency(Dependency2) then
-            exit(true);
-
-        if IsPerDiemDependency(Dependency1) and IsPerDiemDependency(Dependency2) then
-            exit(true);
-
-        if IsSettlementDependency(Dependency1) and IsSettlementDependency(Dependency2) then
-            exit(true);
-
-        exit(false);
     end;
-
 
     procedure DependencyIsUsed(Dependency: Record "CEM Field Type Dependency"): Boolean
     begin
-        exit(IsExpenseDependency(Dependency) or
-          IsMileageDependency(Dependency) or
-          IsPerDiemDependency(Dependency) or
-          IsSettlementDependency(Dependency));
     end;
-
 
     procedure IsExpenseDependency(Dependency: Record "CEM Field Type Dependency"): Boolean
-    var
-        ConfiguredFieldType: Record "CEM Configured Field Type";
     begin
-        ConfiguredFieldType.SetRange(Type, ConfiguredFieldType.Type::Expense);
-        ConfiguredFieldType.SetRange("Sub Type", ConfiguredFieldType."Sub Type"::" ");
-        ConfiguredFieldType.SetFilter("Field Code", '%1|%2', Dependency."Field Type Code", Dependency."Reference Field Type Code");
-        exit(ConfiguredFieldType.Count = 2);
     end;
-
 
     procedure IsMileageDependency(Dependency: Record "CEM Field Type Dependency"): Boolean
-    var
-        ConfiguredFieldType: Record "CEM Configured Field Type";
     begin
-        ConfiguredFieldType.SetRange(Type, ConfiguredFieldType.Type::Mileage);
-        ConfiguredFieldType.SetRange("Sub Type", ConfiguredFieldType."Sub Type"::" ");
-        ConfiguredFieldType.SetFilter("Field Code", '%1|%2', Dependency."Field Type Code", Dependency."Reference Field Type Code");
-        exit(ConfiguredFieldType.Count = 2);
     end;
-
 
     procedure IsPerDiemDependency(Dependency: Record "CEM Field Type Dependency"): Boolean
     var
@@ -726,7 +512,7 @@ table 6086405 "CEM Field Type Dependency"
         FieldTypeDependency: Record "CEM Field Type Dependency";
         UsedElseWhere: Boolean;
     begin
-        if FieldTypeDependency.FindSet then
+        if FieldTypeDependency.FindSet() then
             repeat
                 UsedElseWhere := false;
                 if (FieldTypeDependency."Field Type Code" = FieldTypeCode) or
@@ -762,10 +548,10 @@ table 6086405 "CEM Field Type Dependency"
                           FieldTypeDependency.Condition,
                           FieldTypeDependency.Value,
                           FieldTypeDependency."Reference Field Type Code");
-                        DependencyNotUsed.Delete;
+                        DependencyNotUsed.Delete();
                     end;
                 end;
-            until FieldTypeDependency.Next = 0;
+            until FieldTypeDependency.Next() = 0;
     end;
 
 
@@ -781,9 +567,9 @@ table 6086405 "CEM Field Type Dependency"
         ErrorMessage: Text[250];
         ExpectedValuesSet: Text[1024];
     begin
-        FieldTypeDependency.Reset;
+        FieldTypeDependency.Reset();
         FieldTypeDependency.SetRange("Reference Field Type Code", DependencyBeingChecked."Reference Field Type Code");
-        if FieldTypeDependency.FindFirst then
+        if FieldTypeDependency.FindFirst() then
             repeat
                 if not MutuallyExclusiveDependencies(FieldTypeDependency, DependencyBeingChecked) then begin
                     case FieldTypeDependency.Expectation of
@@ -799,7 +585,7 @@ table 6086405 "CEM Field Type Dependency"
                             end;
                     end;
                 end;
-            until (FieldTypeDependency.Next = 0);
+            until (FieldTypeDependency.Next() = 0);
 
         NoValueConflictDetected := NoValueExpectedFound and (AnyValueExpectedFound or SpecificValueExpectedFound);
 
@@ -856,12 +642,12 @@ table 6086405 "CEM Field Type Dependency"
             RecursionDetected := RecursionDetected or (RecursionDepth >= 40); // Limitied to maximum number of Fields in Filter.
 
             if not RecursionDetected then begin
-                FieldTypeDependency.Reset;
+                FieldTypeDependency.Reset();
                 FieldTypeDependency.SetFilter("Field Type Code", FieldTypeCodeFilter);
-                if FieldTypeDependency.FindSet then
+                if FieldTypeDependency.FindSet() then
                     repeat
                         if not MutuallyExclusiveDependencies(FieldTypeDependency, DependencyBeingChecked) then begin
-                            ReferenceDependency.Reset;
+                            ReferenceDependency.Reset();
                             ReferenceDependency.SetRange("Field Type Code", FieldTypeDependency."Reference Field Type Code");
                             if not ReferenceDependency.IsEmpty then begin
                                 AddKeyToFilter(FieldTypeCodeFilter, FieldTypeDependency."Reference Field Type Code");
@@ -869,7 +655,7 @@ table 6086405 "CEM Field Type Dependency"
                                   (FieldTypeDependency."Reference Field Type Code" = DependencyBeingChecked."Field Type Code");
                             end;
                         end;
-                    until RecursionDetected or (FieldTypeDependency.Next = 0);
+                    until RecursionDetected or (FieldTypeDependency.Next() = 0);
                 StopRecursion := StopRecursion or RecursionDetected or (FieldTypeCodeFilter = FilterAtBeginning);
             end;
         end;
@@ -976,28 +762,6 @@ table 6086405 "CEM Field Type Dependency"
         if StrPos(List, Element) = 0 then
             List := CopyStr(List + Separator + Element, 1, MaxStrLen(List));
     end;
-
-    local procedure LookupFieldType(IsReferenceFieldType: Boolean): Code[20]
-    var
-        ConfiguredFieldType: Record "CEM Configured Field Type";
-        FieldType: Record "CEM Field Type";
-        LookupFieldTypeTemp: Record "CEM Field Type" temporary;
-    begin
-        if ConfiguredFieldType.FindFirst then
-            repeat
-                FieldType.Get(ConfiguredFieldType."Field Code");
-                if LookupDataType(FieldType.Type) and not (IsReferenceFieldType and ("Field Type Code" = FieldType.Code)) then begin
-                    LookupFieldTypeTemp.Init;
-                    LookupFieldTypeTemp.Code := FieldType.Code;
-                    LookupFieldTypeTemp.Description := FieldType.Description;
-                    if LookupFieldTypeTemp.Insert then;
-                end;
-            until ConfiguredFieldType.Next = 0;
-
-        if (PAGE.RunModal(PAGE::"CEM Field Type Lookup", LookupFieldTypeTemp) = ACTION::LookupOK) then
-            exit(LookupFieldTypeTemp.Code);
-    end;
-
 
     procedure LookupFieldTypeLookupValue(var Text: Text[1024]): Boolean
     var

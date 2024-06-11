@@ -38,12 +38,12 @@ table 6086378 "CEM Bank Stat. Matching Buffer"
     var
         BankStatementMatchingBuffer: Record "CEM Bank Stat. Matching Buffer";
     begin
-        BankStatementMatchingBuffer.Init;
+        BankStatementMatchingBuffer.Init();
         BankStatementMatchingBuffer."Line No." := LineNo;
         BankStatementMatchingBuffer."Entry No." := EntryNo;
         BankStatementMatchingBuffer.Quality := Quality;
         Rec := BankStatementMatchingBuffer;
-        Insert;
+        Insert();
     end;
 }
 

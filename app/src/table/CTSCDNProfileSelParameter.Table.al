@@ -31,28 +31,6 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
         field(5; "Code"; Code[30])
         {
             Caption = 'Code';
-            TableRelation = IF (Type = CONST(Profile)) "CTS-CDN Network Profile"."Filter Code" WHERE("Network Name" = FIELD("Network Name"))
-            ELSE
-            IF (Type = CONST(Group)) "CTS-CDN Network Profile Group".Code WHERE("Network Name" = FIELD("Network Name"));
-            ValidateTableRelation = false;
-
-            trigger OnValidate()
-            var
-                NetworkProfile: Record "CTS-CDN Network Profile";
-                NetworkProfileGroup: Record "CTS-CDN Network Profile Group";
-                ProfileID: Integer;
-            begin
-                if Type = Type::Group then begin
-                    if NetworkProfileGroup.Get("Network Name", Code) then begin
-                        Description := NetworkProfileGroup.Description;
-                    end;
-                end else
-                    if Evaluate(ProfileID, Code) then
-                        if NetworkProfile.Get(ProfileID) then
-                            Description := NetworkProfile.Description;
-
-                "Lookup Info" := '';
-            end;
         }
         field(6; Description; Text[250])
         {
@@ -90,7 +68,7 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
     trigger OnInsert()
     begin
         if "Network Name" = 'peppol' then
-            SetProfileDirFromLicense;
+            SetProfileDirFromLicense();
     end;
 
     var
@@ -103,7 +81,7 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
         CDNParticipation.SetRange("Network Name", "Network Name");
         CDNParticipation.SetRange("Identifier Type ID", "Participation Identifier Type");
         CDNParticipation.SetRange("Identifier Value", "Participation Identifier Value");
-        CDNParticipation.FindFirst;
+        CDNParticipation.FindFirst();
     end;
 
 
@@ -122,12 +100,12 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
         ParticipProfileRel.SetRange(Disabled, 0DT);
 
         NetworkProfileGroup.SetRange("Network Name", Participation."Network Name");
-        if NetworkProfileGroup.FindSet then
+        if NetworkProfileGroup.FindSet() then
             repeat
                 NetworkProfileGroup.CalcFields("No. of Profiles");
                 ParticipProfileRel.CalcFields("Profile Group Code");
                 ParticipProfileRel.SetRange("Profile Group Code", NetworkProfileGroup.Code);
-                if ParticipProfileRel.FindFirst then begin
+                if ParticipProfileRel.FindFirst() then begin
                     DocCatCode := ParticipProfileRel."DC Document Category";
                     ProfileDirection := ParticipProfileRel."Profile Direction";
                     ParticipProfileRel.SetRange("DC Document Category", DocCatCode);
@@ -137,14 +115,14 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
                         CreateProfileSelection(Participation, NetworkProfileGroup.Code, DocCatCode, NetworkProfileGroup.Description,
                           ProfileDirection, true);
                 end;
-            until NetworkProfileGroup.Next = 0;
+            until NetworkProfileGroup.Next() = 0;
 
         // Then the profiles
         ParticipProfileRel.SetRange("Profile Group Code");
         ParticipProfileRel.SetRange("DC Document Category");
         ParticipProfileRel.SetRange("Profile Direction");
 
-        if ParticipProfileRel.FindSet then
+        if ParticipProfileRel.FindSet() then
             repeat
                 Participation.FilterProfileSelections(Rec);
                 SetRange(Type, Type::Group);
@@ -158,14 +136,14 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
                       ParticipProfileRel."DC Document Category", NetworkProfile.Description, ParticipProfileRel."Profile Direction", false);
                 end;
 
-            until ParticipProfileRel.Next = 0;
+            until ParticipProfileRel.Next() = 0;
 
-        Reset;
+        Reset();
     end;
 
     local procedure CreateProfileSelection(var CDNParticipation: Record "CTS-CDN Participation"; NewCode: Code[30]; DocCatCode: Code[20]; NewDescription: Text[250]; NewProfileDirection: Integer; Group: Boolean)
     begin
-        Rec.Init;
+        Rec.Init();
         Rec."Network Name" := CDNParticipation."Network Name";
         Rec."Participation Identifier Type" := CDNParticipation."Identifier Type ID";
         Rec."Participation Identifier Value" := CDNParticipation."Identifier Value";
@@ -178,7 +156,7 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
         Rec.Validate(Code, NewCode);
         Rec."Profile Direction" := NewProfileDirection;
         Rec."Document Category" := DocCatCode;
-        Rec.Insert;
+        Rec.Insert();
     end;
 
 
@@ -200,55 +178,10 @@ table 6086227 "CTS-CDN Profile Sel. Parameter"
 
 
     procedure SetProfileDirFromLicense()
-    var
-        LicenseMgt: Codeunit "CTS-CDN License Mgt.";
     begin
-        case true of
-            LicenseMgt.HasLicenseAccessToDC and LicenseMgt.HasLicenseAccessToDO:
-                "Profile Direction" := "Profile Direction"::Both;
-            LicenseMgt.HasLicenseAccessToDC and not LicenseMgt.HasLicenseAccessToDO:
-                "Profile Direction" := "Profile Direction"::Inbound;
-            not LicenseMgt.HasLicenseAccessToDC and LicenseMgt.HasLicenseAccessToDO:
-                "Profile Direction" := "Profile Direction"::Outbound;
-        end;
     end;
-
 
     procedure CheckRegisteredProfiles(NetworkName: Text[30]; var APNetworkProfiles: Record "CTS-CDN AP Network Profile" temporary)
-    var
-        NetworkProfile: Record "CTS-CDN Network Profile";
-        ProfileID: Integer;
-        RegisteredProfiles: Text[1024];
     begin
-        SetFilter("Profile Direction", '%1|%2', "Profile Direction"::Inbound, "Profile Direction"::Both);
-        if FindSet then
-            repeat
-                if Type = Type::Profile then begin
-                    Evaluate(ProfileID, Code);
-                    APNetworkProfiles.SetRange("Network Profile ID", ProfileID);
-                    if not APNetworkProfiles.IsEmpty then begin
-                        Validate("Lookup Info", ProfileAlreadyRegMsg);
-                        Modify;
-                    end;
-                end else begin
-                    NetworkProfile.SetRange("Network Name", NetworkName);
-                    NetworkProfile.SetRange("Network Profile Group Code", Code);
-                    if NetworkProfile.FindSet then
-                        repeat
-                            APNetworkProfiles.SetRange("Network Profile ID", NetworkProfile."System ID");
-                            if not APNetworkProfiles.IsEmpty then begin
-                                if RegisteredProfiles = '' then
-                                    RegisteredProfiles := NetworkProfile.Description
-                                else
-                                    RegisteredProfiles += ', ' + NetworkProfile.Description;
-                            end;
-                        until NetworkProfile.Next = 0;
-
-                    Validate("Lookup Info", StrSubstNo(GroupAlreadyRegMsg, RegisteredProfiles));
-                    Modify;
-
-                end;
-            until Next = 0;
     end;
 }
-

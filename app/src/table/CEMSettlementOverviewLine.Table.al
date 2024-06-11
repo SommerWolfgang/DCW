@@ -22,9 +22,9 @@ table 6086340 "CEM Settlement Overview Line"
         field(4; "Doc. Ref. No."; Integer)
         {
             Caption = 'Doc. Ref. No.';
-            TableRelation = IF ("Table ID" = CONST(6086320)) "CEM Expense"
-            ELSE
-            IF ("Table ID" = CONST(6086338)) "CEM Mileage";
+            TableRelation = if ("Table ID" = const(6086320)) "CEM Expense"
+            else
+            if ("Table ID" = const(6086338)) "CEM Mileage";
         }
         field(5; "Continia User ID"; Code[50])
         {
@@ -54,20 +54,20 @@ table 6086340 "CEM Settlement Overview Line"
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(12; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(14; "Code"; Code[20])
         {
             Caption = 'Code';
-            TableRelation = IF ("Table ID" = CONST(6086320)) "CEM Expense Type"
-            ELSE
-            IF ("Table ID" = CONST(6086338)) "CEM Vehicle";
+            TableRelation = if ("Table ID" = const(6086320)) "CEM Expense Type"
+            else
+            if ("Table ID" = const(6086338)) "CEM Vehicle";
         }
         field(15; Details; Text[250])
         {
@@ -81,7 +81,7 @@ table 6086340 "CEM Settlement Overview Line"
         field(17; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(210; "No Refund"; Boolean)
         {
@@ -123,17 +123,17 @@ table 6086340 "CEM Settlement Overview Line"
     begin
         PosRecTmp := Rec;
 
-        SttlOverviewTmp.Reset;
-        SttlOverviewTmp.DeleteAll;
+        SttlOverviewTmp.Reset();
+        SttlOverviewTmp.DeleteAll();
 
         if DocumentNo = '' then
             exit;
 
         Expense.SetCurrentKey("Settlement No.");
         Expense.SetRange("Settlement No.", DocumentNo);
-        if Expense.FindSet then
+        if Expense.FindSet() then
             repeat
-                SttlOverviewTmp.Init;
+                SttlOverviewTmp.Init();
                 SttlOverviewTmp."Table ID" := DATABASE::"CEM Expense";
                 SttlOverviewTmp."Document Type" := SttlOverviewTmp."Document Type"::Settlement;
                 SttlOverviewTmp."Document No." := DocumentNo;
@@ -148,16 +148,16 @@ table 6086340 "CEM Settlement Overview Line"
                 SttlOverviewTmp."Global Dimension 2 Code" := Expense."Global Dimension 2 Code";
                 SttlOverviewTmp."Job No." := Expense."Job No.";
                 SttlOverviewTmp."Job Task No." := Expense."Job Task No.";
-                SttlOverviewTmp.Details := Expense.GetOverviewDetails;
+                SttlOverviewTmp.Details := Expense.GetOverviewDetails();
                 SttlOverviewTmp."No Refund" := Expense."No Refund";
-                SttlOverviewTmp.Insert;
-            until Expense.Next = 0;
+                SttlOverviewTmp.Insert();
+            until Expense.Next() = 0;
 
         Mileage.SetCurrentKey("Settlement No.");
         Mileage.SetRange("Settlement No.", DocumentNo);
-        if Mileage.FindSet then
+        if Mileage.FindSet() then
             repeat
-                SttlOverviewTmp.Init;
+                SttlOverviewTmp.Init();
                 SttlOverviewTmp."Table ID" := DATABASE::"CEM Mileage";
                 SttlOverviewTmp."Document Type" := SttlOverviewTmp."Document Type"::Settlement;
                 SttlOverviewTmp."Document No." := DocumentNo;
@@ -171,18 +171,18 @@ table 6086340 "CEM Settlement Overview Line"
                 SttlOverviewTmp."Global Dimension 2 Code" := Mileage."Global Dimension 2 Code";
                 SttlOverviewTmp."Job No." := Mileage."Job No.";
                 SttlOverviewTmp."Job Task No." := Mileage."Job Task No.";
-                SttlOverviewTmp.Details := Mileage.GetOverviewDetails;
+                SttlOverviewTmp.Details := Mileage.GetOverviewDetails();
                 SttlOverviewTmp."No Refund" := Mileage."No Refund";
-                SttlOverviewTmp.Insert;
-            until Mileage.Next = 0;
+                SttlOverviewTmp.Insert();
+            until Mileage.Next() = 0;
 
 
         PerDiem.SetCurrentKey("Settlement No.");
         PerDiem.SetRange("Settlement No.", DocumentNo);
-        if PerDiem.FindSet then
+        if PerDiem.FindSet() then
             repeat
                 PerDiem.CalcFields("Amount (LCY)");
-                SttlOverviewTmp.Init;
+                SttlOverviewTmp.Init();
                 SttlOverviewTmp."Table ID" := DATABASE::"CEM Per Diem";
                 SttlOverviewTmp."Document Type" := SttlOverviewTmp."Document Type"::Settlement;
                 SttlOverviewTmp."Document No." := DocumentNo;
@@ -197,11 +197,11 @@ table 6086340 "CEM Settlement Overview Line"
                 SttlOverviewTmp."Global Dimension 2 Code" := PerDiem."Global Dimension 2 Code";
                 SttlOverviewTmp."Job No." := PerDiem."Job No.";
                 SttlOverviewTmp."Job Task No." := PerDiem."Job Task No.";
-                SttlOverviewTmp.Details := PerDiem.GetOverviewDetails;
-                SttlOverviewTmp.Insert;
-            until PerDiem.Next = 0;
+                SttlOverviewTmp.Details := PerDiem.GetOverviewDetails();
+                SttlOverviewTmp.Insert();
+            until PerDiem.Next() = 0;
         if not SttlOverviewTmp.Get(PosRecTmp."Table ID", PosRecTmp."Document Type", PosRecTmp."Document No.", PosRecTmp."Doc. Ref. No.") then
-            if SttlOverviewTmp.FindFirst then;
+            if SttlOverviewTmp.FindFirst() then;
     end;
 
 
@@ -283,19 +283,19 @@ table 6086340 "CEM Settlement Overview Line"
             DATABASE::"CEM Expense":
                 begin
                     Expense.Get("Doc. Ref. No.");
-                    Expense.DrillDownAttendees;
+                    Expense.DrillDownAttendees();
                 end;
 
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
-                    Mileage.DrillDownAttendees;
+                    Mileage.DrillDownAttendees();
                 end;
 
             DATABASE::"CEM Per Diem":
                 begin
                     PerDiem.Get("Doc. Ref. No.");
-                    PerDiem.DrillDownAttendees;
+                    PerDiem.DrillDownAttendees();
                 end;
         end;
     end;
@@ -311,19 +311,19 @@ table 6086340 "CEM Settlement Overview Line"
             DATABASE::"CEM Expense":
                 begin
                     Expense.Get("Doc. Ref. No.");
-                    Expense.OpenDocumentCard;
+                    Expense.OpenDocumentCard();
                 end;
 
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
-                    Mileage.OpenDocumentCard;
+                    Mileage.OpenDocumentCard();
                 end;
 
             DATABASE::"CEM Per Diem":
                 begin
                     PerDiem.Get("Doc. Ref. No.");
-                    PerDiem.OpenDocumentCard;
+                    PerDiem.OpenDocumentCard();
                 end;
         end;
     end;
@@ -339,19 +339,19 @@ table 6086340 "CEM Settlement Overview Line"
             DATABASE::"CEM Expense":
                 begin
                     Expense.Get("Doc. Ref. No.");
-                    Expense.SplitAndAllocate;
+                    Expense.SplitAndAllocate();
                 end;
 
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
-                    Mileage.SplitAndAllocate;
+                    Mileage.SplitAndAllocate();
                 end;
 
             DATABASE::"CEM Per Diem":
                 begin
                     PerDiem.Get("Doc. Ref. No.");
-                    PerDiem.SplitAndAllocate;
+                    PerDiem.SplitAndAllocate();
                 end;
         end;
     end;
@@ -367,29 +367,26 @@ table 6086340 "CEM Settlement Overview Line"
             DATABASE::"CEM Expense":
                 begin
                     Expense.Get("Doc. Ref. No.");
-                    exit(Expense.HasExpenseComment or Expense.HasApprovalComment);
+                    exit(Expense.HasExpenseComment() or Expense.HasApprovalComment());
                 end;
 
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
-                    exit(Mileage.HasMileageComment or Mileage.HasApprovalComment);
+                    exit(Mileage.HasMileageComment() or Mileage.HasApprovalComment());
                 end;
 
             DATABASE::"CEM Per Diem":
                 begin
                     PerDiem.Get("Doc. Ref. No.");
-                    exit(PerDiem.HasPerDiemComment or PerDiem.HasApprovalComment);
+                    exit(PerDiem.HasPerDiemComment() or PerDiem.HasApprovalComment());
                 end;
         end;
     end;
 
 
     procedure LookupComments()
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        EMCmtMgt.LookupComments("Table ID", 0, '', "Doc. Ref. No.");
     end;
 
 
@@ -408,12 +405,12 @@ table 6086340 "CEM Settlement Overview Line"
             ConfirmText := ConfirmDetachExpenseMultiple;
 
         if Confirm(ConfirmText, false, SttlOverviewLine.Count) then begin
-            SttlOverviewLine.FindFirst;
+            SttlOverviewLine.FindFirst();
             repeat
                 Expense.Get("Doc. Ref. No.");
                 Expense.Validate("Settlement No.", '');
                 Expense.Modify(true);
-            until SttlOverviewLine.Next = 0;
+            until SttlOverviewLine.Next() = 0;
         end;
     end;
 
@@ -433,12 +430,12 @@ table 6086340 "CEM Settlement Overview Line"
             ConfirmText := StrSubstNo(ConfirmDetachMileageMultiple, SttlOverviewLine.Count);
 
         if Confirm(ConfirmText) then
-            if SttlOverviewLine.FindSet then
+            if SttlOverviewLine.FindSet() then
                 repeat
                     Mileage.Get("Doc. Ref. No.");
                     Mileage.Validate("Settlement No.", '');
                     Mileage.Modify(true);
-                until SttlOverviewLine.Next = 0;
+                until SttlOverviewLine.Next() = 0;
     end;
 
 
@@ -457,12 +454,12 @@ table 6086340 "CEM Settlement Overview Line"
             ConfirmText := StrSubstNo(ConfirmDetachPerDiemMultiple, SttlOverviewLine.Count);
 
         if Confirm(ConfirmText) then
-            if SttlOverviewLine.FindSet then
+            if SttlOverviewLine.FindSet() then
                 repeat
                     PerDiem.Get("Doc. Ref. No.");
                     PerDiem.Validate("Settlement No.", '');
                     PerDiem.Modify(true);
-                until SttlOverviewLine.Next = 0;
+                until SttlOverviewLine.Next() = 0;
     end;
 
 
@@ -478,13 +475,13 @@ table 6086340 "CEM Settlement Overview Line"
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
-                    Mileage.ShowDetails;
+                    Mileage.ShowDetails();
                 end;
 
             DATABASE::"CEM Per Diem":
                 begin
                     PerDiem.Get("Doc. Ref. No.");
-                    PerDiem.ShowDetails;
+                    PerDiem.ShowDetails();
                 end;
         end;
     end;

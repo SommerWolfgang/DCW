@@ -51,10 +51,10 @@ table 6085577 "CDC Document Comment Line"
         {
             Caption = 'Date';
         }
-        field(10; "Table Name"; Text[80])
+        field(10; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -69,59 +69,7 @@ table 6085577 "CDC Document Comment Line"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    begin
-        TestField(Type, Type::User);
-    end;
-
-    trigger OnInsert()
-    var
-        DocumentCommentLine: Record "CDC Document Comment Line";
-        NextLineNo: Integer;
-    begin
-        if "Line No." = 0 then begin
-            DocumentCommentLine.SetRange("Table ID", "Table ID");
-            DocumentCommentLine.SetRange("No.", "No.");
-            if DocumentCommentLine.FindLast then
-                NextLineNo := DocumentCommentLine."Line No." + 10000
-            else
-                NextLineNo := 10000;
-
-            "Line No." := NextLineNo;
-        end;
-
-        "User ID" := UserId;
-        Type := Type::User;
-        "Creation Date/Time" := CurrentDateTime;
-    end;
-
-    trigger OnModify()
-    begin
-        TestField(Type, Type::User);
-    end;
-
-    trigger OnRename()
-    begin
-        Error(Text001, TableCaption);
-    end;
-
-    var
-        Text001: Label 'You cannot rename a %1.';
-
-
     procedure SetUpNewLine()
-    var
-        DocumentCommentLine: Record "CDC Document Comment Line";
     begin
-        DocumentCommentLine.SetRange("Table ID", "Table ID");
-        DocumentCommentLine.SetRange("No.", "No.");
-        DocumentCommentLine.SetRange(Date, WorkDate);
-        if DocumentCommentLine.IsEmpty then
-            Date := WorkDate;
     end;
 }
-

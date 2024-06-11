@@ -13,9 +13,9 @@ table 6086325 "CEM Attendee Inbox"
         {
             Caption = 'Doc. Ref. No.';
             Editable = false;
-            TableRelation = IF ("Table ID" = CONST(6086323)) "CEM Expense Inbox"
-            ELSE
-            IF ("Table ID" = CONST(6086353)) "CEM Mileage Inbox";
+            TableRelation = if ("Table ID" = const(6086323)) "CEM Expense Inbox"
+            else
+            if ("Table ID" = const(6086353)) "CEM Mileage Inbox";
         }
         field(3; "Entry No."; Integer)
         {
@@ -51,18 +51,18 @@ table 6086325 "CEM Attendee Inbox"
 
     trigger OnDelete()
     begin
-        CheckInbox;
+        CheckInbox();
     end;
 
     trigger OnInsert()
     var
         ExpenseAttendeesInbox: Record "CEM Attendee Inbox";
     begin
-        CheckInbox;
+        CheckInbox();
         if "Entry No." = 0 then begin
             ExpenseAttendeesInbox.SetRange("Table ID", "Table ID");
             ExpenseAttendeesInbox.SetRange("Doc. Ref. No.", "Doc. Ref. No.");
-            if ExpenseAttendeesInbox.FindLast then
+            if ExpenseAttendeesInbox.FindLast() then
                 "Entry No." := ExpenseAttendeesInbox."Entry No." + 1
             else
                 "Entry No." := 1;
@@ -71,12 +71,12 @@ table 6086325 "CEM Attendee Inbox"
 
     trigger OnModify()
     begin
-        CheckInbox;
+        CheckInbox();
     end;
 
     trigger OnRename()
     begin
-        CheckInbox;
+        CheckInbox();
     end;
 
     var
@@ -129,7 +129,7 @@ table 6086325 "CEM Attendee Inbox"
 
             1:
                 begin
-                    ExpAttendeeInbox.FindFirst;
+                    ExpAttendeeInbox.FindFirst();
                     if ExpAttendeeInbox.Name <> '' then
                         exit(StrSubstNo('%1 (%2)', ExpAttendeeInbox.Name, ExpAttendeeInbox.Type))
                     else

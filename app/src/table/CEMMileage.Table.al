@@ -18,7 +18,7 @@ table 6086338 "CEM Mileage"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -76,7 +76,6 @@ table 6086338 "CEM Mileage"
                 end;
 
                 CalculateMileageDetails();
-                MilValidate.Run(Rec);
             end;
         }
         field(11; "Amount (LCY)"; Decimal)
@@ -121,10 +120,10 @@ table 6086338 "CEM Mileage"
         }
         field(20; Comment; Boolean)
         {
-            CalcFormula = Exist("CEM Comment" WHERE("Table ID" = CONST(6086338),
-                                                     "Document Type" = CONST(Budget),
-                                                     "Document No." = CONST(''),
-                                                     "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = exist("CEM Comment" where("Table ID" = const(6086338),
+                                                     "Document Type" = const(Budget),
+                                                     "Document No." = const(''),
+                                                     "Doc. Ref. No." = field("Entry No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -144,10 +143,10 @@ table 6086338 "CEM Mileage"
         }
         field(22; "Current Reminder Level"; Integer)
         {
-            CalcFormula = Max("CEM Reminder"."No." WHERE("Table ID" = CONST(6086338),
-                                                          "Document Type" = CONST(Budget),
-                                                          "Document No." = CONST(''),
-                                                          "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = max("CEM Reminder"."No." where("Table ID" = const(6086338),
+                                                          "Document Type" = const(Budget),
+                                                          "Document No." = const(''),
+                                                          "Doc. Ref. No." = field("Entry No.")));
             Caption = 'Current Reminder Level';
             Editable = false;
             FieldClass = FlowField;
@@ -228,31 +227,10 @@ table 6086338 "CEM Mileage"
         field(41; "From Home"; Boolean)
         {
             Caption = 'From Home';
-
-            trigger OnValidate()
-            var
-                EMSetup: Record "CEM Expense Management Setup";
-            begin
-                if "Job Line Type" = "Job Line Type"::Contract then begin
-                    TestField("Job No.");
-                    TestField("Job Task No.");
-                end;
-
-                DeductOfficeDistanceOrRevert(false);
-
-                MilValidate.Run(Rec);
-            end;
         }
         field(42; "To Home"; Boolean)
         {
             Caption = 'To Home';
-
-            trigger OnValidate()
-            begin
-                DeductOfficeDistanceOrRevert(false);
-
-                MilValidate.Run(Rec);
-            end;
         }
         field(43; "Register No."; Integer)
         {
@@ -287,16 +265,6 @@ table 6086338 "CEM Mileage"
             Caption = 'Reimbursement Method';
             OptionCaption = 'Internal (on User),External Payroll System,Both';
             OptionMembers = "Vendor (on User)","External System",Both;
-
-            trigger OnValidate()
-            var
-                MileageDetails: Record "CEM Mileage Detail";
-            begin
-                MileageDetails.SetRange("Mileage Entry No.", "Entry No.");
-                MileageDetails.ModifyAll("Reimbursement Method", "Reimbursement Method");
-
-                MilValidate.Run(Rec);
-            end;
         }
         field(63; "Entry No. (Code)"; Code[20])
         {
@@ -345,52 +313,10 @@ table 6086338 "CEM Mileage"
             Caption = 'Mileage Account Type';
             OptionCaption = ' ,G/L Account';
             OptionMembers = " ","G/L Account";
-
-            trigger OnValidate()
-            begin
-                if xRec."Mileage Account Type" <> "Mileage Account Type" then
-                    Clear("Mileage Account");
-
-                MilValidate.Run(Rec);
-            end;
         }
         field(110; "Mileage Account"; Code[20])
         {
             Caption = 'Mileage Account';
-            TableRelation = IF ("Mileage Account Type" = CONST("G/L Account")) "G/L Account"."No.";
-
-            trigger OnValidate()
-            var
-                GLAcc: Record "G/L Account";
-                ExpCmtMgt: Codeunit "CEM Comment Mgt.";
-            begin
-                if "Mileage Account" <> '' then begin
-                    TestField("Mileage Account Type");
-
-                    case "Mileage Account Type" of
-                        "Mileage Account Type"::"G/L Account":
-                            begin
-                                GLAcc.Get("Mileage Account");
-                                if "Job No." <> '' then
-                                    GLAcc.TestField("Direct Posting", true);
-                                GLAcc.CheckGLAcc();
-                            end;
-                    end;
-                end;
-
-                "Mil. Account Manually Changed" := CurrFieldNo = FieldNo("Mileage Account");
-
-                if CurrFieldNo = FieldNo("Mileage Account") then
-                    ExpCmtMgt.AddFieldValueChanged(
-                      DATABASE::"CEM Mileage", 0, '', "Entry No.", FieldNo("Mileage Account"), FieldCaption("Mileage Account"),
-                        xRec."Mileage Account", "Mileage Account")
-                else
-                    ExpCmtMgt.DelFieldValueChangedCmt(DATABASE::"CEM Mileage", 0, '', "Entry No.", FieldNo("Mileage Account"));
-
-                AddDefaultDim(CurrFieldNo);
-
-                MilValidate.Run(Rec);
-            end;
         }
         field(111; "Mil. Account Manually Changed"; Boolean)
         {
@@ -410,54 +336,9 @@ table 6086338 "CEM Mileage"
         field(125; "Settlement No."; Code[20])
         {
             Caption = 'Settlement No.';
-            TableRelation = "CEM Expense Header"."No." WHERE("Document Type" = CONST(Settlement),
-                                                              "Continia User ID" = FIELD("Continia User ID"));
+            TableRelation = "CEM Expense Header"."No." where("Document Type" = const(Settlement),
+                                                              "Continia User ID" = field("Continia User ID"));
 
-            trigger OnLookup()
-            var
-                Settlement: Record "CEM Expense Header";
-                EmSetup: Record "CEM Expense Management Setup";
-            begin
-                EmSetup.Get();
-                EmSetup.TestSettlementEnabled();
-
-                if "Settlement No." <> '' then
-                    if Settlement.Get(Settlement."Document Type"::Settlement, "Settlement No.") then;
-                if "Continia User ID" <> '' then
-                    Settlement.SetRange("Continia User ID", "Continia User ID");
-                if Posted then
-                    PAGE.RunModal(PAGE::"CEM Posted Settlement List", Settlement)
-                else
-                    if PAGE.RunModal(PAGE::"CEM Settlement List", Settlement) = ACTION::LookupOK then
-                        Validate("Settlement No.", Settlement."No.");
-            end;
-
-            trigger OnValidate()
-            var
-                ExpHeader: Record "CEM Expense Header";
-                EmSetup: Record "CEM Expense Management Setup";
-            begin
-                if "Settlement No." = xRec."Settlement No." then
-                    exit;
-
-                TestStatusAllowsChange();
-
-                if ExpHeader.Get(ExpHeader."Document Type"::Settlement, "Settlement No.") then begin
-                    EmSetup.Get();
-                    EmSetup.TestSettlementEnabled();
-                    ExpHeader.TestField("Continia User ID", "Continia User ID");
-                    ExpHeader.TestField(Posted, false);
-                    if ExpHeader.Status = ExpHeader.Status::Released then
-                        Error(SettlementReleasedErr);
-
-                    if "Settlement Line No." = 0 then
-                        "Settlement Line No." := GetNextDocumentLineNo();
-                    "Expense Header GUID" := ExpHeader."Exp. Header GUID";
-                end else begin
-                    Clear("Settlement Line No.");
-                    Clear("Expense Header GUID");
-                end;
-            end;
         }
         field(126; "Settlement Line No."; Integer)
         {
@@ -519,18 +400,18 @@ table 6086338 "CEM Mileage"
         }
         field(260; "No. of Attachments"; Integer)
         {
-            CalcFormula = Count("CEM Attachment" WHERE("Table ID" = CONST(6086338),
-                                                        "Document Type" = CONST(Budget),
-                                                        "Document No." = FILTER(''),
-                                                        "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attachment" where("Table ID" = const(6086338),
+                                                        "Document Type" = const(Budget),
+                                                        "Document No." = filter(''),
+                                                        "Doc. Ref. No." = field("Entry No.")));
             Caption = 'Attachments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(270; "No. of Attendees"; Integer)
         {
-            CalcFormula = Count("CEM Attendee" WHERE("Table ID" = CONST(6086338),
-                                                      "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attendee" where("Table ID" = const(6086338),
+                                                      "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attendees';
             Editable = false;
             FieldClass = FlowField;
@@ -538,17 +419,6 @@ table 6086338 "CEM Mileage"
         field(271; "Updated By Delegation User"; Code[50])
         {
             Caption = 'Updated By Delegation User';
-            TableRelation = "CDC Continia User Setup";
-
-            trigger OnValidate()
-            var
-                EMComment: Record "CEM Comment";
-                CmtMgt: Codeunit "CEM Comment Mgt.";
-            begin
-                if ("Updated By Delegation User" <> '') and (Rec."Updated By Delegation User" <> "Updated By Delegation User") then
-                    CmtMgt.AddComment(DATABASE::"CEM Mileage", 0, '', "Entry No.", EMComment.Importance::Information, 'DELEGATIONUPDATED',
-                      StrSubstNo(DelegateUpdateTxt, "Continia User ID"), false);
-            end;
         }
         field(280; "External Posting Account Type"; Option)
         {
@@ -556,51 +426,10 @@ table 6086338 "CEM Mileage"
             OptionCaption = ' ,Lessor Pay Type,Dataloen Pay Type';
             OptionMembers = " ","Lessor Pay Type","Dataloen Pay Type";
 
-            trigger OnValidate()
-            var
-                Mileage2: Record "CEM Mileage";
-                Mileage3: Record "CEM Mileage";
-            begin
-                if "External Posting Account Type" in ["External Posting Account Type"::"Lessor Pay Type",
-                   "External Posting Account Type"::"Dataloen Pay Type"]
-                then
-                    Mileage2."Reimbursement Method" := Mileage2."Reimbursement Method"::Both;
-                Mileage3."Reimbursement Method" := Mileage2."Reimbursement Method"::"External System";
-                if "Reimbursement Method" = "Reimbursement Method"::"Vendor (on User)" then
-                    Error(WrongReimbursementMethod, FieldCaption("Reimbursement Method"), Mileage2."Reimbursement Method",
-                      Mileage3."Reimbursement Method", FieldCaption("External Posting Account Type"));
-                MilValidate.Run(Rec);
-            end;
         }
         field(285; "External Posting Account No."; Code[20])
         {
             Caption = 'External Posting Account No.';
-
-            trigger OnValidate()
-            var
-                ExpCmtMgt: Codeunit "CEM Comment Mgt.";
-                DataloenIntegration: Codeunit "CEM Dataloen Integration";
-                LessorIntegration: Codeunit "CEM Lessor Integration";
-            begin
-                case "External Posting Account Type" of
-                    "External Posting Account Type"::"Lessor Pay Type":
-                        if "External Posting Account No." <> '' then
-                            LessorIntegration.ValidatePayType("External Posting Account No.");
-
-                    "External Posting Account Type"::"Dataloen Pay Type":
-                        if "External Posting Account No." <> '' then
-                            DataloenIntegration.ValidatePayType("External Posting Account No.");
-                end;
-
-                if CurrFieldNo = FieldNo("External Posting Account No.") then
-                    ExpCmtMgt.AddFieldValueChanged(
-                      DATABASE::"CEM Mileage", 0, '', "Entry No.", FieldNo("External Posting Account No."), FieldCaption("External Posting Account No."),
-                        xRec."External Posting Account No.", "External Posting Account No.")
-                else
-                    ExpCmtMgt.DelFieldValueChangedCmt(DATABASE::"CEM Mileage", 0, '', "Entry No.", FieldNo("External Posting Account No."));
-
-                MilValidate.Run(Rec);
-            end;
         }
     }
 
@@ -656,154 +485,7 @@ table 6086338 "CEM Mileage"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
     var
-        EMAttachment: Record "CEM Attachment";
-        EMAttendee: Record "CEM Attendee";
-        EMComment: Record "CEM Comment";
-        EMDimension: Record "CEM Dimension";
-        MileageDetail: Record "CEM Mileage Detail";
-        EMReminder: Record "CEM Reminder";
-        EMApprovalsBridge: Codeunit "CEM Approvals Bridge";
-        EMOnlineMgt: Codeunit "CEM Online Synch. Mgt.";
-    begin
-        TestField(Posted, false);
-        TestStatusAllowsChange();
-        CheckInboxAndThrowError();
-
-        EMDimension.LockTable();
-        EMDimension.SetCurrentKey("Table ID", "Document Type", "Document No.", "Doc. Ref. No.");
-        EMDimension.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMDimension.SetRange("Document Type", 0);
-        EMDimension.SetRange("Document No.", '');
-        EMDimension.SetRange("Doc. Ref. No.", "Entry No.");
-        EMDimension.DeleteAll();
-
-        EMAttachment.LockTable();
-        EMAttachment.SetCurrentKey("Table ID", "Document Type", "Document No.", "Doc. Ref. No.");
-        EMAttachment.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMAttachment.SetRange("Document Type", 0);
-        EMAttachment.SetRange("Document No.", '');
-        EMAttachment.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttachment.SetHideUI();
-        EMAttachment.DeleteAll(true);
-
-        EMReminder.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMReminder.SetRange("Doc. Ref. No.", "Entry No.");
-        EMReminder.DeleteAll(true);
-
-        if Status = Status::"Pending Expense User" then
-            EMOnlineMgt.PhysicalDeleteDocFromCO(DATABASE::"CEM Mileage", "Mileage GUID", false);
-
-        EMComment.SetCurrentKey("Table ID", "Document Type", "Document No.", "Doc. Ref. No.");
-        EMComment.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMComment.SetRange("Document Type", 0);
-        EMComment.SetRange("Document No.", '');
-        EMComment.SetRange("Doc. Ref. No.", "Entry No.");
-        EMComment.DeleteAll(true);
-
-        EMApprovalsBridge.DeleteApprovalEntries(DATABASE::"CEM Mileage", Format("Entry No."));
-
-        EMAttendee.SetRange("Table ID", DATABASE::"CEM Mileage");
-        EMAttendee.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttendee.DeleteAll();
-
-        MileageDetail.SetRange("Mileage Entry No.", "Entry No.");
-        MileageDetail.DeleteAll(true);
-    end;
-
-    trigger OnInsert()
-    var
-        ExpHeader: Record "CEM Expense Header";
-        EMSetup: Record "CEM Expense Management Setup";
-        Vehicle: Record "CEM Vehicle";
-        SendToUser: Codeunit "CEM Mileage - Send to User";
-        CEMModuleLicense: Codeunit "CEM Module License";
-    begin
-        EMSetup.Get();
-        EMSetup.TestField("Enable Mileage", true);
-        CEMModuleLicense.MileageModuleActivated(true);
-
-        if "Continia User ID" = '' then
-            "Continia User ID" := UserId;
-        if "Registration Date" = 0D then
-            "Registration Date" := WorkDate();
-        Validate("Reimbursement Method", GetReimbursMethodForRecUsr());
-
-        "Entry No." := GetEntryNo();
-        "Entry No. (Code)" := Format("Entry No.");
-        if ("Settlement No." <> '') and ("Settlement Line No." = 0) then
-            "Settlement Line No." := GetNextDocumentLineNo();
-
-        if "Vehicle Code" = '' then
-            Validate("Vehicle Code", Vehicle.GetUserVehicle("Continia User ID"));
-
-        if "Settlement No." <> '' then begin
-            ExpHeader.Get(ExpHeader."Document Type"::Settlement, "Settlement No.");
-            ExpHeader.TestStatusAllowsChange();
-
-            if Status <> ExpHeader.Status then begin
-                if ExpHeader.Status = ExpHeader.Status::"Pending Expense User" then
-                    SendToUser.UpdateRefWithoutFiles(Rec);
-                Status := ExpHeader.Status;
-            end;
-            Validate("Global Dimension 1 Code", "Global Dimension 1 Code");
-            Validate("Global Dimension 2 Code", "Global Dimension 2 Code");
-        end;
-
-        "Date Created" := Today;
-        "Created by User ID" := UserId;
-
-        // Send notification in the app
-        "Notification Type" := "Notification Type"::"New document";
-
-        TestStatusAllowsChange();
-
-        AddDefaultDim(0);
-
-        MilValidate.Run(Rec);
-    end;
-
-    trigger OnModify()
-    var
-        ExpHeader: Record "CEM Expense Header";
-        UsageImplementation: Codeunit "CEM Usage Implementation";
-        Sent: Boolean;
-    begin
-        TestField(Posted, false);
-        TestStatusOrUserAllowsChange();
-        CheckInboxAndThrowError();
-
-        if "Settlement No." <> '' then begin
-            ExpHeader.Get(ExpHeader."Document Type"::Settlement, "Settlement No.");
-            if Status <> ExpHeader.Status then begin
-                TestField(Status, Status::Open);
-                if ExpHeader.Status = ExpHeader.Status::"Pending Expense User" then begin
-                    CODEUNIT.Run(CODEUNIT::"CEM Mileage - Send to User", Rec);
-                    Sent := true;
-                end;
-                Status := ExpHeader.Status;
-            end;
-        end;
-
-        "Entry No. (Code)" := Format("Entry No.");
-        if not Sent then
-            SendToExpenseUser();
-
-        UsageImplementation.LogMileageUsageIfValid(Rec);
-    end;
-
-    trigger OnRename()
-    begin
-        Error(RenameNotAllowed, TableCaption);
-    end;
-
-    var
-        MilValidate: Codeunit "CEM Mileage-Validate";
         SkipSendToExpUser: Boolean;
         SuspendInboxCheck: Boolean;
         CannotChangeWhenSttl: Label '%1 cannot be changed when assigned to a settlement.';
@@ -838,11 +520,7 @@ table 6086338 "CEM Mileage"
 
 
     procedure ShowReminders()
-    var
-        Reminders: Page "CEM Reminders";
     begin
-        Reminders.SetRecordFilter(DATABASE::"CEM Mileage", 0, '', "Entry No.");
-        Reminders.RunModal;
     end;
 
 
@@ -887,108 +565,21 @@ table 6086338 "CEM Mileage"
 
 
     procedure AddDefaultDim(ValidatedFieldNo: Integer)
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
     begin
-        DeleteOldDefaultDim();
-
-        if ContiniaUser.Get("Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode() <> '' then
-                EMDimMgt.InsertDefaultDimMileage(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.InsertDefaultDimMileage(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-            if ContiniaUser."Employee No." <> '' then;
-            EMDimMgt.InsertDefaultDimMileage(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-        end;
-
-        if "Mileage Account" <> '' then
-            EMDimMgt.InsertDefaultDimMileage(DATABASE::"G/L Account", "Mileage Account", Rec);
-
-        if "Job No." <> '' then
-            EMDimMgt.InsertDefaultDimMileage(DATABASE::Job, "Job No.", Rec);
-
-        if "Job Task No." <> '' then
-            EMDimMgt.InsertDefaultDimMileage(DATABASE::"Job Task", "Job Task No.", Rec);
-
-        case ValidatedFieldNo of
-            FieldNo("Continia User ID"):
-                if ContiniaUser.Get("Continia User ID") then begin
-                    if ContiniaUser.GetSalesPurchCode() <> '' then
-                        EMDimMgt.InsertDefaultDimMileage(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-                    if ContiniaUser."Vendor No." <> '' then
-                        EMDimMgt.InsertDefaultDimMileage(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-                    if ContiniaUser."Employee No." <> '' then;
-                    EMDimMgt.InsertDefaultDimMileage(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-                end;
-
-            FieldNo("Mileage Account"):
-                if "Mileage Account" <> '' then
-                    EMDimMgt.InsertDefaultDimMileage(DATABASE::"G/L Account", "Mileage Account", Rec);
-
-            FieldNo("Job No."):
-                if "Job No." <> '' then
-                    EMDimMgt.InsertDefaultDimMileage(DATABASE::Job, "Job No.", Rec);
-
-            FieldNo("Job Task No."):
-                if "Job Task No." <> '' then
-                    EMDimMgt.InsertDefaultDimMileage(DATABASE::"Job Task", "Job Task No.", Rec);
-        end;
     end;
-
-    local procedure DeleteOldDefaultDim()
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
-    begin
-        if ContiniaUser.Get(xRec."Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode() <> '' then
-                EMDimMgt.DeleteDefaultDimMileage(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode(), Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.DeleteDefaultDimMileage(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-
-            if ContiniaUser."Employee No." <> '' then;
-            EMDimMgt.DeleteDefaultDimMileage(DATABASE::Employee, ContiniaUser."Employee No.", Rec);
-        end;
-
-        if xRec."Mileage Account" <> '' then
-            EMDimMgt.DeleteDefaultDimMileage(DATABASE::"G/L Account", xRec."Mileage Account", Rec);
-
-        if xRec."Job No." <> '' then
-            EMDimMgt.DeleteDefaultDimMileage(DATABASE::Job, xRec."Job No.", Rec);
-
-        if xRec."Job Task No." <> '' then
-            EMDimMgt.DeleteDefaultDimMileage(DATABASE::"Job Task", xRec."Job Task No.", Rec);
-    end;
-
 
     procedure HasMileageComment(): Boolean
     begin
-        CalcFields(Comment);
-        exit(Comment);
     end;
 
 
     procedure HasErrorComment(ShowFirstError: Boolean; RunValidationChecks: Boolean): Boolean
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        exit(EMCmtMgt.HasErrorComments(DATABASE::"CEM Mileage", 0, "Settlement No.", "Entry No.", ShowFirstError, RunValidationChecks));
     end;
-
 
     procedure HasWarningComment(ShowFirstError: Boolean): Boolean
-    var
-        EMCmtMgt: Codeunit "CEM Comment Mgt.";
     begin
-        exit(EMCmtMgt.HasWarningComments(DATABASE::"CEM Mileage", 0, "Settlement No.", "Entry No.", ShowFirstError, true));
     end;
-
 
     procedure HasApprovalComment(): Boolean
     var

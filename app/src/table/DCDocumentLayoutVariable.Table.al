@@ -28,8 +28,8 @@ table 12032006 "DC - Document Layout Variable"
         }
         field(6; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Table No.")));
+            CalcFormula = lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -41,8 +41,8 @@ table 12032006 "DC - Document Layout Variable"
         }
         field(8; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = field("Table No."),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -87,23 +87,23 @@ table 12032006 "DC - Document Layout Variable"
         }
         field(50; "No. of Filters"; Integer)
         {
-            CalcFormula = Count("DC - Document Layout Filter" WHERE("Layout No." = FIELD("Layout No."),
-                                                                     "Layout Line No." = FIELD("Layout Line No."),
-                                                                     "Layout Criteria Line No." = CONST(0),
-                                                                     "Layout Field Line No." = CONST(0),
-                                                                     "Layout Variable Line No." = FIELD("Line No."),
-                                                                     "Layout Codeunit Line No." = CONST(0)));
+            CalcFormula = count("DC - Document Layout Filter" where("Layout No." = field("Layout No."),
+                                                                     "Layout Line No." = field("Layout Line No."),
+                                                                     "Layout Criteria Line No." = const(0),
+                                                                     "Layout Field Line No." = const(0),
+                                                                     "Layout Variable Line No." = field("Line No."),
+                                                                     "Layout Codeunit Line No." = const(0)));
             Caption = 'No. of Filters';
             Editable = false;
             FieldClass = FlowField;
         }
         field(51; "No. of Criterias"; Integer)
         {
-            CalcFormula = Count("DC - Document Layout Criterion" WHERE("Layout No." = FIELD("Layout No."),
-                                                                        "Layout Line No." = FIELD("Layout Line No."),
-                                                                        "Layout Field Line No." = CONST(0),
-                                                                        "Layout Variable Line No." = FIELD("Line No."),
-                                                                        "Layout Codeunit Line No." = CONST(0)));
+            CalcFormula = count("DC - Document Layout Criterion" where("Layout No." = field("Layout No."),
+                                                                        "Layout Line No." = field("Layout Line No."),
+                                                                        "Layout Field Line No." = const(0),
+                                                                        "Layout Variable Line No." = field("Line No."),
+                                                                        "Layout Codeunit Line No." = const(0)));
             Caption = 'No. of Criteria';
             Editable = false;
             FieldClass = FlowField;

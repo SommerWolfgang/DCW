@@ -1,7 +1,6 @@
 table 6086342 "CEM Dataloen Employee"
 {
     Caption = 'Dataloen Employee';
-    LookupPageID = "CEM Expense by User Part";
 
     fields
     {
@@ -18,23 +17,7 @@ table 6086342 "CEM Dataloen Employee"
         field(3; "Continia User ID"; Code[50])
         {
             Caption = 'Continia User ID';
-            TableRelation = "CDC Continia User Setup" WHERE ("Expense Management User" = CONST (true));
-
-            trigger OnValidate()
-            var
-                DLEmployee: Record "CEM Dataloen Employee";
-                UserDelegation: Record "CEM User Delegation";
-            begin
-                if "Continia User ID" = '' then
-                    exit;
-
-                UserDelegation.VerifyUser("Continia User ID");
-
-                DLEmployee.SetCurrentKey("Continia User ID");
-                DLEmployee.SetFilter("Continia User ID", "Continia User ID");
-                if DLEmployee.FindFirst then
-                    Error(ContiniaUserAllreadyMapped, "Continia User ID", DLEmployee."Employee ID", DLEmployee."Employee Name");
-            end;
+            TableRelation = "CDC Continia User Setup" where("Expense Management User" = const(true));
         }
     }
 
@@ -48,12 +31,4 @@ table 6086342 "CEM Dataloen Employee"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        ContiniaUserAllreadyMapped: Label 'Continia User %1 already mapped with Dataløn user %2 %3.\\Only one mapping is allowed.';
 }
-

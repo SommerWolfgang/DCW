@@ -134,7 +134,7 @@ table 6086017 "CDC Msg. Center Setup Template"
             "Warning Allowed" := WarningAllowed;
             "Error Allowed" := ErrorAllowed;
             "User Defined Comment Type" := "Comment Type";
-            Insert;
+            Insert();
         end else begin
             if ("Information Allowed" <> InfoAllowed) or ("Warning Allowed" <> WarningAllowed) or ("Error Allowed" <> ErrorAllowed) then begin
                 "Information Allowed" := InfoAllowed;
@@ -152,7 +152,7 @@ table 6086017 "CDC Msg. Center Setup Template"
                         if not InfoAllowed then
                             "User Defined Comment Type" := "Comment Type";
                 end;
-                Modify;
+                Modify();
             end;
         end;
     end;
@@ -167,7 +167,7 @@ table 6086017 "CDC Msg. Center Setup Template"
             FromMsgCentup.SetRange("Message Center ID", MsgCenterID);
 
         FromMsgCentup.SetRange("Template No.", '');
-        if FromMsgCentup.FindSet then
+        if FromMsgCentup.FindSet() then
             repeat
                 Clear(ToMsgCentup);
                 ToMsgCentup := FromMsgCentup;
@@ -175,9 +175,9 @@ table 6086017 "CDC Msg. Center Setup Template"
                 ToMsgCentup."User Defined Comment Type" := RemoteMsgCentup."User Defined Comment Type";
                 ToMsgCentup."Create Delegate Comt. On Error" := RemoteMsgCentup."Create Delegate Comt. On Error";
                 ToMsgCentup."Delegated To User ID" := RemoteMsgCentup."Delegated To User ID";
-                if not ToMsgCentup.Insert then
-                    ToMsgCentup.Modify;
-            until FromMsgCentup.Next = 0;
+                if not ToMsgCentup.Insert() then
+                    ToMsgCentup.Modify();
+            until FromMsgCentup.Next() = 0;
     end;
 }
 

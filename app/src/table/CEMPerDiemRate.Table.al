@@ -120,12 +120,12 @@ table 6086381 "CEM Per Diem Rate"
         PerDiemRateDetails.SetRange("Per Diem Group Code", "Per Diem Group Code");
         PerDiemRateDetails.SetRange("Destination Country/Region", "Destination Country/Region");
         PerDiemRateDetails.SetRange("Start Date", "Start Date");
-        PerDiemRateDetails.DeleteAll;
+        PerDiemRateDetails.DeleteAll();
     end;
 
     trigger OnInsert()
     begin
-        SuggestDescription;
+        SuggestDescription();
         TestField("Per Diem Group Code");
         TestField("Start Date");
     end;
@@ -134,7 +134,7 @@ table 6086381 "CEM Per Diem Rate"
     begin
         TestField("Per Diem Group Code");
         TestField("Start Date");
-        SuggestDescription;
+        SuggestDescription();
     end;
 
     trigger OnRename()
@@ -186,19 +186,19 @@ table 6086381 "CEM Per Diem Rate"
         PerDiemRates: Record "CEM Per Diem Rate";
         OldPerDiemRatesExist: Boolean;
     begin
-        if PerDiemGroup.FindSet then
+        if PerDiemGroup.FindSet() then
             repeat
                 SetRange("Per Diem Group Code", PerDiemGroup.Code);
-                if FindSet then
+                if FindSet() then
                     repeat
                         PerDiemRates.Copy(Rec);
                         PerDiemRates.SetRange("Destination Country/Region", "Destination Country/Region");
-                        if PerDiemRates.FindLast then
+                        if PerDiemRates.FindLast() then
                             if (Today - PerDiemRates."Start Date" > 365) then
                                 OldPerDiemRatesExist := true;
                         Rec := PerDiemRates;
-                    until Next = 0;
-            until PerDiemGroup.Next = 0;
+                    until Next() = 0;
+            until PerDiemGroup.Next() = 0;
 
         if OldPerDiemRatesExist then
             Message(RatesOlderThanOneYear);
@@ -211,19 +211,19 @@ table 6086381 "CEM Per Diem Rate"
         PerDiemRates: Record "CEM Per Diem Rate";
         RatesExpireSoon: Boolean;
     begin
-        if PerDiemGroup.FindSet then
+        if PerDiemGroup.FindSet() then
             repeat
                 SetRange("Per Diem Group Code", PerDiemGroup.Code);
-                if FindSet then
+                if FindSet() then
                     repeat
                         PerDiemRates.Copy(Rec);
                         PerDiemRates.SetRange("Destination Country/Region", "Destination Country/Region");
-                        if PerDiemRates.FindLast then
+                        if PerDiemRates.FindLast() then
                             if (Today - PerDiemRates."Start Date" > 365 - 14) then
                                 RatesExpireSoon := true;
                         Rec := PerDiemRates;
-                    until Next = 0;
-            until PerDiemGroup.Next = 0;
+                    until Next() = 0;
+            until PerDiemGroup.Next() = 0;
 
         if RatesExpireSoon then
             if Confirm(RatesCouldBeExpiringSoon) then
@@ -236,7 +236,7 @@ table 6086381 "CEM Per Diem Rate"
         SetRange("Per Diem Group Code", PerDiem."Per Diem Group Code");
         SetRange("Destination Country/Region", PerDiem."Destination Country/Region");
         SetRange("Start Date", 0D, DT2Date(PerDiem."Departure Date/Time"));
-        if FindLast then
+        if FindLast() then
             if (DT2Date(PerDiem."Departure Date/Time") - "Start Date" > 365) then
                 exit(true);
     end;
@@ -270,7 +270,7 @@ table 6086381 "CEM Per Diem Rate"
 
     procedure GetResidualAfterDeductingMeals(): Decimal
     begin
-        exit("Daily Meal Allowance" - GetBreakfastAmount - GetLunchAmount - GetDinnerAmount);
+        exit("Daily Meal Allowance" - GetBreakfastAmount() - GetLunchAmount() - GetDinnerAmount());
     end;
 }
 

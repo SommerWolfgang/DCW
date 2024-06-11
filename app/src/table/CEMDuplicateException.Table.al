@@ -34,7 +34,7 @@ table 6086335 "CEM Duplicate Exception"
     trigger OnInsert()
     begin
         if "Entry No." = 0 then
-            "Entry No." := NextEntryNo;
+            "Entry No." := NextEntryNo();
     end;
 
     var
@@ -51,13 +51,13 @@ table 6086335 "CEM Duplicate Exception"
             Error('');
 
         BankTransaction.Duplicate := false;
-        BankTransaction.Modify;
+        BankTransaction.Modify();
 
         SetFilter("Business Name", BankTransaction."Business Name");
-        if FindFirst then begin
+        if FindFirst() then begin
             if "Maximum Amount(LCY)" < BankTransaction."Bank-Currency Amount" then begin
                 "Maximum Amount(LCY)" := BankTransaction."Bank-Currency Amount";
-                Modify;
+                Modify();
             end;
         end else begin
             "Business Name" := BankTransaction."Business Name";
@@ -70,7 +70,7 @@ table 6086335 "CEM Duplicate Exception"
     var
         NotDuplicate: Record "CEM Duplicate Exception";
     begin
-        if NotDuplicate.FindLast then;
+        if NotDuplicate.FindLast() then;
         exit(NotDuplicate."Entry No." + 1);
     end;
 }

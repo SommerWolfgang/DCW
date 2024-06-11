@@ -70,7 +70,7 @@ table 6086348 "CEM Table Filter Field EM"
     trigger OnInsert()
     begin
         if "Table Filter GUID" = EmptyGUID then
-            "Table Filter GUID" := CreateGuid;
+            "Table Filter GUID" := CreateGuid();
     end;
 
     var

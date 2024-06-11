@@ -1,7 +1,6 @@
 table 6086404 "CEM User Delegation"
 {
     Caption = 'Expense User Delegation';
-    LookupPageID = "CEM User Delegation";
     Permissions = TableData "CEM User Delegation" = rimd;
 
     fields
@@ -10,13 +9,13 @@ table 6086404 "CEM User Delegation"
         {
             Caption = 'Owner User ID';
             NotBlank = true;
-            TableRelation = "CDC Continia User Setup" WHERE("Expense Management User" = CONST(true));
+            TableRelation = "CDC Continia User Setup" where("Expense Management User" = const(true));
         }
         field(2; "Delegated User ID"; Code[50])
         {
             Caption = 'Delegated User ID';
             NotBlank = true;
-            TableRelation = "CDC Continia User Setup" WHERE("Expense Management User" = CONST(true));
+            TableRelation = "CDC Continia User Setup" where("Expense Management User" = const(true));
         }
         field(3; "Valid From"; Date)
         {
@@ -49,7 +48,7 @@ table 6086404 "CEM User Delegation"
     var
         UserDelegation: Record "CEM User Delegation";
     begin
-        if not IsNAVUser then
+        if not IsNAVUser() then
             exit;
 
         FilterTxt := UserId;
@@ -57,10 +56,10 @@ table 6086404 "CEM User Delegation"
         UserDelegation.SetRange("Delegated User ID", UserId);
         UserDelegation.SetRange("Valid From", 0D, Today);
         UserDelegation.SetFilter("Valid To", '=%1|>=%2', 0D, Today);
-        if UserDelegation.FindSet then
+        if UserDelegation.FindSet() then
             repeat
                 FilterTxt := FilterTxt + '|' + UserDelegation."Owner User ID";
-            until UserDelegation.Next = 0;
+            until UserDelegation.Next() = 0;
     end;
 
 
@@ -71,19 +70,19 @@ table 6086404 "CEM User Delegation"
         UserDelegation.SetRange("Owner User ID", OwnerUserID);
         UserDelegation.SetRange("Valid From", 0D, Today);
         UserDelegation.SetFilter("Valid To", '=%1|>=%2', 0D, Today);
-        if UserDelegation.FindSet then
+        if UserDelegation.FindSet() then
             repeat
                 if FilterTxt = '' then
                     FilterTxt := UserDelegation."Delegated User ID"
                 else
                     FilterTxt := FilterTxt + '|' + UserDelegation."Delegated User ID";
-            until UserDelegation.Next = 0;
+            until UserDelegation.Next() = 0;
     end;
 
 
     procedure LookupUser2(var Text: Text[1024]; var ContiniaUserSetup: Record "CDC Continia User Setup"): Boolean
     begin
-        ContiniaUserSetup.SetFilter("Continia User ID", GetDelegationFilter);
+        ContiniaUserSetup.SetFilter("Continia User ID", GetDelegationFilter());
         if ContiniaUserSetup.Get(Text) then;
         if PAGE.RunModal(0, ContiniaUserSetup) = ACTION::LookupOK then begin
             Text := ContiniaUserSetup."Continia User ID";
@@ -107,15 +106,15 @@ table 6086404 "CEM User Delegation"
         if DelegatedUserID = '' then
             Error(UserIDBlankErr);
 
-        if GetDelegationFilter = '' then
+        if GetDelegationFilter() = '' then
             exit;
 
-        ContiniaUserSetup.SetFilter("Continia User ID", GetDelegationFilter);
-        if ContiniaUserSetup.FindSet then
+        ContiniaUserSetup.SetFilter("Continia User ID", GetDelegationFilter());
+        if ContiniaUserSetup.FindSet() then
             repeat
                 if ContiniaUserSetup."Continia User ID" = DelegatedUserID then
                     exit;
-            until ContiniaUserSetup.Next = 0
+            until ContiniaUserSetup.Next() = 0
         else
             exit;
 
@@ -128,7 +127,7 @@ table 6086404 "CEM User Delegation"
         ContiniaUserSetup: Record "CDC Continia User Setup";
         EMSetup: Record "CEM Expense Management Setup";
     begin
-        if not EMSetup.Get then
+        if not EMSetup.Get() then
             exit(false);
 
         ContiniaUserSetup.SetRange("Continia User ID", UserId);
@@ -138,28 +137,7 @@ table 6086404 "CEM User Delegation"
 
 
     procedure GetDelegationNames() FilterTxt: Text[1024]
-    var
-        UserDelegation: Record "CEM User Delegation";
-        ApprovalMgt: Codeunit "CDC Approval Management";
-        StopLoop: Boolean;
     begin
-        if not IsNAVUser then
-            exit;
-
-        UserDelegation.SetRange("Delegated User ID", UserId);
-        if UserDelegation.FindSet then
-            repeat
-                if UserDelegation."Owner User ID" <> UserId then
-                    if (StrLen(ApprovalMgt.GetApproverDisplayName(UserDelegation."Owner User ID")) +
-                      StrLen(FilterTxt) + 2) >= 1024 then
-                        StopLoop := true
-                    else begin
-                        if FilterTxt = '' then
-                            FilterTxt := ApprovalMgt.GetApproverDisplayName(UserDelegation."Owner User ID")
-                        else
-                            FilterTxt := FilterTxt + ', ' + ApprovalMgt.GetApproverDisplayName(UserDelegation."Owner User ID");
-                    end;
-            until (UserDelegation.Next = 0) or StopLoop;
     end;
 
 

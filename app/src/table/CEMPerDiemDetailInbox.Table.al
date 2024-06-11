@@ -73,7 +73,7 @@ table 6086391 "CEM Per Diem Detail Inbox"
 
     trigger OnInsert()
     begin
-        "Entry No." := GetEntryNo;
+        "Entry No." := GetEntryNo();
     end;
 
 
@@ -84,7 +84,7 @@ table 6086391 "CEM Per Diem Detail Inbox"
         Rec.TestField("Per Diem Inbox Entry No.");
 
         PerDiemDetailsInbox.SetRange("Per Diem Inbox Entry No.", "Per Diem Inbox Entry No.");
-        if PerDiemDetailsInbox.FindLast then
+        if PerDiemDetailsInbox.FindLast() then
             exit(PerDiemDetailsInbox."Entry No." + 1)
         else
             exit(1);
@@ -100,28 +100,18 @@ table 6086391 "CEM Per Diem Detail Inbox"
         if PerDiemDestInbox.IsEmpty then
             exit('');
 
-        PerDiemDestInbox.FindSet;
+        PerDiemDestInbox.FindSet();
         repeat
             PerDiemDestInbox.CalcFields("Destination Name");
             if DestinationTxt <> '' then
                 DestinationTxt += ',';
 
             DestinationTxt += PerDiemDestInbox."Destination Name";
-        until PerDiemDestInbox.Next = 0;
+        until PerDiemDestInbox.Next() = 0;
     end;
 
 
     procedure DrillDownDestinations()
-    var
-        PerDiemDestInbox: Record "CEM Per Diem Dest. Inbox";
-        PerDiemDestiInboxPage: Page "CEM Per Diem Dest. Inbox";
     begin
-        PerDiemDestInbox.SetRange("Per Diem Inbox Entry No.", "Per Diem Inbox Entry No.");
-        PerDiemDestInbox.SetRange("Per Diem Inbox Detail No.", "Entry No.");
-
-        PerDiemDestiInboxPage.SetTableView(PerDiemDestInbox);
-        PerDiemDestiInboxPage.Editable(true);
-        PerDiemDestiInboxPage.Run;
     end;
 }
-

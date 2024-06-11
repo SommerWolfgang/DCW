@@ -69,7 +69,7 @@ table 6086383 "CEM Per Diem Group"
                         exit(DefaultUserSetup."Per Diem Group Code");
 
         PerDiemGroup.SetRange(Default, true);
-        if PerDiemGroup.FindFirst then
+        if PerDiemGroup.FindFirst() then
             exit(PerDiemGroup.Code);
     end;
 }

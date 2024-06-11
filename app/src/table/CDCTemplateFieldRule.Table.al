@@ -15,15 +15,15 @@ table 6085583 "CDC Template Field Rule"
             Caption = 'Type';
             OptionCaption = 'Header,Line';
             OptionMembers = Header,Line;
-            TableRelation = "CDC Template Field".Type WHERE ("Template No." = FIELD ("Template No."));
+            TableRelation = "CDC Template Field".Type where("Template No." = field("Template No."));
             ValidateTableRelation = false;
         }
         field(3; "Code"; Code[20])
         {
             Caption = 'Code';
             NotBlank = true;
-            TableRelation = "CDC Template Field".Code WHERE ("Template No." = FIELD ("Template No."),
-                                                             Type = FIELD (Type));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = field(Type));
         }
         field(4; "Entry No."; Integer)
         {
@@ -36,10 +36,10 @@ table 6085583 "CDC Template Field Rule"
 
             trigger OnLookup()
             var
-                Template: Record "CDC Template";
                 MasterTemplate: Record "CDC Template";
-                TemplateFilter: Text[1024];
+                Template: Record "CDC Template";
                 FieldRule: Record "CDC Template Field Rule";
+                TemplateFilter: Text[1024];
             begin
                 Template.Get("Template No.");
 
@@ -49,13 +49,13 @@ table 6085583 "CDC Template Field Rule"
                 MasterTemplate.SetRange("Data Type", Template."Data Type");
                 if Template."Data Type" = Template."Data Type"::XML then
                     MasterTemplate.SetRange("XML Ident. Template No.", Template."XML Ident. Template No.");
-                if MasterTemplate.FindSet then
+                if MasterTemplate.FindSet() then
                     repeat
                         if TemplateFilter = '' then
                             TemplateFilter := MasterTemplate."No."
                         else
                             TemplateFilter := TemplateFilter + '|' + MasterTemplate."No.";
-                    until MasterTemplate.Next = 0;
+                    until MasterTemplate.Next() = 0;
 
                 FieldRule.SetRange("Template No.", Template."No.");
                 FieldRule.SetFilter("Template No.", TemplateFilter);

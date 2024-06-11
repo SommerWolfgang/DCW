@@ -14,27 +14,20 @@ table 6086407 "CEM Transaction Field Mapping"
         {
             Caption = 'Column No.';
             InitValue = 1;
-            TableRelation = Integer WHERE(Number = FILTER(1 .. 100));
+            TableRelation = Integer where(Number = filter(1 .. 100));
         }
         field(10; "Journal Field No."; Integer)
         {
             Caption = 'Journal Field No.';
             InitValue = 2;
-            TableRelation = Field."No." WHERE(TableNo = CONST(6086410),
-                                               "No." = FILTER(2 .. 19 | 22 .. 27 | 100 | 120 | 130 | 140 .. 141));
+            TableRelation = Field."No." where(TableNo = const(6086410),
+                                               "No." = filter(2 .. 19 | 22 .. 27 | 100 | 120 | 130 | 140 .. 141));
             ValuesAllowed = 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 27, 100, 120, 130, 140, 141;
-
-            trigger OnLookup()
-            var
-                RecIDMgt: Codeunit "CDC Record ID Mgt.";
-                Text: Text[250];
-            begin
-            end;
         }
-        field(11; "Journal Field Name"; Text[30])
+        field(11; "Journal Field Name"; Text[80])
         {
-            CalcFormula = Lookup(Field."Field Caption" WHERE(TableNo = CONST(6086410),
-                                                              "No." = FIELD("Journal Field No.")));
+            CalcFormula = lookup(Field."Field Caption" where(TableNo = const(6086410),
+                                                              "No." = field("Journal Field No.")));
             Caption = 'Journal Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -132,28 +125,6 @@ table 6086407 "CEM Transaction Field Mapping"
 
 
     procedure LookupField(): Integer
-    var
-        Journal: Record "CEM Transaction Journal";
-        "Field": Record "Field";
-        LookupField: Record "Field" temporary;
-        NAVversionMgt: Codeunit "CEM NAV-version Mgt.";
     begin
-        Field.SetRange(TableNo, DATABASE::"CEM Transaction Journal");
-        Field.SetRange(Enabled, true);
-        Field.SetRange(Class, Field.Class::Normal);
-
-        if Field.FindSet then
-            repeat
-                if not (Field."No." in [Journal.FieldNo("Entry No."), Journal.FieldNo("Document Time"), Journal.FieldNo("Template Code")]) then begin
-                    LookupField := Field;
-                    LookupField.Insert;
-                end;
-            until Field.Next = 0;
-
-        if LookupField.FindFirst then;
-
-        if PAGE.RunModal(NAVversionMgt.GetFieldLookupPageID, LookupField) = ACTION::LookupOK then
-            exit(LookupField."No.");
     end;
 }
-

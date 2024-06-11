@@ -24,9 +24,9 @@ table 6086359 "CEM Attachment"
         field(4; "Doc. Ref. No."; Integer)
         {
             Caption = 'Doc. Ref. No.';
-            TableRelation = IF ("Table ID" = CONST(6086320)) "CEM Expense"
-            ELSE
-            IF ("Table ID" = CONST(6086338)) "CEM Mileage";
+            TableRelation = if ("Table ID" = const(6086320)) "CEM Expense"
+            else
+            if ("Table ID" = const(6086338)) "CEM Mileage";
         }
         field(10; "Entry No."; Integer)
         {

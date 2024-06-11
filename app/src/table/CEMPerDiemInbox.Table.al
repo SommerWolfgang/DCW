@@ -17,7 +17,7 @@ table 6086390 "CEM Per Diem Inbox"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -56,34 +56,10 @@ table 6086390 "CEM Per Diem Inbox"
         field(14; "Global Dimension 1 Code"; Code[20])
         {
             Caption = 'Global Dimension 1 Code';
-            CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(CannotModifyErr, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Per Diem Inbox", 0, '', "Entry No.", 1, "Global Dimension 1 Code");
-            end;
         }
         field(15; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
-            CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(CannotModifyErr, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Per Diem Inbox", 0, '', "Entry No.", 2, "Global Dimension 2 Code");
-            end;
         }
         field(16; "Job No."; Code[20])
         {
@@ -93,7 +69,7 @@ table 6086390 "CEM Per Diem Inbox"
         field(17; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(18; Billable; Boolean)
         {
@@ -113,8 +89,8 @@ table 6086390 "CEM Per Diem Inbox"
         field(26; "Settlement No."; Code[20])
         {
             Caption = 'Settlement No.';
-            TableRelation = "CEM Expense Header"."No." WHERE("Document Type" = CONST(Settlement),
-                                                              "Continia User ID" = FIELD("Continia User ID"));
+            TableRelation = "CEM Expense Header"."No." where("Document Type" = const(Settlement),
+                                                              "Continia User ID" = field("Continia User ID"));
 
             trigger OnLookup()
             var
@@ -188,7 +164,7 @@ table 6086390 "CEM Per Diem Inbox"
 
             trigger OnValidate()
             begin
-                CheckChangeAndConfirm;
+                CheckChangeAndConfirm();
             end;
         }
         field(39; "Updated By Delegation User"; Code[50])
@@ -225,52 +201,6 @@ table 6086390 "CEM Per Diem Inbox"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        EMDimInbox: Record "CEM Dimension Inbox";
-        PerDiem: Record "CEM Per Diem";
-        PerDiemValidate: Codeunit "CEM Per Diem-Validate";
-    begin
-        TestField(Status, Status::Accepted);
-
-        EMDimInbox.SetRange("Table ID", DATABASE::"CEM Per Diem Inbox");
-        EMDimInbox.SetRange("Document Type", 0);
-        EMDimInbox.SetRange("Document No.", '');
-        EMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMDimInbox.DeleteAll;
-
-        if "Per Diem Entry No." <> 0 then
-            if PerDiem.Get("Per Diem Entry No.") then
-                PerDiemValidate.Run(PerDiem);
-    end;
-
-    trigger OnInsert()
-    begin
-        "Entry No." := GetEntryNo;
-    end;
-
-    trigger OnModify()
-    var
-        UserDelegation: Record "CEM User Delegation";
-    begin
-        if xRec.Status = Status::Accepted then
-            Error(CannotModifyErr, TableCaption, "Entry No.");
-
-        if Status = Status::Error then
-            Status := Status::Pending;
-
-        UserDelegation.VerifyUser("Continia User ID");
-    end;
-
-    trigger OnRename()
-    begin
-        Error(CannotRenameErr, TableCaption);
-    end;
-
     var
         CannotModifyErr: Label 'You cannot modify %1 %2, because it is already accepted.';
         CannotRenameErr: Label 'You cannot rename a %1.';
@@ -281,7 +211,7 @@ table 6086390 "CEM Per Diem Inbox"
     var
         PerDiemInbox: Record "CEM Per Diem Inbox";
     begin
-        if PerDiemInbox.FindLast then
+        if PerDiemInbox.FindLast() then
             exit(PerDiemInbox."Entry No." + 1)
         else
             exit(1);

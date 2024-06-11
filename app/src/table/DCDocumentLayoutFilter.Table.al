@@ -17,69 +17,49 @@ table 12032005 "DC - Document Layout Filter"
         {
             Caption = 'Layout Line No.';
             NotBlank = true;
-            TableRelation = "DC - Document Layout Line"."Line No." WHERE("Layout No." = FIELD("Layout No."));
+            TableRelation = "DC - Document Layout Line"."Line No." where("Layout No." = field("Layout No."));
         }
         field(3; "Layout Criteria Line No."; Integer)
         {
             Caption = 'Layout Criteria Line No.';
-            TableRelation = "DC - Document Layout Criterion"."Line No." WHERE("Layout No." = FIELD("Layout No."),
-                                                                               "Layout Line No." = FIELD("Layout Line No."),
-                                                                               "Layout Field Line No." = FIELD("Layout Field Line No."),
-                                                                               "Layout Variable Line No." = FIELD("Layout Variable Line No."),
-                                                                               "Layout Codeunit Line No." = FIELD("Layout Codeunit Line No."));
+            TableRelation = "DC - Document Layout Criterion"."Line No." where("Layout No." = field("Layout No."),
+                                                                               "Layout Line No." = field("Layout Line No."),
+                                                                               "Layout Field Line No." = field("Layout Field Line No."),
+                                                                               "Layout Variable Line No." = field("Layout Variable Line No."),
+                                                                               "Layout Codeunit Line No." = field("Layout Codeunit Line No."));
         }
         field(4; "Layout Field Line No."; Integer)
         {
             Caption = 'Layout Field Line No.';
-            TableRelation = "DC - Document Layout Field"."Line No." WHERE("Layout No." = FIELD("Layout No."),
-                                                                           "Layout Line No." = FIELD("Layout Line No."));
+            TableRelation = "DC - Document Layout Field"."Line No." where("Layout No." = field("Layout No."),
+                                                                           "Layout Line No." = field("Layout Line No."));
         }
         field(5; "Layout Variable Line No."; Integer)
         {
             Caption = 'Layout Variable Line No.';
-            TableRelation = "DC - Document Layout Variable"."Line No." WHERE("Layout No." = FIELD("Layout No."),
-                                                                              "Layout Line No." = FIELD("Layout Line No."));
+            TableRelation = "DC - Document Layout Variable"."Line No." where("Layout No." = field("Layout No."),
+                                                                              "Layout Line No." = field("Layout Line No."));
         }
         field(6; "Layout Codeunit Line No."; Integer)
         {
             Caption = 'Layout Codeunit Line No.';
-            TableRelation = "DC - Document Layout Codeunit"."Line No." WHERE("Layout No." = FIELD("Layout No."),
-                                                                              "Layout Line No." = FIELD("Layout Line No."));
+            TableRelation = "DC - Document Layout Codeunit"."Line No." where("Layout No." = field("Layout No."),
+                                                                              "Layout Line No." = field("Layout Line No."));
         }
         field(7; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
         }
         field(8; "Field No."; Integer)
         {
             Caption = 'Field No.';
             NotBlank = true;
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                FieldID: Integer;
-            begin
-                InitTableNo;
-
-                FieldID := ConfiguratorDocMng.LookupField("Table No.");
-
-                if FieldID <> 0 then
-                    Validate("Field No.", FieldID);
-            end;
-
-            trigger OnValidate()
-            begin
-                InitTableNo;
-
-                CalcFields("Field Name");
-            end;
         }
         field(9; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = field("Table No."),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -116,35 +96,16 @@ table 12032005 "DC - Document Layout Filter"
         field(11; "Filter Table No."; Integer)
         {
             Caption = 'Filter Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
         }
         field(12; "Filter Field No."; Integer)
         {
             Caption = 'Filter Field No.';
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                FieldID: Integer;
-            begin
-                FieldID := ConfiguratorDocMng.LookupField("Filter Table No.");
-
-                if FieldID <> 0 then
-                    Validate("Filter Field No.", FieldID);
-            end;
-
-            trigger OnValidate()
-            begin
-                if "Filter Field No." <> 0 then
-                    TestField("Filter Type", "Filter Type"::Value);
-
-                CalcFields("Filter Field Name");
-            end;
         }
         field(13; "Filter Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Filter Table No."),
-                                                        "No." = FIELD("Filter Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = field("Filter Table No."),
+                                                        "No." = field("Filter Field No.")));
             Caption = 'Filter Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -152,12 +113,6 @@ table 12032005 "DC - Document Layout Filter"
         field(14; Text; Text[250])
         {
             Caption = 'Text';
-
-            trigger OnValidate()
-            begin
-                if Text <> '' then
-                    TestField("Filter Type", "Filter Type"::Text);
-            end;
         }
         field(15; "System Value"; Option)
         {
@@ -168,20 +123,10 @@ table 12032005 "DC - Document Layout Filter"
         field(16; "Start Date Formula"; DateFormula)
         {
             Caption = 'Start Date Formula';
-
-            trigger OnValidate()
-            begin
-                TestField("Filter Type", "Filter Type"::"Date Range");
-            end;
         }
         field(17; "End Date Formula"; DateFormula)
         {
             Caption = 'End Date Formula';
-
-            trigger OnValidate()
-            begin
-                TestField("Filter Type", "Filter Type"::"Date Range");
-            end;
         }
     }
 
@@ -192,32 +137,6 @@ table 12032005 "DC - Document Layout Filter"
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnDeleteCode("Layout No.");
-    end;
-
-    trigger OnInsert()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnInsertCode("Layout No.");
-    end;
-
-    trigger OnModify()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnModifyCode("Layout No.");
-    end;
-
 
     procedure Caption(): Text[120]
     var

@@ -17,7 +17,7 @@ table 6086341 "CEM Expense Header Inbox"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -38,7 +38,7 @@ table 6086341 "CEM Expense Header Inbox"
         field(8; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(9; "Expense Header Type"; Option)
         {
@@ -49,7 +49,7 @@ table 6086341 "CEM Expense Header Inbox"
         field(10; "Expense Header No."; Code[20])
         {
             Caption = 'Expense Header No.';
-            TableRelation = "CEM Expense Header"."No." WHERE("Document Type" = FIELD("Expense Header Type"));
+            TableRelation = "CEM Expense Header"."No." where("Document Type" = field("Expense Header Type"));
         }
         field(11; "Created Date/Time"; DateTime)
         {
@@ -79,7 +79,7 @@ table 6086341 "CEM Expense Header Inbox"
 
             trigger OnValidate()
             begin
-                CheckChangeAndConfirm;
+                CheckChangeAndConfirm();
             end;
         }
         field(17; "Exp. Header GUID"; Guid)
@@ -90,33 +90,11 @@ table 6086341 "CEM Expense Header Inbox"
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(AlreadyAcceptedErr, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Expense Inbox", 0, '', "Entry No.", 1, "Global Dimension 1 Code");
-            end;
         }
         field(19; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(AlreadyAcceptedErr, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Expense Inbox", 0, '', "Entry No.", 2, "Global Dimension 2 Code");
-            end;
         }
         field(20; "Expense Header Completed"; Boolean)
         {
@@ -148,7 +126,7 @@ table 6086341 "CEM Expense Header Inbox"
 
             trigger OnValidate()
             begin
-                CheckDates;
+                CheckDates();
             end;
         }
         field(26; "Return Date/Time"; DateTime)
@@ -157,7 +135,7 @@ table 6086341 "CEM Expense Header Inbox"
 
             trigger OnValidate()
             begin
-                CheckDates;
+                CheckDates();
             end;
         }
         field(33; Billable; Boolean)

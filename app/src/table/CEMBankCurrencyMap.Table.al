@@ -98,13 +98,13 @@ table 6086310 "CEM Bank Currency Map"
 
         BankCurrencyMapTemp.SetRange("Local Currency", true);
         if not BankCurrencyMapTemp.IsEmpty then begin
-            BankCurrencyMapTemp.FindSet;
+            BankCurrencyMapTemp.FindSet();
             repeat
                 if CurrTxt = '' then
                     CurrTxt := BankCurrencyMapTemp."Currency Code (Bank)"
                 else
                     CurrTxt := CurrTxt + ',' + BankCurrencyMapTemp."Currency Code (Bank)";
-            until BankCurrencyMapTemp.Next = 0;
+            until BankCurrencyMapTemp.Next() = 0;
         end;
         BankCurrencyMapTemp.SetRange("Local Currency");
 
@@ -116,7 +116,7 @@ table 6086310 "CEM Bank Currency Map"
     var
         GLSetup: Record "General Ledger Setup";
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         exit(FieldCaption("Local Currency") + StrSubstNo('(%1)', GLSetup."LCY Code"));
     end;
 }

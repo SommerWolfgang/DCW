@@ -13,9 +13,9 @@ table 6085778 "CDC Our Cont. to Purch./Salesp"
         field(2; "Vendor/Customer No."; Code[20])
         {
             Caption = 'Vendor/Customer No.';
-            TableRelation = IF (Type = CONST(Vendor)) Vendor
-            ELSE
-            IF (Type = CONST(Customer)) Customer;
+            TableRelation = if (Type = const(Vendor)) Vendor
+            else
+            if (Type = const(Customer)) Customer;
         }
         field(3; "Our Contact"; Code[200])
         {

@@ -18,7 +18,7 @@ table 12032003 "DC - Document Layout Field"
         {
             Caption = 'Layout Line No.';
             NotBlank = true;
-            TableRelation = "DC - Document Layout Line"."Line No." WHERE("Layout No." = FIELD("Layout No."));
+            TableRelation = "DC - Document Layout Line"."Line No." where("Layout No." = field("Layout No."));
         }
         field(3; "Line No."; Integer)
         {
@@ -39,11 +39,11 @@ table 12032003 "DC - Document Layout Field"
                         DocumentLayoutField.SetRange("Group Code", "Group Code");
                         if DocumentLayoutField.FindSet(true, false) then
                             repeat
-                                if DocumentLayoutField.GetPosition <> GetPosition then begin
+                                if DocumentLayoutField.GetPosition() <> GetPosition() then begin
                                     DocumentLayoutField.Validate(Line, DocumentLayoutField.Line - (xRec.Line - Line));
-                                    DocumentLayoutField.Modify;
+                                    DocumentLayoutField.Modify();
                                 end;
-                            until DocumentLayoutField.Next = 0;
+                            until DocumentLayoutField.Next() = 0;
                     end;
             end;
         }
@@ -62,12 +62,12 @@ table 12032003 "DC - Document Layout Field"
                         DocumentLayoutField.SetRange("Group Code", "Group Code");
                         if DocumentLayoutField.FindSet(true, false) then
                             repeat
-                                if DocumentLayoutField.GetPosition <> GetPosition then begin
+                                if DocumentLayoutField.GetPosition() <> GetPosition() then begin
                                     DocumentLayoutField.Validate("Indentation (pt)", DocumentLayoutField."Indentation (pt)" -
                                     (xRec."Indentation (pt)" - "Indentation (pt)"));
-                                    DocumentLayoutField.Modify;
+                                    DocumentLayoutField.Modify();
                                 end;
-                            until DocumentLayoutField.Next = 0;
+                            until DocumentLayoutField.Next() = 0;
                     end;
             end;
         }
@@ -134,35 +134,11 @@ table 12032003 "DC - Document Layout Field"
         field(8; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                ObjectID: Integer;
-            begin
-                ObjectID := ConfiguratorDocMng.LookupObject('T');
-
-                if ObjectID <> 0 then
-                    Validate("Table No.", ObjectID);
-            end;
-
-            trigger OnValidate()
-            begin
-                if "Table No." <> 0 then
-                    if (Type = Type::Text) or (Type = Type::"Document Text") or (Type = Type::System) then
-                        FieldError(Type);
-
-                if "Table No." = 0 then
-                    Validate("Field No.", 0);
-
-                CalcFields("Table Name");
-            end;
         }
         field(9; "Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Name" WHERE("Object Type" = CONST(Table),
-                                                                        "Object ID" = FIELD("Table No.")));
+            CalcFormula = lookup(AllObjWithCaption."Object Name" where("Object Type" = const(Table),
+                                                                        "Object ID" = field("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -170,37 +146,11 @@ table 12032003 "DC - Document Layout Field"
         field(10; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = FIELD("Table No."));
-
-            trigger OnLookup()
-            var
-                ConfiguratorDocMng: Codeunit "DC - Management";
-                FieldID: Integer;
-            begin
-                TestField("Table No.");
-
-                FieldID := ConfiguratorDocMng.LookupField("Table No.");
-
-                if FieldID <> 0 then
-                    Validate("Field No.", FieldID);
-            end;
-
-            trigger OnValidate()
-            begin
-                if "Field No." <> 0 then
-                    if (Type = Type::Text) or (Type = Type::"Document Text") or (Type = Type::System) then
-                        FieldError(Type);
-
-                CalcFields("Field Name");
-
-                if Description = '' then
-                    Description := "Field Name";
-            end;
         }
         field(11; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = FIELD("Table No."),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = field("Table No."),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -307,24 +257,10 @@ table 12032003 "DC - Document Layout Field"
         field(31; "Font Family"; Text[30])
         {
             Caption = 'Font Family';
-
-            trigger OnLookup()
-            var
-                DocumentConfigMgt: Codeunit "DC - Management";
-            begin
-                DocumentConfigMgt.SelectFont("Font Family", "Font Size");
-            end;
         }
         field(32; "Font Size"; Integer)
         {
             Caption = 'Font Size';
-
-            trigger OnLookup()
-            var
-                DocumentConfigMgt: Codeunit "DC - Management";
-            begin
-                DocumentConfigMgt.SelectFont("Font Family", "Font Size");
-            end;
         }
         field(33; "Font Weight"; Option)
         {
@@ -335,13 +271,6 @@ table 12032003 "DC - Document Layout Field"
         field(34; "Fore Color"; Text[30])
         {
             Caption = 'Fore Color';
-
-            trigger OnLookup()
-            var
-                DocumentConfigMgt: Codeunit "DC - Management";
-            begin
-                DocumentConfigMgt.SelectColor("Fore Color");
-            end;
         }
         field(35; "Text Decoration"; Option)
         {
@@ -357,23 +286,23 @@ table 12032003 "DC - Document Layout Field"
         }
         field(50; "No. of Filters"; Integer)
         {
-            CalcFormula = Count("DC - Document Layout Filter" WHERE("Layout No." = FIELD("Layout No."),
-                                                                     "Layout Line No." = FIELD("Layout Line No."),
-                                                                     "Layout Criteria Line No." = CONST(0),
-                                                                     "Layout Field Line No." = FIELD("Line No."),
-                                                                     "Layout Variable Line No." = CONST(0),
-                                                                     "Layout Codeunit Line No." = CONST(0)));
+            CalcFormula = count("DC - Document Layout Filter" where("Layout No." = field("Layout No."),
+                                                                     "Layout Line No." = field("Layout Line No."),
+                                                                     "Layout Criteria Line No." = const(0),
+                                                                     "Layout Field Line No." = field("Line No."),
+                                                                     "Layout Variable Line No." = const(0),
+                                                                     "Layout Codeunit Line No." = const(0)));
             Caption = 'No. of Filters';
             Editable = false;
             FieldClass = FlowField;
         }
         field(51; "No. of Criteria"; Integer)
         {
-            CalcFormula = Count("DC - Document Layout Criterion" WHERE("Layout No." = FIELD("Layout No."),
-                                                                        "Layout Line No." = FIELD("Layout Line No."),
-                                                                        "Layout Field Line No." = FIELD("Line No."),
-                                                                        "Layout Variable Line No." = CONST(0),
-                                                                        "Layout Codeunit Line No." = CONST(0)));
+            CalcFormula = count("DC - Document Layout Criterion" where("Layout No." = field("Layout No."),
+                                                                        "Layout Line No." = field("Layout Line No."),
+                                                                        "Layout Field Line No." = field("Line No."),
+                                                                        "Layout Variable Line No." = const(0),
+                                                                        "Layout Codeunit Line No." = const(0)));
             Caption = 'No. of Criteria';
             Editable = false;
             FieldClass = FlowField;
@@ -395,7 +324,7 @@ table 12032003 "DC - Document Layout Field"
         {
             Caption = 'Subreport No.';
             Description = 'CCFD';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Report));
         }
     }
 
@@ -409,48 +338,6 @@ table 12032003 "DC - Document Layout Field"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        DocumentLayoutCriteria: Record "DC - Document Layout Criterion";
-        DocumentLayoutFilter: Record "DC - Document Layout Filter";
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnDeleteCode("Layout No.");
-
-        DocumentLayoutFilter.SetRange("Layout No.", "Layout No.");
-        DocumentLayoutFilter.SetRange("Layout Line No.", "Layout Line No.");
-        DocumentLayoutFilter.SetRange("Layout Field Line No.", "Line No.");
-        DocumentLayoutFilter.SetRange("Layout Variable Line No.", 0);
-        DocumentLayoutFilter.SetRange("Layout Codeunit Line No.", 0);
-        DocumentLayoutFilter.DeleteAll(true);
-
-        DocumentLayoutCriteria.SetRange("Layout No.", "Layout No.");
-        DocumentLayoutCriteria.SetRange("Layout Line No.", "Layout Line No.");
-        DocumentLayoutCriteria.SetRange("Layout Field Line No.", "Line No.");
-        DocumentLayoutCriteria.SetRange("Layout Variable Line No.", 0);
-        DocumentLayoutCriteria.SetRange("Layout Codeunit Line No.", 0);
-        DocumentLayoutCriteria.DeleteAll(true);
-    end;
-
-    trigger OnInsert()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        DocConfMng.OnInsertCode("Layout No.");
-    end;
-
-    trigger OnModify()
-    var
-        DocConfMng: Codeunit "DC - Management";
-    begin
-        TestCarryOver;
-        DocConfMng.OnModifyCode("Layout No.");
-    end;
 
     var
         TextCarryOverCreateNumeric: Label 'may be set to %1 for numerical fields only';
@@ -485,119 +372,17 @@ table 12032003 "DC - Document Layout Field"
         DocumentLayoutField.SetRange("Layout Line No.", "Layout Line No.");
         DocumentLayoutField.SetRange(Line, Line);
         DocumentLayoutField.SetFilter("Indentation (pt)", '>%1', "Indentation (pt)");
-        if DocumentLayoutField.FindFirst then
+        if DocumentLayoutField.FindFirst() then
             "Field Width (pt)" := DocumentLayoutField."Indentation (pt)" - "Indentation (pt)" - ColumnMargin;
 
         if "Field Width (pt)" < 0 then
             "Field Width (pt)" := 0;
 
-        Modify;
+        Modify();
     end;
 
 
     procedure TestCarryOver()
-    var
-        DocumentLayoutField: Record "DC - Document Layout Field";
-        DocumentLayoutLine: Record "DC - Document Layout Line";
-        DocumentLayoutVariable: Record "DC - Document Layout Variable";
-        DCMgt: Codeunit "DC - Management";
-        IsNormalText: Boolean;
-        IsNumeric: Boolean;
-        Dec: Decimal;
-        i: Integer;
-        Text2: Text;
-        VariableName: Text;
     begin
-        if "Carry Over" <> "Carry Over"::" " then begin
-            // Populate field only on lines with Section Type = Line
-            DocumentLayoutLine.Get("Layout No.", "Layout Line No.");
-            DocumentLayoutLine.TestField("Section Type", DocumentLayoutLine."Section Type"::Line);
-
-            case "Carry Over" of
-                "Carry Over"::Create:
-                    begin
-                        // Create is allowed maximum once per layout
-                        DocumentLayoutField.SetRange("Layout No.", "Layout No.");
-                        DocumentLayoutField.SetRange("Carry Over", DocumentLayoutField."Carry Over"::Create);
-                        if DocumentLayoutField.FindSet then begin
-                            repeat
-                                if not
-                                  ((DocumentLayoutField."Layout Line No." = "Layout Line No.") and
-                                  (DocumentLayoutField."Line No." = "Line No."))
-                                then begin
-                                    DocumentLayoutLine.Get(DocumentLayoutField."Layout No.", DocumentLayoutField."Layout Line No.");
-                                    Error(
-                                      TextCarryOverCreateOnce,
-                                      FieldCaption("Carry Over"),
-                                      Format("Carry Over"::Create),
-                                      DocumentLayoutLine.Description,
-                                      DocumentLayoutField.Description);
-                                end;
-                            until DocumentLayoutField.Next = 0;
-                        end;
-
-                        // Allowed only for nummerical values
-                        case Type of
-                            Type::Value:
-                                begin
-                                    TestField("Table No.");
-                                    TestField("Field No.");
-                                    IsNumeric := DCMgt.CheckIfTableFieldIsNumeric("Table No.", "Field No.")
-                                end;
-                            Type::Text:
-                                begin
-                                    TestField(Text);
-                                    IsNumeric := true;
-                                    IsNormalText := true;
-                                    repeat
-                                        i += 1;
-                                        case Text[i] of
-                                            '[':
-                                                begin
-                                                    IsNormalText := false;
-                                                    VariableName := '';
-                                                end;
-                                            ']':
-                                                begin
-                                                    IsNormalText := true;
-                                                    DocumentLayoutVariable.SetRange("Layout No.", "Layout No.");
-                                                    DocumentLayoutVariable.SetFilter("Layout Line No.", '<=%1', "Layout Line No.");
-                                                    DocumentLayoutVariable.SetRange(Variable, VariableName);
-                                                    DocumentLayoutVariable.FindLast;
-                                                    IsNumeric := DocumentLayoutVariable.IsNumeric;
-                                                    if IsNumeric then begin
-                                                        // Replace variable placeholder in text with formatted (dummy) number
-                                                        Text2 += '100';
-                                                    end;
-                                                end;
-                                            else begin
-                                                if IsNormalText then begin
-                                                    Text2 += CopyStr(Text, i, 1);
-                                                end else begin
-                                                    VariableName += CopyStr(Text, i, 1);
-                                                    if i = MaxStrLen(Text) then begin
-                                                        Text2 += '[' + VariableName;
-                                                    end;
-                                                end;
-                                            end;
-                                        end;
-                                    until (i = MaxStrLen(Text)) or (not IsNumeric);
-                                    if IsNumeric then
-                                        IsNumeric := Evaluate(Dec, Text2);
-                                end;
-                            else begin
-                                IsNumeric := false;
-                            end;
-                        end;
-                        if not IsNumeric then
-                            FieldError("Carry Over", StrSubstNo(TextCarryOverCreateNumeric, Format("Carry Over"::Create)));
-                    end;
-
-                "Carry Over"::Stop:
-                    begin
-                    end;
-            end;
-        end;
     end;
 }
-

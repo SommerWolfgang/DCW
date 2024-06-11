@@ -16,7 +16,7 @@ table 6086350 "CEM Bank Mapping Rule"
         field(10; "Field No."; Integer)
         {
             Caption = 'Field No.';
-            TableRelation = Field."No." WHERE(TableNo = CONST(6086330));
+            TableRelation = Field."No." where(TableNo = const(6086330));
         }
         field(11; Value; Text[50])
         {
@@ -24,8 +24,8 @@ table 6086350 "CEM Bank Mapping Rule"
         }
         field(12; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = CONST(6086330),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = const(6086330),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -54,7 +54,7 @@ table 6086350 "CEM Bank Mapping Rule"
         Oldrules: Record "CEM Bank Mapping Rule";
     begin
         if "Rule No." = 0 then
-            if Oldrules.FindLast then
+            if Oldrules.FindLast() then
                 "Rule No." := Oldrules."Rule No." + 10;
     end;
 
@@ -65,17 +65,17 @@ table 6086350 "CEM Bank Mapping Rule"
 
         if Transaction."Expense Type" = '' then begin
             SetRange("Continia User ID", Transaction."Continia User ID");
-            if Rec.FindSet then
+            if Rec.FindSet() then
                 repeat
                     UseBankMappingRule(Transaction);
-                until (Rec.Next = 0) or (Transaction."Expense Type" <> '');
+                until (Rec.Next() = 0) or (Transaction."Expense Type" <> '');
 
             if Transaction."Expense Type" = '' then begin
                 SetRange("Continia User ID", '');
-                if Rec.FindSet then
+                if Rec.FindSet() then
                     repeat
                         UseBankMappingRule(Transaction);
-                    until (Rec.Next = 0) or (Transaction."Expense Type" <> '');
+                    until (Rec.Next() = 0) or (Transaction."Expense Type" <> '');
             end;
         end;
     end;
@@ -94,7 +94,7 @@ table 6086350 "CEM Bank Mapping Rule"
                 if ExpenseType.Get("Expense Type Code") then
                     if ExpenseType."Exclude Transactions" then
                         Transaction."Exclude Entry" := ExpenseType."Exclude Transactions";
-                Transaction.Modify;
+                Transaction.Modify();
             end;
         end;
     end;

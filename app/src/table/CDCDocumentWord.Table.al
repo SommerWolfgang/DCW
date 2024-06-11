@@ -12,7 +12,7 @@ table 6085592 "CDC Document Word"
         field(2; "Page No."; Integer)
         {
             Caption = 'Page No.';
-            TableRelation = "CDC Document Page"."Page No." WHERE ("Document No." = FIELD ("Document No."));
+            TableRelation = "CDC Document Page"."Page No." where("Document No." = field("Document No."));
         }
         field(3; "Entry No."; Integer)
         {
@@ -85,7 +85,7 @@ table 6085592 "CDC Document Word"
         if "Entry No." = 0 then begin
             Word.SetRange("Document No.", "Document No.");
             Word.SetRange("Page No.", "Page No.");
-            if Word.FindLast then
+            if Word.FindLast() then
                 "Entry No." := Word."Entry No." + 1
             else
                 "Entry No." := 1;

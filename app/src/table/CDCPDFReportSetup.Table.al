@@ -8,7 +8,7 @@ table 6086012 "CDC PDF Report Setup"
         {
             Caption = 'Table ID';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
 
             trigger OnValidate()
             begin
@@ -25,25 +25,25 @@ table 6086012 "CDC PDF Report Setup"
         {
             Caption = 'PDF Report ID';
             NotBlank = true;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Report));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Report));
 
             trigger OnValidate()
             begin
                 CalcFields("Report Name");
             end;
         }
-        field(4; "Table Name"; Text[100])
+        field(4; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
         }
-        field(5; "Report Name"; Text[100])
+        field(5; "Report Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Report),
-                                                                           "Object ID" = FIELD("PDF Report ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Report),
+                                                                           "Object ID" = field("PDF Report ID")));
             Caption = 'Report Name';
             Editable = false;
             FieldClass = FlowField;

@@ -41,7 +41,7 @@ table 6086008 "CDC Web Help Line"
 
             trigger OnValidate()
             begin
-                ValidateLinkPath;
+                ValidateLinkPath();
             end;
         }
         field(9; "Link Type"; Option)
@@ -52,7 +52,7 @@ table 6086008 "CDC Web Help Line"
 
             trigger OnValidate()
             begin
-                ValidateLinkPath;
+                ValidateLinkPath();
             end;
         }
         field(10; "Open Link in new Window"; Boolean)

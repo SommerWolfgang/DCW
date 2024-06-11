@@ -23,21 +23,21 @@ table 6086357 "CEM Expense Allocation Dim."
                     exit;
 
                 if not DimMgt.CheckDim("Dimension Code") then
-                    Error(DimMgt.GetDimErr);
+                    Error(DimMgt.GetDimErr());
             end;
         }
         field(3; "Dimension Value Code"; Code[20])
         {
             Caption = 'Dimension Value Code';
             NotBlank = true;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
 
             trigger OnValidate()
             var
                 ExpenseAllocation: Record "CEM Expense Allocation";
                 GLSetup: Record "General Ledger Setup";
             begin
-                GLSetup.Get;
+                GLSetup.Get();
                 ExpenseAllocation.Get("Expense Allocation Entry No.");
 
                 if "Dimension Code" in [GLSetup."Global Dimension 1 Code", GLSetup."Global Dimension 2 Code"] then begin
@@ -49,14 +49,14 @@ table 6086357 "CEM Expense Allocation Dim."
                 end;
 
                 ExpenseAllocation.Modified := true;
-                ExpenseAllocation.Modify;
+                ExpenseAllocation.Modify();
             end;
         }
         field(4; "Field Code"; Code[20])
         {
             Caption = 'Field Name';
-            TableRelation = "CEM Field Type" WHERE("System Field" = CONST(false),
-                                                    "Source Table No." = FILTER(<> 349));
+            TableRelation = "CEM Field Type" where("System Field" = const(false),
+                                                    "Source Table No." = filter(<> 349));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -72,7 +72,7 @@ table 6086357 "CEM Expense Allocation Dim."
         field(5; "Field Value"; Text[250])
         {
             Caption = 'Field Value';
-            TableRelation = "CEM Lookup Value".Code WHERE("Field Type Code" = FIELD("Field Code"));
+            TableRelation = "CEM Lookup Value".Code where("Field Type Code" = field("Field Code"));
             ValidateTableRelation = false;
 
             trigger OnValidate()
@@ -109,13 +109,13 @@ table 6086357 "CEM Expense Allocation Dim."
 
     trigger OnDelete()
     begin
-        TestNotPosted;
+        TestNotPosted();
         UpdateRecordGlobalDimValue("Expense Allocation Entry No.", "Dimension Code", '');
     end;
 
     trigger OnInsert()
     begin
-        TestNotPosted;
+        TestNotPosted();
         UpdateRecordGlobalDimValue("Expense Allocation Entry No.", "Dimension Code", "Dimension Value Code");
 
         if ("Dimension Code" = '') and ("Field Code" = '') then
@@ -124,7 +124,7 @@ table 6086357 "CEM Expense Allocation Dim."
 
     trigger OnModify()
     begin
-        TestNotPosted;
+        TestNotPosted();
         UpdateRecordGlobalDimValue("Expense Allocation Entry No.", "Dimension Code", "Dimension Value Code");
 
         if ("Dimension Code" = '') and ("Field Code" = '') then
@@ -164,13 +164,13 @@ table 6086357 "CEM Expense Allocation Dim."
     var
         xExpAllocDim: Record "CEM Expense Allocation Dim.";
     begin
-        ExpAllocDim.Reset;
+        ExpAllocDim.Reset();
         ExpAllocDim.SetRange("Expense Allocation Entry No.", AllocationEntryNo);
 
-        xExpAllocDim.Reset;
+        xExpAllocDim.Reset();
         xExpAllocDim.SetRange("Expense Allocation Entry No.", AllocationEntryNo);
 
-        if ExpAllocDim.FindSet then
+        if ExpAllocDim.FindSet() then
             repeat
                 if not xExpAllocDim.Get(AllocationEntryNo, ExpAllocDim."Dimension Code", ExpAllocDim."Field Code") then
                     exit(true);
@@ -181,13 +181,13 @@ table 6086357 "CEM Expense Allocation Dim."
                 if ExpAllocDim."Field Value" <> xExpAllocDim."Field Value" then
                     exit(true);
 
-            until ExpAllocDim.Next = 0;
+            until ExpAllocDim.Next() = 0;
 
-        if xExpAllocDim.FindSet then
+        if xExpAllocDim.FindSet() then
             repeat
                 if not ExpAllocDim.Get(AllocationEntryNo, xExpAllocDim."Dimension Code", xExpAllocDim."Field Code") then
                     exit(true);
-            until xExpAllocDim.Next = 0;
+            until xExpAllocDim.Next() = 0;
     end;
 
     local procedure UpdateRecordGlobalDimValue(AllocationEntryNo: Integer; DimCode: Code[20]; DimValCode: Code[20])
@@ -195,7 +195,7 @@ table 6086357 "CEM Expense Allocation Dim."
         ExpAllocation: Record "CEM Expense Allocation";
         GLSetup: Record "General Ledger Setup";
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         if not (DimCode in [GLSetup."Global Dimension 1 Code", GLSetup."Global Dimension 2 Code"]) then
             exit;
 
@@ -204,7 +204,7 @@ table 6086357 "CEM Expense Allocation Dim."
             ExpAllocation."Global Dimension 1 Code" := DimValCode;
         if DimCode = GLSetup."Global Dimension 2 Code" then
             ExpAllocation."Global Dimension 2 Code" := DimValCode;
-        ExpAllocation.Modify;
+        ExpAllocation.Modify();
     end;
 }
 

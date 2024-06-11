@@ -43,7 +43,7 @@ table 6086311 "CEM Continia User Credit Card"
                     Validate("Account No.", '');
 
                 if "Account Type" = "Account Type"::Vendor then begin
-                    EMSetup.Get;
+                    EMSetup.Get();
                     EMSetup.TestField("Expense Posting", EMSetup."Expense Posting"::"Preferable Purchase Invoice");
                     EMSetup.TestField("Post Bank Trans. on Import", false);
                 end;
@@ -52,11 +52,11 @@ table 6086311 "CEM Continia User Credit Card"
         field(11; "Account No."; Code[20])
         {
             Caption = 'Account No.';
-            TableRelation = IF ("Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Account Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Account Type" = const(Vendor)) Vendor;
 
             trigger OnValidate()
             var
@@ -72,9 +72,9 @@ table 6086311 "CEM Continia User Credit Card"
                 if (xRec."Account No." = "Account No.") then
                     exit;
 
-                ValidateAccount;
+                ValidateAccount();
 
-                EMSetup.Get;
+                EMSetup.Get();
                 if EMSetup."Post Bank Trans. on Import" then
                     ErrorIncomplBankTransForUser("Card No.", "Continia User ID", true);
 
@@ -100,26 +100,26 @@ table 6086311 "CEM Continia User Credit Card"
                     if Confirm(ConfString, false, Format(NumberOfCreditCard), TableCaption,
                       CreditCard.FieldCaption("Card No."), "Card No.", CreditCard.FieldCaption("Account Type"), CreditCard.FieldCaption("Account No."))
                     then begin
-                        CreditCard.FindSet;
+                        CreditCard.FindSet();
                         repeat
                             CreditCard."Account Type" := "Account Type";
                             CreditCard."Account No." := "Account No.";
-                            CreditCard.Modify;
+                            CreditCard.Modify();
 
                             if EMSetup."Post Bank Trans. on Import" then
                                 ErrorIncomplBankTransForUser(CreditCard."Card No.", CreditCard."Continia User ID", true);
 
                             UpdateBankAccountForUser(
                               CreditCard."Card No.", CreditCard."Continia User ID", "Account Type", "Account No.", OldCurrencyCode, NewCurrencyCode);
-                        until CreditCard.Next = 0;
+                        until CreditCard.Next() = 0;
                     end;
                 end;
             end;
         }
         field(20; "Mapping Count"; Integer)
         {
-            CalcFormula = Count("CEM Credit Card User Mapping" WHERE("Card No." = FIELD("Card No."),
-                                                                      "Continia User ID" = FIELD("Continia User ID")));
+            CalcFormula = count("CEM Credit Card User Mapping" where("Card No." = field("Card No."),
+                                                                      "Continia User ID" = field("Continia User ID")));
             Caption = 'Field Mapping Count';
             Editable = false;
             FieldClass = FlowField;
@@ -133,11 +133,11 @@ table 6086311 "CEM Continia User Credit Card"
                 EMSetup: Record "CEM Expense Management Setup";
             begin
                 if Rec."User Paid Credit Card" then begin
-                    EMSetup.Get;
+                    EMSetup.Get();
                     EMSetup.TestField("Ask User Paid Credit Card", true);
                 end;
 
-                UpdateUserPaidCrCardForUser;
+                UpdateUserPaidCrCardForUser();
             end;
         }
     }
@@ -171,7 +171,7 @@ table 6086311 "CEM Continia User Credit Card"
         if ContiniaUserSetup.Get("Continia User ID") then
             if not ContiniaUserSetup."Expense Management User" then begin
                 ContiniaUserSetup."Expense Management User" := true;
-                ContiniaUserSetup.Modify;
+                ContiniaUserSetup.Modify();
             end;
     end;
 
@@ -231,7 +231,7 @@ table 6086311 "CEM Continia User Credit Card"
             "Account Type"::"G/L Account":
                 begin
                     GLAccount.Get("Account No.");
-                    GLAccount.CheckGLAcc;
+                    GLAccount.CheckGLAcc();
                     GLAccount.TestField("Direct Posting");
                 end;
 
@@ -264,12 +264,12 @@ table 6086311 "CEM Continia User Credit Card"
         BankTransaction.SetRange("Card No.", CardNo);
         BankTransaction.SetRange("Continia User ID", ContiniaUserID);
         BankTransaction.SetRange("Matched to Expense", true);
-        if BankTransaction.FindSet then
+        if BankTransaction.FindSet() then
             repeat
-                Expense.Get(BankTransaction.GetMatchedExpenseEntryNo);
+                Expense.Get(BankTransaction.GetMatchedExpenseEntryNo());
                 if not Expense.Posted then
                     Error(MatchedExpToPostTxt);
-            until BankTransaction.Next = 0;
+            until BankTransaction.Next() = 0;
 
         if FailOnUnmatchedTrans then begin
             BankTransaction.SetRange("Matched to Expense", false);
@@ -283,7 +283,7 @@ table 6086311 "CEM Continia User Credit Card"
     var
         EMSetup: Record "CEM Expense Management Setup";
     begin
-        EMSetup.Get;
+        EMSetup.Get();
         if EMSetup."Card Transaction Bal. No." <> '' then begin
             "Account Type" := EMSetup."Card Transaction Bal. Type";
             "Account No." := EMSetup."Card Transaction Bal. No.";
@@ -298,7 +298,7 @@ table 6086311 "CEM Continia User Credit Card"
         EMSetup: Record "CEM Expense Management Setup";
         CorporateCreditCardAssigned: Boolean;
     begin
-        EMSetup.Get;
+        EMSetup.Get();
 
         ContiniaUserCreditCard.SetRange("Continia User ID", User);
         CorporateCreditCardAssigned := not ContiniaUserCreditCard.IsEmpty;
@@ -330,23 +330,23 @@ table 6086311 "CEM Continia User Credit Card"
         BankTransaction.SetRange("Card No.", CardNo);
         BankTransaction.SetRange("Continia User ID", ContiniaUserID);
         BankTransaction.SetRange(Posted, false);
-        if BankTransaction.FindSet then
+        if BankTransaction.FindSet() then
             repeat
                 BankTransaction."Bank Account Type" := BankAccType;
                 BankTransaction."Bank Account No." := BankAccNo;
 
-                if CurrencyChanged then begin
+                if CurrencyChanged() then begin
                     BankTransaction."Bank Currency Code" := NewCurrencyCode;
-                    if Expense.Get(BankTransaction.GetMatchedExpenseEntryNo) then
+                    if Expense.Get(BankTransaction.GetMatchedExpenseEntryNo()) then
                         if (not Expense.Posted) and (Expense."Bank Currency Code" = OldCurrencyCode) then begin
                             Expense.Validate("Bank Currency Code", NewCurrencyCode);
                             Expense."Bank-Currency Amount" := BankTransaction."Bank-Currency Amount";
-                            Expense.Modify;
+                            Expense.Modify();
                         end;
                 end;
 
-                BankTransaction.Modify;
-            until BankTransaction.Next = 0;
+                BankTransaction.Modify();
+            until BankTransaction.Next() = 0;
     end;
 
     local procedure UpdateUserPaidCrCardForUser()

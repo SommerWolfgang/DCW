@@ -70,13 +70,13 @@ table 12032507 "Email Distribution Attachment"
         field(7; "Use for Code"; Code[20])
         {
             Caption = 'Use for Code';
-            TableRelation = IF ("Use for Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Use for Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Use for Type" = CONST(Contact)) Contact
-            ELSE
-            IF ("Use for Type" = CONST("Responsibility Center")) "Responsibility Center";
+            TableRelation = if ("Use for Type" = const(Customer)) Customer
+            else
+            if ("Use for Type" = const(Vendor)) Vendor
+            else
+            if ("Use for Type" = const(Contact)) Contact
+            else
+            if ("Use for Type" = const("Responsibility Center")) "Responsibility Center";
 
             trigger OnValidate()
             var
@@ -157,9 +157,9 @@ table 12032507 "Email Distribution Attachment"
         EmailAttachmentSetup: Record "Email Distribution Attachment";
     begin
         EmailAttachmentSetup := Rec;
-        EmailAttachmentSetup.SetRecFilter;
+        EmailAttachmentSetup.SetRecFilter();
         EmailAttachmentSetup.SetRange("Line No.");
-        if EmailAttachmentSetup.FindLast then begin
+        if EmailAttachmentSetup.FindLast() then begin
             "Line No." := EmailAttachmentSetup."Line No." + 1;
         end else begin
             "Line No." := 1;
@@ -173,60 +173,10 @@ table 12032507 "Email Distribution Attachment"
 
 
     procedure UploadFile(ClientFileName: Text)
-    var
-        FileMgt: Codeunit "File Management";
-        ServerFile: DotNet File;
-        [RunOnClient]
-        ClientFileInfo: DotNet FileInfo;
-        ServerTempFileName: Text;
     begin
-        if ClientFileName = '' then begin
-            ClientFileName := FileMgt.OpenFileDialog(TextUploadFileDialog, "Display File Name", TextFilterAllFiles);
-        end;
-
-        if ClientFileName = '' then begin
-            exit;
-        end;
-
-        ServerTempFileName := FileMgt.UploadFileSilent(ClientFileName);
-        Clear("File BLOB");
-        "File BLOB".Import(ServerTempFileName);
-
-        if ServerFile.Exists(ServerTempFileName) then begin
-            ServerFile.Delete(ServerTempFileName);
-        end;
-
-        ClientFileInfo := ClientFileInfo.FileInfo(ClientFileName);
-        Validate("Display File Name", ClientFileInfo.Name);
     end;
-
 
     procedure DownloadFile(ClientFileName: Text)
-    var
-        FileMgt: Codeunit "File Management";
-        ServerFile: DotNet File;
-        ServerTempFileName: Text;
     begin
-        CalcFields("File BLOB");
-        if not "File BLOB".HasValue then begin
-            exit;
-        end;
-
-        if ClientFileName = '' then begin
-            ClientFileName := FileMgt.SaveFileDialog(TextDownloadFileDialog, "Display File Name", TextFilterAllFiles);
-        end;
-
-        if ClientFileName = '' then begin
-            exit;
-        end;
-
-        ServerTempFileName := FileMgt.ServerTempFileName('download');
-        "File BLOB".Export(ServerTempFileName);
-        FileMgt.DownloadToFile(ServerTempFileName, ClientFileName);
-
-        if ServerFile.Exists(ServerTempFileName) then begin
-            ServerFile.Delete(ServerTempFileName);
-        end;
     end;
 }
-

@@ -49,7 +49,7 @@ table 6086226 "CTS-CDN Particip. Profile Rel."
         }
         field(30; "Profile Group Code"; Code[20])
         {
-            CalcFormula = Lookup("CTS-CDN Network Profile"."Network Profile Group Code" WHERE("System ID" = FIELD("Profile System ID")));
+            CalcFormula = lookup("CTS-CDN Network Profile"."Network Profile Group Code" where("System ID" = field("Profile System ID")));
             Caption = 'Profile Group Code';
             Editable = false;
             FieldClass = FlowField;
@@ -106,7 +106,7 @@ table 6086226 "CTS-CDN Particip. Profile Rel."
         CDNParticipation.SetRange("Network Name", "Network Name");
         CDNParticipation.SetRange("Identifier Type ID", "Participation Identifier Type");
         CDNParticipation.SetRange("Identifier Value", "Participation Identifier Value");
-        CDNParticipation.FindFirst;
+        CDNParticipation.FindFirst();
     end;
 }
 

@@ -73,7 +73,7 @@ table 6085767 "CDC Purchase Header Info."
 
         PurchInvHeaderDCInfo."No." := PurchInvHeader."No.";
         PurchInvHeaderDCInfo."Approval Flow Code" := PurchHeaderDCInfo."Approval Flow Code";
-        PurchInvHeaderDCInfo.Insert;
+        PurchInvHeaderDCInfo.Insert();
     end;
 
 
@@ -87,7 +87,7 @@ table 6085767 "CDC Purchase Header Info."
 
         PurchCrMemoHdrDCInfo."No." := PurchCrMemoHdr."No.";
         PurchCrMemoHdrDCInfo."Approval Flow Code" := PurchHeaderDCInfo."Approval Flow Code";
-        PurchCrMemoHdrDCInfo.Insert;
+        PurchCrMemoHdrDCInfo.Insert();
     end;
 
     procedure IsApprovalFlowVisible(): Boolean

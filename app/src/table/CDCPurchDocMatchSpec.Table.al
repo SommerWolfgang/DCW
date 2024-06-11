@@ -13,11 +13,11 @@ table 6085761 "CDC Purch. Doc. Match Spec."
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF (Type = CONST(Document)) "CDC Document"
-            ELSE
-            IF (Type = CONST("Purchase Invoice")) "Purchase Header"."No." WHERE("Document Type" = CONST(Invoice))
-            ELSE
-            IF (Type = CONST("Purchase Credit Memo")) "Purchase Header"."No." WHERE("Document Type" = CONST("Credit Memo"));
+            TableRelation = if (Type = const(Document)) "CDC Document"
+            else
+            if (Type = const("Purchase Invoice")) "Purchase Header"."No." where("Document Type" = const(Invoice))
+            else
+            if (Type = const("Purchase Credit Memo")) "Purchase Header"."No." where("Document Type" = const("Credit Memo"));
         }
         field(3; "Line No."; Integer)
         {

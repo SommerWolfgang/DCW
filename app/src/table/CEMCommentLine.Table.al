@@ -13,7 +13,7 @@ table 6086371 "CEM Comment Line"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table Name" = CONST("Expense Header")) "CEM Expense Header"."No." WHERE("Document Type" = CONST(Settlement));
+            TableRelation = if ("Table Name" = const("Expense Header")) "CEM Expense Header"."No." where("Document Type" = const(Settlement));
         }
         field(3; "Line No."; Integer)
         {
@@ -52,9 +52,9 @@ table 6086371 "CEM Comment Line"
     begin
         EMCommentLine.SetRange("Table Name", "Table Name");
         EMCommentLine.SetRange("No.", "No.");
-        EMCommentLine.SetRange(Date, WorkDate);
+        EMCommentLine.SetRange(Date, WorkDate());
         if EMCommentLine.IsEmpty then
-            Date := WorkDate;
+            Date := WorkDate();
     end;
 }
 
