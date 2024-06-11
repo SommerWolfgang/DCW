@@ -81,14 +81,14 @@ table 6085781 "CDC Vendor Statistics"
         NoOfVendors: Integer;
         SuggestXmlPoints: Integer;
     begin
-        DeleteAll;
+        DeleteAll();
 
         if VendorFilter <> '' then
             Vendor.SetFilter("No.", VendorFilter);
 
-        if Vendor.FindSet then
+        if Vendor.FindSet() then
             repeat
-                Init;
+                Init();
                 "No." := Vendor."No.";
                 Name := CopyStr(Vendor.Name, 1, MaxStrLen(Name));
 
@@ -101,8 +101,8 @@ table 6085781 "CDC Vendor Statistics"
                 if ("No. of Invoice Lines" + "No. of Credit Memo Lines" > 250) or ("No. of OCR Pages" > 50) then
                     "Suggested Format" := "Suggested Format"::XML;
 
-                Insert;
-            until Vendor.Next = 0;
+                Insert();
+            until Vendor.Next() = 0;
     end;
 
     local procedure CountPurchInv(VendorNo: Code[20]; DateFilter: Text[1024]; var NoOfInv: Integer; var NoOfLines: Integer)
@@ -128,13 +128,13 @@ table 6085781 "CDC Vendor Statistics"
 
         if DateFilter <> '' then begin
             PurchaseHeader.SetFilter("Document Date", DateFilter);
-            if PurchaseHeader.FindSet then
+            if PurchaseHeader.FindSet() then
                 repeat
                     NoOfInv += 1;
 
                     PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
                     NoOfLines += PurchaseLine.Count;
-                until PurchaseHeader.Next = 0;
+                until PurchaseHeader.Next() = 0;
 
             PurchInvHeader.SetFilter("Posting Date", DateFilter);
             NoOfInv += PurchInvHeader.Count;
@@ -170,13 +170,13 @@ table 6085781 "CDC Vendor Statistics"
 
         if DateFilter <> '' then begin
             PurchaseHeader.SetFilter("Document Date", DateFilter);
-            if PurchaseHeader.FindSet then
+            if PurchaseHeader.FindSet() then
                 repeat
                     NoOfCrMemo += 1;
 
                     PurchaseLine.SetRange("Document No.", PurchaseHeader."No.");
                     NoOfLines += PurchaseLine.Count;
-                until PurchaseHeader.Next = 0;
+                until PurchaseHeader.Next() = 0;
 
             PurchCrMemoHdr.SetFilter("Posting Date", DateFilter);
             NoOfCrMemo += PurchCrMemoHdr.Count;
@@ -197,19 +197,19 @@ table 6085781 "CDC Vendor Statistics"
     begin
         DocCategory.SetRange("Destination Header Table No.", DATABASE::"Purchase Header");
         DocCategory.SetRange("Source Table No.", DATABASE::Vendor);
-        if DocCategory.FindSet then
+        if DocCategory.FindSet() then
             repeat
                 Document.SetRange("Source Record No.", VendorNo);
                 Document.SetRange("Document Category Code", DocCategory.Code);
                 if DateFilter <> '' then
                     Document.SetFilter("Imported Date-Time", DateFilter);
 
-                if Document.FindSet then
+                if Document.FindSet() then
                     repeat
                         DocumentPage.SetRange("Document No.", Document."No.");
                         NoOfRecords += DocumentPage.Count;
-                    until Document.Next = 0;
-            until DocCategory.Next = 0;
+                    until Document.Next() = 0;
+            until DocCategory.Next() = 0;
     end;
 }
 

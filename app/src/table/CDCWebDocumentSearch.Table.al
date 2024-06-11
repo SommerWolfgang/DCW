@@ -13,13 +13,13 @@ table 6086005 "CDC Web Document Search"
         field(2; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST ("Posted Purch. Invoice")) "Purch. Inv. Header"
-            ELSE
-            IF (Type = CONST ("Posted Purch. Credit Memo")) "Purch. Cr. Memo Hdr."
-            ELSE
-            IF (Type = CONST ("Purchase Invoice")) "Purchase Header"."No." WHERE ("Document Type" = CONST (Invoice))
-            ELSE
-            IF (Type = CONST ("Purchase Credit Memo")) "Purchase Header"."No." WHERE ("Document Type" = CONST ("Credit Memo"));
+            TableRelation = if (Type = const("Posted Purch. Invoice")) "Purch. Inv. Header"
+            else
+            if (Type = const("Posted Purch. Credit Memo")) "Purch. Cr. Memo Hdr."
+            else
+            if (Type = const("Purchase Invoice")) "Purchase Header"."No." where("Document Type" = const(Invoice))
+            else
+            if (Type = const("Purchase Credit Memo")) "Purchase Header"."No." where("Document Type" = const("Credit Memo"));
         }
         field(3; Name; Text[100])
         {
@@ -101,42 +101,42 @@ table 6086005 "CDC Web Document Search"
         field(31; "Dimension Value 1"; Code[20])
         {
             Caption = 'Dimension Value 1';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 1"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 1"));
         }
         field(32; "Dimension Value 2"; Code[20])
         {
             Caption = 'Dimension Value 2';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 2"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 2"));
         }
         field(33; "Dimension Value 3"; Code[20])
         {
             Caption = 'Dimension Value 3';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 3"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 3"));
         }
         field(34; "Dimension Value 4"; Code[20])
         {
             Caption = 'Dimension Value 4';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 4"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 4"));
         }
         field(35; "Dimension Value 5"; Code[20])
         {
             Caption = 'Dimension Value 5';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 5"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 5"));
         }
         field(36; "Dimension Value 6"; Code[20])
         {
             Caption = 'Dimension Value 6';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 6"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 6"));
         }
         field(37; "Dimension Value 7"; Code[20])
         {
             Caption = 'Dimension Value 7';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 7"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 7"));
         }
         field(38; "Dimension Value 8"; Code[20])
         {
             Caption = 'Dimension Value 8';
-            TableRelation = "Dimension Value".Code WHERE ("Dimension Code" = FIELD ("Dimension Code 8"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code 8"));
         }
     }
 

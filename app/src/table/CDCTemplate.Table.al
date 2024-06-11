@@ -36,7 +36,7 @@ table 6085579 "CDC Template"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: After Capture';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(9; "Recognize Lines"; Option)
         {

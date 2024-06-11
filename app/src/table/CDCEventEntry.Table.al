@@ -17,7 +17,7 @@ table 6085741 "CDC Event Entry"
         }
         field(3; Comment; Text[80])
         {
-            CalcFormula = Lookup("CDC Event Entry Comment".Comment WHERE("Event Entry No." = FIELD("Entry No.")));
+            CalcFormula = lookup("CDC Event Entry Comment".Comment where("Event Entry No." = field("Entry No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -60,8 +60,8 @@ table 6085741 "CDC Event Entry"
     var
         EventEntry: Record "CDC Event Entry";
     begin
-        EventEntry.LockTable;
-        if EventEntry.FindLast then
+        EventEntry.LockTable();
+        if EventEntry.FindLast() then
             "Entry No." := EventEntry."Entry No." + 1
         else
             "Entry No." := 1;

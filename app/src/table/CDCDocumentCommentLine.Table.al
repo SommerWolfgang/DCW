@@ -53,8 +53,8 @@ table 6085577 "CDC Document Comment Line"
         }
         field(10; "Table Name"; Text[80])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -86,7 +86,7 @@ table 6085577 "CDC Document Comment Line"
         if "Line No." = 0 then begin
             DocumentCommentLine.SetRange("Table ID", "Table ID");
             DocumentCommentLine.SetRange("No.", "No.");
-            if DocumentCommentLine.FindLast then
+            if DocumentCommentLine.FindLast() then
                 NextLineNo := DocumentCommentLine."Line No." + 10000
             else
                 NextLineNo := 10000;
@@ -119,9 +119,9 @@ table 6085577 "CDC Document Comment Line"
     begin
         DocumentCommentLine.SetRange("Table ID", "Table ID");
         DocumentCommentLine.SetRange("No.", "No.");
-        DocumentCommentLine.SetRange(Date, WorkDate);
+        DocumentCommentLine.SetRange(Date, WorkDate());
         if DocumentCommentLine.IsEmpty then
-            Date := WorkDate;
+            Date := WorkDate();
     end;
 }
 

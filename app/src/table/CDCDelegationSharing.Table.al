@@ -38,7 +38,7 @@ table 6086018 "CDC Delegation Sharing"
 
             trigger OnValidate()
             begin
-                CheckValidDates;
+                CheckValidDates();
             end;
         }
         field(5; "Valid To"; Date)
@@ -47,7 +47,7 @@ table 6086018 "CDC Delegation Sharing"
 
             trigger OnValidate()
             begin
-                CheckValidDates;
+                CheckValidDates();
             end;
         }
         field(7; "Display Order"; Integer)
@@ -72,7 +72,7 @@ table 6086018 "CDC Delegation Sharing"
                     if Confirm(Text002, true, TableCaption) then
                         DeleteFromAllCompanies
                     else
-                        ModifyInAllCompanies;
+                        ModifyInAllCompanies();
                 end;
             end;
         }
@@ -105,21 +105,21 @@ table 6086018 "CDC Delegation Sharing"
         Company: Record Company;
     begin
         Company.SetFilter(Name, '<>%1', CompanyName);
-        if Company.FindSet then
+        if Company.FindSet() then
             repeat
                 if DCSetup.ChangeCompany(Company.Name) then
                     if DCSetup.ReadPermission then
-                        if DCSetup.Get and (DCSetup."Document Nos." <> '') then begin
+                        if DCSetup.Get() and (DCSetup."Document Nos." <> '') then begin
                             if ContiniaUserSetup.ChangeCompany(Company.Name) then
                                 if ContiniaUserSetup.Get("Owner User ID") and ContiniaUserSetup.Get("Shared to User ID") then begin
                                     if DelegationlSharing.ChangeCompany(Company.Name) then
                                         if not DelegationlSharing.Get("Owner User ID", "Shared to User ID", "Valid From", "Valid To") then begin
                                             DelegationlSharing := Rec;
-                                            DelegationlSharing.Insert;
+                                            DelegationlSharing.Insert();
                                         end;
                                 end;
                         end;
-            until Company.Next = 0;
+            until Company.Next() = 0;
     end;
 
 
@@ -130,15 +130,15 @@ table 6086018 "CDC Delegation Sharing"
         Company: Record Company;
     begin
         Company.SetFilter(Name, '<>%1', CompanyName);
-        if Company.FindSet then
+        if Company.FindSet() then
             repeat
                 if DelegationlSharing.ChangeCompany(Company.Name) then
                     if DelegationlSharing.Get("Owner User ID", "Shared to User ID", "Valid From", "Valid To") then begin
                         DelegationlSharing."Display Order" := "Display Order";
                         DelegationlSharing."Copy to All Companies" := "Copy to All Companies";
-                        DelegationlSharing.Modify;
+                        DelegationlSharing.Modify();
                     end;
-            until Company.Next = 0;
+            until Company.Next() = 0;
     end;
 
 
@@ -148,12 +148,12 @@ table 6086018 "CDC Delegation Sharing"
         Company: Record Company;
     begin
         Company.SetFilter(Name, '<>%1', CompanyName);
-        if Company.FindSet then
+        if Company.FindSet() then
             repeat
                 if DelegationlSharing.ChangeCompany(Company.Name) then
                     if DelegationlSharing.Get("Owner User ID", "Shared to User ID", "Valid From", "Valid To") then
-                        DelegationlSharing.Delete;
-            until Company.Next = 0;
+                        DelegationlSharing.Delete();
+            until Company.Next() = 0;
     end;
 
 
@@ -164,20 +164,20 @@ table 6086018 "CDC Delegation Sharing"
         Company: Record Company;
     begin
         Company.SetFilter(Name, '<>%1', CompanyName);
-        if Company.FindSet then
+        if Company.FindSet() then
             repeat
                 if DelegationlSharing.ChangeCompany(Company.Name) then begin
                     if DelegationlSharing.Get(xRec."Owner User ID", xRec."Shared to User ID", xRec."Valid From", xRec."Valid To")
                     then
-                        DelegationlSharing.Delete;
+                        DelegationlSharing.Delete();
 
                     if DelegationlSharing.Get("Owner User ID", "Shared to User ID", "Valid From", "Valid To") then
-                        DelegationlSharing.Delete;
+                        DelegationlSharing.Delete();
 
                     DelegationlSharing := Rec;
-                    DelegationlSharing.Insert;
+                    DelegationlSharing.Insert();
                 end;
-            until Company.Next = 0;
+            until Company.Next() = 0;
     end;
 
     local procedure CheckValidDates()
@@ -197,7 +197,7 @@ table 6086018 "CDC Delegation Sharing"
     begin
         DelegationlSharing.SetRange("Owner User ID", DelegatedToUserId);
         if not DelegationlSharing.IsEmpty then begin
-            DelegationlSharing.FindSet;
+            DelegationlSharing.FindSet();
             repeat
                 case ExcludeOption of
                     ExcludeOption::None:
@@ -214,19 +214,19 @@ table 6086018 "CDC Delegation Sharing"
                                     (xRec."Valid To" <> DelegationlSharing."Valid To");
                 end;
                 if doDelete then
-                    DelegationlSharing.Delete;
-            until DelegationlSharing.Next = 0;
+                    DelegationlSharing.Delete();
+            until DelegationlSharing.Next() = 0;
         end;
         if DeleteInAllOtherCompanies then begin
             Company.SetFilter(Name, '<>%1', CompanyName);
-            if Company.FindSet then
+            if Company.FindSet() then
                 repeat
                     if DelegationlSharing.ChangeCompany(Company.Name) then begin
                         DelegationlSharing.SetRange("Owner User ID", DelegatedToUserId);
                         if not DelegationlSharing.IsEmpty then
-                            DelegationlSharing.DeleteAll;
+                            DelegationlSharing.DeleteAll();
                     end;
-                until Company.Next = 0;
+                until Company.Next() = 0;
         end;
     end;
 }

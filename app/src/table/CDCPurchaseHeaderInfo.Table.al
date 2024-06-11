@@ -39,14 +39,6 @@ table 6085767 "CDC Purchase Header Info."
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        AppFlowAndAdvAppErr: Label 'Approval Flow Code and Advanced Approval can not be used at the same time.';
-
     procedure GetApprovalFlowCode(PurchHeader: Record "Purchase Header"): Code[10]
     var
         PurchHeaderDCInfo: Record "CDC Purchase Header Info.";
@@ -57,6 +49,7 @@ table 6085767 "CDC Purchase Header Info."
 
     procedure LookupApprovalFlowCode(var Text: Text[1024]): Boolean
     begin
+        Text := '';
     end;
 
     procedure UpdateApprovalFlowCode(PurchHeader: Record "Purchase Header"; NewCode: Code[10])
@@ -73,7 +66,7 @@ table 6085767 "CDC Purchase Header Info."
 
         PurchInvHeaderDCInfo."No." := PurchInvHeader."No.";
         PurchInvHeaderDCInfo."Approval Flow Code" := PurchHeaderDCInfo."Approval Flow Code";
-        PurchInvHeaderDCInfo.Insert;
+        PurchInvHeaderDCInfo.Insert();
     end;
 
 
@@ -87,7 +80,7 @@ table 6085767 "CDC Purchase Header Info."
 
         PurchCrMemoHdrDCInfo."No." := PurchCrMemoHdr."No.";
         PurchCrMemoHdrDCInfo."Approval Flow Code" := PurchHeaderDCInfo."Approval Flow Code";
-        PurchCrMemoHdrDCInfo.Insert;
+        PurchCrMemoHdrDCInfo.Insert();
     end;
 
     procedure IsApprovalFlowVisible(): Boolean

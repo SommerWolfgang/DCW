@@ -24,20 +24,6 @@ table 12032504 "Email Distribution Entry"
         field(14; "Use for Code"; Code[20])
         {
             Caption = 'Use for Code';
-            TableRelation = IF ("Use for Type" = CONST (Customer)) Customer
-            ELSE
-            IF ("Use for Type" = CONST (Vendor)) Vendor
-            ELSE
-            IF ("Use for Type" = CONST (Contact)) Contact
-            ELSE
-            IF ("Use for Type" = CONST ("Responsibility Center")) "Responsibility Center";
-
-            trigger OnValidate()
-            var
-                Customer: Record Customer;
-                Vendor: Record Vendor;
-            begin
-            end;
         }
         field(18; "Distribution Type"; Option)
         {

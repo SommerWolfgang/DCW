@@ -52,7 +52,7 @@ table 6085771 "CDC Gen. Posting Setup Info."
     begin
         if AccNo <> '' then begin
             GLAcc.Get(AccNo);
-            GLAcc.CheckGLAcc;
+            GLAcc.CheckGLAcc();
         end;
     end;
 }

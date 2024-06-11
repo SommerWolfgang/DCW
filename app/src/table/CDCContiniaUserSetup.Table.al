@@ -57,7 +57,7 @@ table 6086002 "CDC Continia User Setup"
         field(28; "No. of Approval Groups"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Approval User Group Member" WHERE("Continia User ID" = FIELD("Continia User ID")));
+            CalcFormula = count("CDC Approval User Group Member" where("Continia User ID" = field("Continia User ID")));
             Caption = 'No. of Approval Groups';
             Editable = false;
             FieldClass = FlowField;
@@ -65,7 +65,7 @@ table 6086002 "CDC Continia User Setup"
         field(29; "No. of Approval Permissions"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Continia User Permission" WHERE("Continia User ID" = FIELD("Continia User ID")));
+            CalcFormula = count("CDC Continia User Permission" where("Continia User ID" = field("Continia User ID")));
             Caption = 'No. of Approval Permissions';
             Editable = false;
             FieldClass = FlowField;
@@ -76,7 +76,7 @@ table 6086002 "CDC Continia User Setup"
         }
         field(31; "Vendor Name"; Text[100])
         {
-            CalcFormula = Lookup(Vendor.Name WHERE("No." = FIELD("Vendor No.")));
+            CalcFormula = lookup(Vendor.Name where("No." = field("Vendor No.")));
             Caption = 'Vendor Name';
             Editable = false;
             FieldClass = FlowField;
@@ -84,7 +84,7 @@ table 6086002 "CDC Continia User Setup"
         field(32; "Shared to this user"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Approval Sharing" WHERE("Shared to User ID" = FIELD("Continia User ID")));
+            CalcFormula = count("CDC Approval Sharing" where("Shared to User ID" = field("Continia User ID")));
             Caption = 'Shared to this user';
             Editable = false;
             FieldClass = FlowField;
@@ -92,7 +92,7 @@ table 6086002 "CDC Continia User Setup"
         field(33; "Shared to other users"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Approval Sharing" WHERE("Owner User ID" = FIELD("Continia User ID")));
+            CalcFormula = count("CDC Approval Sharing" where("Owner User ID" = field("Continia User ID")));
             Caption = 'Shared to other users';
             Editable = false;
             FieldClass = FlowField;
@@ -107,9 +107,9 @@ table 6086002 "CDC Continia User Setup"
         }
         field(40; "No. of Purch. Doc. for Appr."; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Table ID" = FILTER(38),
-                                                        "Approver ID" = FIELD("Continia User ID"),
-                                                        Status = CONST(Open)));
+            CalcFormula = count("Approval Entry" where("Table ID" = filter(38),
+                                                        "Approver ID" = field("Continia User ID"),
+                                                        Status = const(Open)));
             Caption = 'No. of Purch. Doc. for Approval';
             Editable = false;
             FieldClass = FlowField;
@@ -135,9 +135,9 @@ table 6086002 "CDC Continia User Setup"
         }
         field(43; "No. of Expenses for Approval"; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Table ID" = FILTER(6086320),
-                                                        "Approver ID" = FIELD("Continia User ID"),
-                                                        Status = CONST(Open)));
+            CalcFormula = count("Approval Entry" where("Table ID" = filter(6086320),
+                                                        "Approver ID" = field("Continia User ID"),
+                                                        Status = const(Open)));
             Caption = 'No. of Expenses for Approval';
             Editable = false;
             FieldClass = FlowField;
@@ -145,7 +145,7 @@ table 6086002 "CDC Continia User Setup"
         field(59; "Vendor Balance (LCY)"; Decimal)
         {
             AutoFormatType = 1;
-            CalcFormula = - Sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" WHERE("Vendor No." = FIELD("Vendor No.")));
+            CalcFormula = - sum("Detailed Vendor Ledg. Entry"."Amount (LCY)" where("Vendor No." = field("Vendor No.")));
             Caption = 'Vendor Balance (LCY)';
             Editable = false;
             FieldClass = FlowField;
@@ -258,7 +258,7 @@ table 6086002 "CDC Continia User Setup"
     var
         ContiniaUser: Record "CDC Continia User";
     begin
-        ContiniaUser.ResendWelcomeEmail;
+        ContiniaUser.ResendWelcomeEmail();
     end;
 
 
@@ -348,9 +348,9 @@ table 6086002 "CDC Continia User Setup"
     begin
     end;
 
-    procedure SetControlAppearance(var CEMEnabled: Boolean; var DCEnabled: Boolean; var CEMEnabledApp: Boolean; var CEMMatchingNotRequired: Boolean; var CEMShowEmployeeNo: Boolean; var CEMShowAddressSetup: Boolean; var ShowApproval: Boolean; var ShowDCOnlyApproval: Boolean; var ShowWebApproval: Boolean; var ShowApprovalClientApp: Boolean; var ShowApprovalClient: Boolean)
-    begin
-    end;
+    // procedure SetControlAppearance(var CEMEnabled: Boolean; var DCEnabled: Boolean; var CEMEnabledApp: Boolean; var CEMMatchingNotRequired: Boolean; var CEMShowEmployeeNo: Boolean; var CEMShowAddressSetup: Boolean; var ShowApproval: Boolean; var ShowDCOnlyApproval: Boolean; var ShowWebApproval: Boolean; var ShowApprovalClientApp: Boolean; var ShowApprovalClient: Boolean)
+    // begin
+    // end;
 
     procedure CanEditPendingDocuments(InputUserID: Code[50]): Boolean
     begin

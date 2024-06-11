@@ -52,13 +52,13 @@ table 6085762 "CDC Table Filter Field"
             Caption = 'Template Field Type';
             OptionCaption = 'Header,Line';
             OptionMembers = Header,Line;
-            TableRelation = "CDC Template Field".Type WHERE("Template No." = FIELD("Template No."));
+            TableRelation = "CDC Template Field".Type where("Template No." = field("Template No."));
         }
         field(12; "Template Field Code"; Code[20])
         {
             Caption = 'Template Field Code';
-            TableRelation = "CDC Template Field".Code WHERE("Template No." = FIELD("Template No."),
-                                                             Type = FIELD("Template Field Type"));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = field("Template Field Type"));
         }
         field(13; "Filter View"; Text[250])
         {

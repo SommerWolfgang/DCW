@@ -1,7 +1,5 @@
 table 12032506 "Email Distribution Setup"
 {
-    // Copyright (Exclusive Rights): COSMO CONSULT Licensing GmbH, Sarnen, Switzerland
-
     Caption = 'Email Distribution Setup';
 
     fields
@@ -10,33 +8,11 @@ table 12032506 "Email Distribution Setup"
         {
             Caption = 'Email Distribution Code';
             NotBlank = true;
-            TableRelation = "Email Distribution Code";
         }
         field(5; "Language Code"; Code[10])
         {
             Caption = 'Language Code';
             Description = '';
-            TableRelation = Language;
-
-            trigger OnValidate()
-            begin
-                case "Use for Type" of
-                    "Use for Type"::Customer:
-                        begin
-                            "Language Code" := '';
-                        end;
-
-                    "Use for Type"::Vendor:
-                        begin
-                            "Language Code" := '';
-                        end;
-
-                    "Use for Type"::Contact:
-                        begin
-                            "Language Code" := '';
-                        end;
-                end;
-            end;
         }
         field(6; "Use for Type"; Option)
         {
@@ -44,72 +20,15 @@ table 12032506 "Email Distribution Setup"
             Description = '';
             OptionCaption = ' ,Customer,Vendor,Contact,Responsibility Center';
             OptionMembers = " ",Customer,Vendor,Contact,"Responsibility Center";
-
-            trigger OnValidate()
-            begin
-                case "Use for Type" of
-                    "Use for Type"::" ":
-                        begin
-                            "Language Code" := '';
-                        end;
-
-                    "Use for Type"::Customer:
-                        begin
-                            "Language Code" := '';
-                        end;
-
-                    "Use for Type"::Vendor:
-                        begin
-                            "Language Code" := '';
-                        end;
-
-                    "Use for Type"::Contact:
-                        begin
-                            "Language Code" := '';
-                        end;
-                end;
-            end;
         }
         field(7; "Use for Code"; Code[20])
         {
             Caption = 'Use for Code';
             Description = '';
-            TableRelation = IF ("Use for Type" = CONST(Customer)) Customer
-            ELSE
-            IF ("Use for Type" = CONST(Vendor)) Vendor
-            ELSE
-            IF ("Use for Type" = CONST(Contact)) Contact
-            ELSE
-            IF ("Use for Type" = CONST("Responsibility Center")) "Responsibility Center";
-
-            trigger OnValidate()
-            var
-                Customer: Record Customer;
-                Vendor: Record Vendor;
-            begin
-                case "Use for Type" of
-                    "Use for Type"::" ":
-                        FieldError("Use for Type");
-
-                    "Use for Type"::Customer:
-                        begin
-                            if Customer.Get("Use for Code") and (Customer."Language Code" <> '') then begin
-                                "Language Code" := Customer."Language Code";
-                            end;
-                        end;
-
-                    "Use for Type"::Vendor:
-                        begin
-                            if Vendor.Get("Use for Code") and (Vendor."Language Code" <> '') then begin
-                                "Language Code" := Vendor."Language Code";
-                            end;
-                        end;
-                end;
-            end;
         }
         field(10; Description; Text[30])
         {
-            CalcFormula = Lookup("Email Distribution Code".Description WHERE(Code = FIELD("Email Distribution Code")));
+            CalcFormula = lookup("Email Distribution Code".Description where(Code = field("Email Distribution Code")));
             Caption = 'Description';
             Editable = false;
             FieldClass = FlowField;
@@ -119,35 +38,12 @@ table 12032506 "Email Distribution Setup"
             Caption = 'Mail Type';
             OptionCaption = 'Outlook,SMTP';
             OptionMembers = Outlook,SMTP;
-
-            trigger OnValidate()
-            begin
-                if "Mail Type" = "Mail Type"::Outlook then begin
-                    Validate(Sender, Sender::"Current User");
-                end else begin
-                    "Hide Mail Dialog" := false;
-                end;
-            end;
         }
         field(30; Sender; Option)
         {
             Caption = 'Sender';
             OptionCaption = 'Current User,Fixed';
             OptionMembers = "Current User","Fixed";
-
-            trigger OnValidate()
-            begin
-                if Sender = Sender::Fixed then begin
-                    TestField("Mail Type", "Mail Type"::SMTP);
-                    "Sender Address" := '';
-                    "Sender Name" := '';
-                end else begin
-                    ClearSMTPSetup;
-                    if "Mail Type" = "Mail Type"::SMTP then begin
-                        InitSMTP;
-                    end;
-                end;
-            end;
         }
         field(40; "Sender Address"; Text[80])
         {
@@ -250,37 +146,20 @@ table 12032506 "Email Distribution Setup"
         EmailAttachmentSetup.FilterGroup(2);
         EmailAttachmentSetup.SetRange("Email Distribution Code", "Email Distribution Code");
         EmailAttachmentSetup.SetRange("Language Code", "Language Code");
-        EmailAttachmentSetup.SetRange("Use for Type", "Use for Type");
         EmailAttachmentSetup.SetRange("Use for Code", "Use for Code");
         EmailAttachmentSetup.FilterGroup(0);
     end;
 
 
     procedure SetPassword(NewPassword: Text[250])
-    var
-        ServicePassword: Record "Service Password";
     begin
-        if IsNullGuid("Password Key") or not ServicePassword.Get("Password Key") then begin
-            ServicePassword.SavePassword(NewPassword);
-            ServicePassword.Insert(true);
-            "Password Key" := ServicePassword.Key;
-        end;
     end;
-
 
     procedure GetPassword(): Text[250]
-    var
-        ServicePassword: Record "Service Password";
     begin
-        if not IsNullGuid("Password Key") then
-            if ServicePassword.Get("Password Key") then
-                exit(ServicePassword.GetPassword);
-        exit('');
     end;
-
 
     procedure HasPassword(): Boolean
     begin
-        exit(GetPassword <> '');
     end;
 }

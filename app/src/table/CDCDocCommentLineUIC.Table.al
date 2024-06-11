@@ -55,8 +55,8 @@ table 6085604 "CDC Doc. Comment Line (UIC)"
         }
         field(10; "Table Name"; Text[80])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -88,7 +88,7 @@ table 6085604 "CDC Doc. Comment Line (UIC)"
         if "Line No." = 0 then begin
             DocumentCommentLineUIC.SetRange("Table ID", "Table ID");
             DocumentCommentLineUIC.SetRange("No.", "No.");
-            if DocumentCommentLineUIC.FindLast then
+            if DocumentCommentLineUIC.FindLast() then
                 NextLineNo := DocumentCommentLineUIC."Line No." + 10000
             else
                 NextLineNo := 10000;

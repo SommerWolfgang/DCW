@@ -14,13 +14,13 @@ table 6085702 "CDC Purchase Line Relationship"
         field(2; "Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = FIELD("Document Type"));
+            TableRelation = "Purchase Header"."No." where("Document Type" = field("Document Type"));
         }
         field(3; "Document Line No."; Integer)
         {
             Caption = 'Line No.';
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = FIELD("Document Type"),
-                                                              "Document No." = FIELD("Document No."));
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = field("Document Type"),
+                                                              "Document No." = field("Document No."));
         }
         field(4; "Related Document Type"; Option)
         {
@@ -32,13 +32,13 @@ table 6085702 "CDC Purchase Line Relationship"
         field(5; "Related Document No."; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = FIELD("Related Document Type"));
+            TableRelation = "Purchase Header"."No." where("Document Type" = field("Related Document Type"));
         }
         field(6; "Related Line No."; Integer)
         {
             Caption = 'Related Line No.';
-            TableRelation = "Purchase Line"."Line No." WHERE("Document Type" = FIELD("Related Document Type"),
-                                                              "Document No." = FIELD("Related Document No."));
+            TableRelation = "Purchase Line"."Line No." where("Document Type" = field("Related Document Type"),
+                                                              "Document No." = field("Related Document No."));
         }
         field(7; "Suppress Matched Error"; Boolean)
         {

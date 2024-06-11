@@ -10,49 +10,49 @@ table 6085585 "CDC Document Capture Cue"
         }
         field(2; "Documents to Register"; Integer)
         {
-            CalcFormula = Count("CDC Document" WHERE(Status = CONST(Open),
-                                                      "File Type" = FILTER(OCR | XML)));
+            CalcFormula = count("CDC Document" where(Status = const(Open),
+                                                      "File Type" = filter(OCR | XML)));
             Caption = 'Documents to Register';
             Editable = false;
             FieldClass = FlowField;
         }
         field(4; "PIs for Approval"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = FILTER("Pending Approval")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = filter("Pending Approval")));
             Caption = 'PIs for Approval';
             FieldClass = FlowField;
         }
         field(5; "Open PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = CONST(Open)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = const(Open)));
             Caption = 'Open PIs';
             Editable = false;
             FieldClass = FlowField;
         }
         field(6; "Released PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = CONST(Released)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = const(Released)));
             Caption = 'Released PIs';
             Editable = false;
             FieldClass = FlowField;
         }
         field(7; "Overdue PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         "Due Date" = FIELD("Date Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         "Due Date" = field("Date Filter")));
             Caption = 'Overdue Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(8; "Overdue Approval Entries"; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Table ID" = CONST(38),
-                                                        "Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                        Status = FILTER(Created | Open),
-                                                        "Due Date" = FIELD("Date Filter")));
+            CalcFormula = count("Approval Entry" where("Table ID" = const(38),
+                                                        "Document Type" = filter(Invoice | "Credit Memo"),
+                                                        Status = filter(Created | Open),
+                                                        "Due Date" = field("Date Filter")));
             Caption = 'Overdue Approval Entries';
             Editable = false;
             FieldClass = FlowField;
@@ -64,31 +64,31 @@ table 6085585 "CDC Document Capture Cue"
         }
         field(10; "PCMs for Approval"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = FILTER("Pending Approval")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = filter("Pending Approval")));
             Caption = 'PCMs for Approval';
             FieldClass = FlowField;
         }
         field(11; "Open PCMs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = CONST(Open)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = const(Open)));
             Caption = 'Open PCMs';
             Editable = false;
             FieldClass = FlowField;
         }
         field(12; "Released PCMs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = CONST(Released)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = const(Released)));
             Caption = 'Released PCMs';
             Editable = false;
             FieldClass = FlowField;
         }
         field(13; "Delegated Docs"; Integer)
         {
-            CalcFormula = Count("CDC Document" WHERE(Status = FIELD("Status Filter"),
-                                                      "Delegated To User ID" = FIELD("Delegated User ID Filter")));
+            CalcFormula = count("CDC Document" where(Status = field("Status Filter"),
+                                                      "Delegated To User ID" = field("Delegated User ID Filter")));
             Caption = 'Delegated to me';
             FieldClass = FlowField;
         }
@@ -129,7 +129,7 @@ table 6085585 "CDC Document Capture Cue"
     var
         PurchHeader: Record "Purchase Header";
     begin
-        PurchHeader.Reset;
+        PurchHeader.Reset();
         PurchHeader.SetRange("Document Type", Type);
         PurchHeader.SetRange(Status, Status);
         if Type = PurchHeader."Document Type"::Invoice then
@@ -158,7 +158,7 @@ table 6085585 "CDC Document Capture Cue"
     var
         PurchHeader: Record "Purchase Header";
     begin
-        PurchHeader.Reset;
+        PurchHeader.Reset();
         PurchHeader.SetRange("Document Type", PurchHeader."Document Type"::Invoice);
         PurchHeader.SetFilter("Due Date", GetFilter("Date Filter"));
         PAGE.Run(6085725, PurchHeader);

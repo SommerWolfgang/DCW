@@ -80,7 +80,7 @@ table 6085784 "CDC Storage Migration Setup"
 
     trigger OnDelete()
     begin
-        if not AllDocumentsMigrated then
+        if not AllDocumentsMigrated() then
             Error(NotAllDocumentsMigratedErr, TableCaption);
     end;
 
@@ -99,7 +99,7 @@ table 6085784 "CDC Storage Migration Setup"
             Document.ChangeCompany(CurrentCompanyName);
         end;
 
-        DCSetup.Get;
+        DCSetup.Get();
         Document.SetRange("Storage Migration Pending", true);
         DocumentUIC.SetRange("Storage Migration Pending", true);
         if DCSetup."Use UIC Documents" then

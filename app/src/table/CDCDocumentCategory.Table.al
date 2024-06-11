@@ -28,20 +28,20 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Source Table No.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
 
             trigger OnValidate()
             begin
 
-                CheckSourceTable;
+                CheckSourceTable();
                 if "Split on Sep. Fields" and ("Source Table No." > 0) then
                     "Split on Source ID" := true;
             end;
         }
         field(4; "Source Table Name"; Text[30])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Source Table No.")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Source Table No.")));
             Caption = 'Source Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -169,8 +169,8 @@ table 6085575 "CDC Document Category"
         field(22; "No. of Documents with UIC"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Document (UIC)" WHERE("Document Category Code" = FIELD(Code),
-                                                            Status = CONST(Open)));
+            CalcFormula = count("CDC Document (UIC)" where("Document Category Code" = field(Code),
+                                                            Status = const(Open)));
             Caption = 'Open UIC Documents';
             Editable = false;
             FieldClass = FlowField;
@@ -234,7 +234,7 @@ table 6085575 "CDC Document Category"
                 DCSetup: Record "CDC Document Capture Setup";
             begin
 
-                DCSetup.Get;
+                DCSetup.Get();
                 DCSetup.TestField("Use Cloud OCR");
 
                 if "Exported to Cloud OCR" then
@@ -250,7 +250,7 @@ table 6085575 "CDC Document Category"
                 DCSetup: Record "CDC Document Capture Setup";
             begin
 
-                DCSetup.Get;
+                DCSetup.Get();
                 DCSetup.TestField("Use Cloud OCR", false);
             end;
         }
@@ -263,7 +263,7 @@ table 6085575 "CDC Document Category"
                 DCSetup: Record "CDC Document Capture Setup";
             begin
 
-                DCSetup.Get;
+                DCSetup.Get();
                 DCSetup.TestField("Use Cloud OCR", false);
             end;
         }
@@ -276,7 +276,7 @@ table 6085575 "CDC Document Category"
                 DCSetup: Record "CDC Document Capture Setup";
             begin
 
-                DCSetup.Get;
+                DCSetup.Get();
                 DCSetup.TestField("Use Cloud OCR", false);
             end;
         }
@@ -289,7 +289,7 @@ table 6085575 "CDC Document Category"
                 DCSetup: Record "CDC Document Capture Setup";
             begin
 
-                DCSetup.Get;
+                DCSetup.Get();
                 DCSetup.TestField("Use Cloud OCR", false);
             end;
         }
@@ -306,7 +306,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Reopen';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -330,7 +330,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Show Reg. Doc.';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -341,7 +341,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Get Doc. Status';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -433,7 +433,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Get File Count';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -444,7 +444,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Show Document or File';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -455,7 +455,7 @@ table 6085575 "CDC Document Category"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Import Files';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
 
             trigger OnValidate()
             begin
@@ -508,7 +508,7 @@ table 6085575 "CDC Document Category"
 
             trigger OnValidate()
             begin
-                "EWS Client ID" := DelChr("EWS Client ID", '=', Curlies);
+                "EWS Client ID" := DelChr("EWS Client ID", '=', Curlies());
                 if not IsValidGuid("EWS Client ID") then
                     Error(ErrGuidFormat);
             end;
@@ -519,7 +519,7 @@ table 6085575 "CDC Document Category"
 
             trigger OnValidate()
             begin
-                "EWS Tenant ID" := DelChr("EWS Tenant ID", '=', Curlies);
+                "EWS Tenant ID" := DelChr("EWS Tenant ID", '=', Curlies());
                 if not IsValidGuid("EWS Tenant ID") then
                     Error(ErrGuidFormat);
             end;
@@ -557,7 +557,7 @@ table 6085575 "CDC Document Category"
                 if not "Process PDF with XML Files" then
                     exit;
 
-                DCSetup.Get;
+                DCSetup.Get();
                 if not DCSetup."Use Cloud OCR" then
                     DCSetup.TestField("XML File Path");
             end;
@@ -606,12 +606,12 @@ table 6085575 "CDC Document Category"
         if Document.IsEmpty then
             Error(Text002);
 
-        if Document.FindSet then
+        if Document.FindSet() then
             repeat
                 Document.Mark(true);
-            until Document.Next = 0;
+            until Document.Next() = 0;
 
-        Document.FindFirst;
+        Document.FindFirst();
         Document.SetRange("Document Category Code");
         Document.MarkedOnly(true);
     end;
