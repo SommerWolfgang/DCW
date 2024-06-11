@@ -62,8 +62,8 @@ table 6085742 "CDC Event Entry Comment"
     var
         EventEntryCmt: Record "CDC Event Entry Comment";
     begin
-        EventEntryCmt.LockTable;
-        if EventEntryCmt.FindLast then
+        EventEntryCmt.LockTable();
+        if EventEntryCmt.FindLast() then
             "Entry No." := EventEntryCmt."Entry No." + 1
         else
             "Entry No." := 1;

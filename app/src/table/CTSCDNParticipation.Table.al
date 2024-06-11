@@ -12,7 +12,7 @@ table 6086225 "CTS-CDN Participation"
         field(2; "Identifier Type ID"; Integer)
         {
             Caption = 'Identifier Type ID';
-            TableRelation = "CTS-CDN Participation ID Type"."System ID" WHERE("Network Name" = FIELD("Network Name"));
+            TableRelation = "CTS-CDN Participation ID Type"."System ID" where("Network Name" = field("Network Name"));
         }
         field(3; "Identifier Value"; Text[50])
         {
@@ -100,70 +100,17 @@ table 6086225 "CTS-CDN Participation"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    var
-        CDNAPIInterface: Codeunit "CTS-CDN API Interface";
-
-
     procedure AddNetworkProfileRelation(NetworkProfileId: Integer; Direction: Option Outbound,Inbound,Both; DocCategoryCode: Code[20])
-    var
-        CDNParticipProfileRel: Record "CTS-CDN Particip. Profile Rel.";
     begin
-        CDNParticipProfileRel.Init;
-        CDNParticipProfileRel.Validate("Network Name", "Network Name");
-        CDNParticipProfileRel.Validate("Participation Identifier Type", "Identifier Type ID");
-        CDNParticipProfileRel.Validate("Participation Identifier Value", "Identifier Value");
-        CDNParticipProfileRel.Validate("Profile System ID", NetworkProfileId);
-        CDNParticipProfileRel.Validate("Profile Direction", Direction);
-
-        CDNAPIInterface.POSTParticipationNetworks(CDNParticipProfileRel);
-
-        CDNParticipProfileRel.Get("Network Name", "Identifier Type ID", "Identifier Value", NetworkProfileId);
-        if DocCategoryCode <> '' then begin
-            CDNParticipProfileRel.Validate("DC Document Category", DocCategoryCode);
-            CDNParticipProfileRel.Modify;
-        end;
     end;
-
 
     procedure ModifyNetworkProfileRel(NetworkProfileId: Integer; Direction: Option Outbound,Inbound,Both; DocCategoryCode: Code[20])
-    var
-        CDNParticipProfileRel: Record "CTS-CDN Particip. Profile Rel.";
     begin
-        CDNParticipProfileRel.SetRange("Network Name", "Network Name");
-        CDNParticipProfileRel.SetRange("Participation Identifier Type", "Identifier Type ID");
-        CDNParticipProfileRel.SetRange("Participation Identifier Value", "Identifier Value");
-        CDNParticipProfileRel.SetRange("Profile System ID", NetworkProfileId);
-        CDNParticipProfileRel.FindFirst;
-
-        CDNParticipProfileRel.Validate("Profile Direction", Direction);
-        CDNParticipProfileRel.Modify(true);
-
-        CDNAPIInterface.PATCHParticipationNetworks(CDNParticipProfileRel);
-
-        CDNParticipProfileRel.Get("Network Name", "Identifier Type ID", "Identifier Value", NetworkProfileId);
-        if DocCategoryCode <> '' then begin
-            CDNParticipProfileRel.Validate("DC Document Category", DocCategoryCode);
-            CDNParticipProfileRel.Modify;
-        end;
     end;
-
 
     procedure DeleteAllNetworkProfileRel()
-    var
-        CDNParticipProfileRel: Record "CTS-CDN Particip. Profile Rel.";
     begin
-        FilterProfileRelations(CDNParticipProfileRel);
-        if CDNParticipProfileRel.FindSet then
-            repeat
-                CDNAPIInterface.DELETEParticipationNetworks(CDNParticipProfileRel);
-            until CDNParticipProfileRel.Next = 0;
     end;
-
 
     procedure FilterProfileRelations(var CDNParticipProfileRel: Record "CTS-CDN Particip. Profile Rel.")
     begin
@@ -242,7 +189,7 @@ table 6086225 "CTS-CDN Participation"
     begin
         Network.Get("Network Name");
 
-        exit(StrSubstNo('%1 - [%2] %3', Network."Display Name", GetSchemeId, "Identifier Value"));
+        exit(StrSubstNo('%1 - [%2] %3', Network."Display Name", GetSchemeId(), "Identifier Value"));
     end;
 }
 

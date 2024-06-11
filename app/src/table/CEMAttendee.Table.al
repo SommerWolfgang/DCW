@@ -12,9 +12,9 @@ table 6086308 "CEM Attendee"
         field(2; "Doc. Ref. No."; Integer)
         {
             Caption = 'Doc. Ref. No.';
-            TableRelation = IF ("Table ID" = CONST(6086320)) "CEM Expense"
-            ELSE
-            IF ("Table ID" = CONST(6086338)) "CEM Mileage";
+            TableRelation = if ("Table ID" = const(6086320)) "CEM Expense"
+            else
+            if ("Table ID" = const(6086338)) "CEM Mileage";
         }
         field(3; "Entry No."; Integer)
         {
@@ -51,26 +51,26 @@ table 6086308 "CEM Attendee"
 
     trigger OnDelete()
     begin
-        TestNotPosted;
+        TestNotPosted();
     end;
 
     trigger OnInsert()
     begin
         TestField(Name);
-        TestNotPosted;
+        TestNotPosted();
 
         if "Entry No." = 0 then
-            "Entry No." := GetNextEntryNo;
+            "Entry No." := GetNextEntryNo();
     end;
 
     trigger OnModify()
     begin
-        TestNotPosted;
+        TestNotPosted();
     end;
 
     trigger OnRename()
     begin
-        TestNotPosted;
+        TestNotPosted();
     end;
 
     var
@@ -90,20 +90,20 @@ table 6086308 "CEM Attendee"
                 begin
                     Expense.Get("Doc. Ref. No.");
                     Expense.TestField(Posted, false);
-                    Expense.TestStatusOrUserAllowsChange;
+                    Expense.TestStatusOrUserAllowsChange();
                 end;
             DATABASE::"CEM Mileage":
                 begin
                     Mileage.Get("Doc. Ref. No.");
                     Mileage.TestField(Posted, false);
-                    Mileage.TestStatusOrUserAllowsChange;
+                    Mileage.TestStatusOrUserAllowsChange();
                 end;
             DATABASE::"CEM Expense Allocation":
                 begin
                     ExpAllocation.Get("Doc. Ref. No.");
                     Expense.Get(ExpAllocation."Expense Entry No.");
                     Expense.TestField(Posted, false);
-                    Expense.TestStatusOrUserAllowsChange;
+                    Expense.TestStatusOrUserAllowsChange();
                 end;
         end;
     end;
@@ -115,7 +115,7 @@ table 6086308 "CEM Attendee"
     begin
         ExpenseAttendee.SetRange("Table ID", "Table ID");
         ExpenseAttendee.SetRange("Doc. Ref. No.", "Doc. Ref. No.");
-        if ExpenseAttendee.FindLast then
+        if ExpenseAttendee.FindLast() then
             exit(ExpenseAttendee."Entry No." + 1)
         else
             exit(1);
@@ -132,7 +132,7 @@ table 6086308 "CEM Attendee"
         xEMAttendee.SetRange("Table ID", TableNo);
         xEMAttendee.SetRange("Doc. Ref. No.", DocRefNo);
 
-        if EMAttendee.FindSet then
+        if EMAttendee.FindSet() then
             repeat
                 if not xEMAttendee.Get(TableNo, EMAttendee."Doc. Ref. No.", EMAttendee."Entry No.") then
                     exit(true);
@@ -142,13 +142,13 @@ table 6086308 "CEM Attendee"
                    (EMAttendee."Company Name" <> xEMAttendee."Company Name")
                 then
                     exit(true);
-            until EMAttendee.Next = 0;
+            until EMAttendee.Next() = 0;
 
-        if xEMAttendee.FindSet then
+        if xEMAttendee.FindSet() then
             repeat
                 if not EMAttendee.Get(TableNo, xEMAttendee."Doc. Ref. No.", xEMAttendee."Entry No.") then
                     exit(true);
-            until xEMAttendee.Next = 0;
+            until xEMAttendee.Next() = 0;
     end;
 
 
@@ -166,7 +166,7 @@ table 6086308 "CEM Attendee"
 
             1:
                 begin
-                    ExpAttendee.FindFirst;
+                    ExpAttendee.FindFirst();
                     if ExpAttendee.Name <> '' then
                         exit(StrSubstNo('%1 (%2)', ExpAttendee.Name, ExpAttendee.Type))
                     else

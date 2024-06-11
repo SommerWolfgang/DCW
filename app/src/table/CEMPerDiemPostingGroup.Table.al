@@ -17,7 +17,7 @@ table 6086385 "CEM Per Diem Posting Group"
         }
         field(3; "Destination Name"; Text[50])
         {
-            CalcFormula = Lookup("CEM Country/Region".Name WHERE(Code = FIELD("Destination Country/Region")));
+            CalcFormula = lookup("CEM Country/Region".Name where(Code = field("Destination Country/Region")));
             Caption = 'Destination Name';
             Editable = false;
             FieldClass = FlowField;
@@ -45,7 +45,7 @@ table 6086385 "CEM Per Diem Posting Group"
                     exit;
 
                 if "Transport Allowance Code" <> '' then begin
-                    EMSetup.Get;
+                    EMSetup.Get();
                     if not EMSetup."Use Transport Allowance" then
                         Error(AllowanceCodeNotAllowedErr, EMSetup.TableCaption,
                           FieldCaption("Transport Allowance Code"), TableCaption, "Per Diem Group Code");
@@ -65,7 +65,7 @@ table 6086385 "CEM Per Diem Posting Group"
                     exit;
 
                 if "Entertainment Allowance Code" <> '' then begin
-                    EMSetup.Get;
+                    EMSetup.Get();
                     if not EMSetup."Use Entertainment Allowance" then
                         Error(AllowanceCodeNotAllowedErr,
                           EMSetup.TableCaption, FieldCaption("Entertainment Allowance Code"), TableCaption, "Per Diem Group Code");
@@ -85,7 +85,7 @@ table 6086385 "CEM Per Diem Posting Group"
                     exit;
 
                 if "Drinks Allowance Code" <> '' then begin
-                    EMSetup.Get;
+                    EMSetup.Get();
                     if (not EMSetup."Use Drinks Allowance") then
                         Error(AllowanceCodeNotAllowedErr,
                           EMSetup.TableCaption, FieldCaption("Drinks Allowance Code"), TableCaption, "Per Diem Group Code");
@@ -94,8 +94,8 @@ table 6086385 "CEM Per Diem Posting Group"
         }
         field(9; "Allowance Rates"; Integer)
         {
-            CalcFormula = Count("CEM Per Diem Rate" WHERE("Per Diem Group Code" = FIELD("Per Diem Group Code"),
-                                                           "Destination Country/Region" = FIELD("Destination Country/Region")));
+            CalcFormula = count("CEM Per Diem Rate" where("Per Diem Group Code" = field("Per Diem Group Code"),
+                                                           "Destination Country/Region" = field("Destination Country/Region")));
             Caption = 'Allowance Rates';
             Editable = false;
             FieldClass = FlowField;
@@ -120,7 +120,7 @@ table 6086385 "CEM Per Diem Posting Group"
     begin
         PerDiemRate.SetRange("Per Diem Group Code", "Per Diem Group Code");
         PerDiemRate.SetRange("Destination Country/Region", "Destination Country/Region");
-        PerDiemRate.DeleteAll;
+        PerDiemRate.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -173,69 +173,18 @@ table 6086385 "CEM Per Diem Posting Group"
 
 
     procedure AllowanceRatesOnLookup(PerDiemPostingGroup: Record "CEM Per Diem Posting Group")
-    var
-        CountryRegion: Record "CEM Country/Region";
-        PerDiemGroup: Record "CEM Per Diem Group";
-        PerDiemRate: Record "CEM Per Diem Rate";
-        Destination: Text[50];
-        Question: Text[250];
     begin
-        PerDiemGroup.Get(PerDiemPostingGroup."Per Diem Group Code");
-        if PerDiemPostingGroup."Destination Country/Region" <> '' then
-            if CountryRegion.Get(PerDiemPostingGroup."Destination Country/Region") then
-                Destination := CountryRegion.Name;
-
-        if Destination = '' then
-            Question := LocalRateNotFoundCreateQst
-        else
-            Question := RateNotFoundCreateQst;
-
-        PerDiemRate.SetRange("Per Diem Group Code", PerDiemPostingGroup."Per Diem Group Code");
-        PerDiemRate.SetRange("Destination Country/Region", PerDiemPostingGroup."Destination Country/Region");
-        PerDiemRate.SetRange("Start Date", 0D, Today);
-        if PerDiemRate.FindLast then begin
-            PerDiemRate.SetRange("Start Date");
-            PAGE.Run(PAGE::"CEM Per Diem Rate Card", PerDiemRate, PerDiemRate."Start Date")
-        end else
-            if Confirm(Question, true, PerDiemRate.TableCaption,
-                PerDiemGroup.Description, CountryRegion.Name)
-            then begin
-                PerDiemRate.Init;
-                PerDiemRate."Per Diem Group Code" := PerDiemPostingGroup."Per Diem Group Code";
-                PerDiemRate."Destination Country/Region" := PerDiemPostingGroup."Destination Country/Region";
-                Evaluate(PerDiemRate."Start Date", Format('0101' + Format(Date2DMY(Today, 3))));
-                PerDiemRate.Insert(true);
-                PAGE.Run(PAGE::"CEM Per Diem Rate Card", PerDiemRate, PerDiemRate."Start Date");
-            end else begin
-                PerDiemRate.SetRange("Start Date");
-                if PerDiemRate.FindLast then;
-                PAGE.Run(PAGE::"CEM Per Diem Rate Card", PerDiemRate, PerDiemRate."Start Date")
-            end;
     end;
-
 
     procedure GetAllowanceCodeFieldCaption(FieldNo: Integer): Text[250]
     begin
-        case FieldNo of
-            1:
-                exit(FieldCaption("Accommodation Allowance Code"));
-            2:
-                exit(FieldCaption("Meal Allowance Code"));
-            3:
-                exit(FieldCaption("Drinks Allowance Code"));
-            4:
-                exit(FieldCaption("Transport Allowance Code"));
-            5:
-                exit(FieldCaption("Entertainment Allowance Code"));
-        end;
     end;
-
 
     procedure CheckAllowanceSetup(ShowError: Boolean): Boolean
     var
         EMSetup: Record "CEM Expense Management Setup";
     begin
-        EMSetup.Get;
+        EMSetup.Get();
         Clear(LastErrorTxt);
 
         CheckAllowanceReqAndSaveErr(true, "Accommodation Allowance Code", FieldCaption("Accommodation Allowance Code"));

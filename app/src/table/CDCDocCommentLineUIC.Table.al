@@ -53,14 +53,6 @@ table 6085604 "CDC Doc. Comment Line (UIC)"
         {
             Caption = 'Date';
         }
-        field(10; "Table Name"; Text[80])
-        {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
-            Caption = 'Table Name';
-            Editable = false;
-            FieldClass = FlowField;
-        }
     }
 
     keys
@@ -88,7 +80,7 @@ table 6085604 "CDC Doc. Comment Line (UIC)"
         if "Line No." = 0 then begin
             DocumentCommentLineUIC.SetRange("Table ID", "Table ID");
             DocumentCommentLineUIC.SetRange("No.", "No.");
-            if DocumentCommentLineUIC.FindLast then
+            if DocumentCommentLineUIC.FindLast() then
                 NextLineNo := DocumentCommentLineUIC."Line No." + 10000
             else
                 NextLineNo := 10000;

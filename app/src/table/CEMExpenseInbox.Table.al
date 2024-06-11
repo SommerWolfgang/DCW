@@ -17,7 +17,7 @@ table 6086323 "CEM Expense Inbox"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -56,40 +56,18 @@ table 6086323 "CEM Expense Inbox"
         field(13; "Settlement No."; Code[20])
         {
             Caption = 'Settlement No.';
-            TableRelation = "CEM Expense Header"."No." WHERE("Document Type" = CONST(Settlement),
-                                                              "Continia User ID" = FIELD("Continia User ID"));
+            TableRelation = "CEM Expense Header"."No." where("Document Type" = const(Settlement),
+                                                              "Continia User ID" = field("Continia User ID"));
         }
         field(15; "Global Dimension 1 Code"; Code[20])
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(Text001, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Expense Inbox", 0, '', "Entry No.", 1, "Global Dimension 1 Code");
-            end;
         }
         field(16; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(Text001, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Expense Inbox", 0, '', "Entry No.", 2, "Global Dimension 2 Code");
-            end;
         }
         field(21; "Admin Comment"; Text[250])
         {
@@ -117,7 +95,7 @@ table 6086323 "CEM Expense Inbox"
         field(51; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(52; Billable; Boolean)
         {
@@ -160,7 +138,7 @@ table 6086323 "CEM Expense Inbox"
 
             trigger OnValidate()
             begin
-                CheckChangeAndConfirm;
+                CheckChangeAndConfirm();
             end;
         }
         field(100; "Expense GUID"; Guid)
@@ -202,18 +180,18 @@ table 6086323 "CEM Expense Inbox"
         }
         field(260; "No. of Attachments"; Integer)
         {
-            CalcFormula = Count("CEM Attachment Inbox" WHERE("Table ID" = CONST(6086320),
-                                                              "Document Type" = CONST(Budget),
-                                                              "Document No." = FILTER(''),
-                                                              "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attachment Inbox" where("Table ID" = const(6086320),
+                                                              "Document Type" = const(Budget),
+                                                              "Document No." = filter(''),
+                                                              "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attachments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(270; "No. of Attendees"; Integer)
         {
-            CalcFormula = Count("CEM Attendee Inbox" WHERE("Table ID" = CONST(6086323),
-                                                            "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attendee Inbox" where("Table ID" = const(6086323),
+                                                            "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attendees';
             Editable = false;
             FieldClass = FlowField;
@@ -249,59 +227,6 @@ table 6086323 "CEM Expense Inbox"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        EMAttachmentInbox: Record "CEM Attachment Inbox";
-        EMAttendeeInbox: Record "CEM Attendee Inbox";
-        EMDimInbox: Record "CEM Dimension Inbox";
-        Expense: Record "CEM Expense";
-        ExpValidate: Codeunit "CEM Expense-Validate";
-    begin
-        TestField(Status, Status::Accepted);
-
-        EMAttachmentInbox.SetRange("Table ID", DATABASE::"CEM Expense Inbox");
-        EMAttachmentInbox.SetRange("Document Type", 0);
-        EMAttachmentInbox.SetRange("Document No.", '');
-        EMAttachmentInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttachmentInbox.DeleteAll(true);
-
-        EMAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Expense Inbox");
-        EMAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttendeeInbox.DeleteAll;
-
-        EMDimInbox.SetRange("Table ID", DATABASE::"CEM Expense Inbox");
-        EMDimInbox.SetRange("Document Type", 0);
-        EMDimInbox.SetRange("Document No.", '');
-        EMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMDimInbox.DeleteAll;
-
-        if "Expense Entry No." <> 0 then
-            if Expense.Get("Expense Entry No.") then
-                ExpValidate.Run(Expense);
-    end;
-
-    trigger OnModify()
-    var
-        UserDelegation: Record "CEM User Delegation";
-    begin
-        if xRec.Status = Status::Accepted then
-            Error(Text001, TableCaption, "Entry No.");
-
-        if Status = Status::Error then
-            Status := Status::Pending;
-
-        UserDelegation.VerifyUser("Continia User ID");
-    end;
-
-    trigger OnRename()
-    begin
-        Error(Text002, TableCaption);
-    end;
-
     var
         ExpTypeAttNotReq: Label 'The %1 %2 does not require attendees.';
         StatusChangeQst: Label 'Status changes will lead to version conflicts.\Do you want to continue?';
@@ -318,24 +243,8 @@ table 6086323 "CEM Expense Inbox"
 
 
     procedure DrillDownAttendees()
-    var
-        ExpAttendeeInbox: Record "CEM Attendee Inbox";
-        ExpenseType: Record "CEM Expense Type";
-        ExpAttendeesInbox: Page "CEM Expense Attendees Inbox";
     begin
-        ExpAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Expense Inbox");
-        ExpAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-
-        TestField("Expense Type");
-        ExpenseType.Get("Expense Type");
-        if not ExpenseType."Attendees Required" then
-            Error(ExpTypeAttNotReq, ExpenseType.TableCaption, ExpenseType.Code);
-
-        ExpAttendeesInbox.SetTableView(ExpAttendeeInbox);
-        ExpAttendeesInbox.Editable := not (Status = Status::Accepted);
-        ExpAttendeesInbox.RunModal;
     end;
-
 
     procedure GetNoOfEntriesWithError(): Integer
     var

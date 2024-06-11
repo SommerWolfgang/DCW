@@ -24,13 +24,13 @@ table 12032504 "Email Distribution Entry"
         field(14; "Use for Code"; Code[20])
         {
             Caption = 'Use for Code';
-            TableRelation = IF ("Use for Type" = CONST (Customer)) Customer
-            ELSE
-            IF ("Use for Type" = CONST (Vendor)) Vendor
-            ELSE
-            IF ("Use for Type" = CONST (Contact)) Contact
-            ELSE
-            IF ("Use for Type" = CONST ("Responsibility Center")) "Responsibility Center";
+            TableRelation = if ("Use for Type" = const(Customer)) Customer
+            else
+            if ("Use for Type" = const(Vendor)) Vendor
+            else
+            if ("Use for Type" = const(Contact)) Contact
+            else
+            if ("Use for Type" = const("Responsibility Center")) "Responsibility Center";
 
             trigger OnValidate()
             var

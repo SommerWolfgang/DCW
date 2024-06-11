@@ -92,7 +92,7 @@ table 6086322 "CEM Expense Allocation Inbox"
         field(22; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(23; Billable; Boolean)
         {
@@ -203,11 +203,11 @@ table 6086322 "CEM Expense Allocation Inbox"
         EMDimInbox.SetRange("Document Type", 0);
         EMDimInbox.SetRange("Document No.", '');
         EMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMDimInbox.DeleteAll;
+        EMDimInbox.DeleteAll();
 
         EMAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Expense Allocation");
         EMAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttendeeInbox.DeleteAll;
+        EMAttendeeInbox.DeleteAll();
     end;
 
     var
@@ -223,7 +223,7 @@ table 6086322 "CEM Expense Allocation Inbox"
     var
         ExpAllocInbox: Record "CEM Expense Allocation Inbox";
     begin
-        if ExpAllocInbox.FindLast then
+        if ExpAllocInbox.FindLast() then
             exit(ExpAllocInbox."Entry No.")
         else
             exit(1);
@@ -235,7 +235,7 @@ table 6086322 "CEM Expense Allocation Inbox"
         Currency: Record Currency;
     begin
         ExpInbox.Get("Inbox Entry No.");
-        Currency.InitRoundingPrecision;
+        Currency.InitRoundingPrecision();
 
         case CalledByFieldNo of
 
@@ -255,14 +255,7 @@ table 6086322 "CEM Expense Allocation Inbox"
 
 
     procedure ShowDimensions(ReadOnly: Boolean)
-    var
-        ExpInbox: Record "CEM Expense Inbox";
     begin
-        if "Entry No." = 0 then
-            Error(Text002, TableCaption);
-
-        ExpInbox.Get("Inbox Entry No.");
-        DrillDownDimensions(not ReadOnly);
     end;
 
     procedure InitFromExpInbox(var ExpAllInbox: Record "CEM Expense Allocation Inbox"; ExpInbox: Record "CEM Expense Inbox")
@@ -297,7 +290,7 @@ table 6086322 "CEM Expense Allocation Inbox"
                 Error(
                   RemAmountMissmatchErr, ExpenseInbox."Currency Code", ExpenseInbox.Amount, ExpenseInbox.Amount - ExpenseAllocationInbox.Amount);
 
-        if ZeroAmountLines then
+        if ZeroAmountLines() then
             if ShowDialog then
                 exit(Confirm(ConfZeroLines, false))
             else

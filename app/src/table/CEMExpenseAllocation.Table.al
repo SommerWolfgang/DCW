@@ -118,13 +118,13 @@ table 6086321 "CEM Expense Allocation"
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(24; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(28; "Amount w/o VAT"; Decimal)
         {
@@ -161,7 +161,7 @@ table 6086321 "CEM Expense Allocation"
         field(51; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
 
             trigger OnValidate()
             begin
@@ -221,7 +221,7 @@ table 6086321 "CEM Expense Allocation"
                     "Expense Account Type"::"G/L Account":
                         begin
                             GLAcc.Get("Expense Account");
-                            GLAcc.CheckGLAcc;
+                            GLAcc.CheckGLAcc();
                         end;
                 end;
 
@@ -297,8 +297,8 @@ table 6086321 "CEM Expense Allocation"
         }
         field(270; "No. of Attendees"; Integer)
         {
-            CalcFormula = Count("CEM Attendee" WHERE("Table ID" = CONST(6086321),
-                                                      "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attendee" where("Table ID" = const(6086321),
+                                                      "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attendees';
             Editable = false;
             FieldClass = FlowField;
@@ -369,11 +369,11 @@ table 6086321 "CEM Expense Allocation"
         CurrencyDate: Date;
         CurrencyFactor: Decimal;
     begin
-        GLSetup.Get;
+        GLSetup.Get();
         GetExpense("Expense Entry No.");
         if _Expense."Currency Code" <> '' then begin
             if "Document Date" = 0D then
-                CurrencyDate := WorkDate
+                CurrencyDate := WorkDate()
             else
                 CurrencyDate := "Document Date";
 
@@ -383,17 +383,17 @@ table 6086321 "CEM Expense Allocation"
                 CurrencyFactor := 1;
 
             Currency.Get(_Expense."Currency Code");
-            Currency.CheckAmountRoundingPrecision;
+            Currency.CheckAmountRoundingPrecision();
         end else begin
-            Currency.InitRoundingPrecision;
+            Currency.InitRoundingPrecision();
             CurrencyFactor := 1;
         end;
 
         if "Bank Currency Code" <> '' then begin
             BankAccCurrency.Get("Bank Currency Code");
-            BankAccCurrency.CheckAmountRoundingPrecision;
+            BankAccCurrency.CheckAmountRoundingPrecision();
         end else
-            BankAccCurrency.InitRoundingPrecision;
+            BankAccCurrency.InitRoundingPrecision();
 
         case CalledByFieldNo of
 
@@ -538,27 +538,27 @@ table 6086321 "CEM Expense Allocation"
         if (RemainingAmount = 0) and (RemainingAmountLCY <> 0) then begin
             ExpenseAllocation.SetCurrentKey("Expense Entry No.");
             ExpenseAllocation.SetRange("Expense Entry No.", ExpEntryNo);
-            if ExpenseAllocation.FindLast then begin
+            if ExpenseAllocation.FindLast() then begin
                 ExpenseAllocation."Amount (LCY)" := ExpenseAllocation."Amount (LCY)" + RemainingAmountLCY;
-                ExpenseAllocation.Modify;
+                ExpenseAllocation.Modify();
             end;
         end;
 
         if (RemainingAmount <> 0) and (RemainingAmountLCY = 0) then begin
             ExpenseAllocation.SetCurrentKey("Expense Entry No.");
             ExpenseAllocation.SetRange("Expense Entry No.", ExpEntryNo);
-            if ExpenseAllocation.FindLast then begin
+            if ExpenseAllocation.FindLast() then begin
                 ExpenseAllocation.Amount := ExpenseAllocation.Amount + RemainingAmount;
-                ExpenseAllocation.Modify;
+                ExpenseAllocation.Modify();
             end;
         end;
 
         if (RemainingAmount = 0) and (RemainingAmtBankLCY <> 0) then begin
             ExpenseAllocation.SetCurrentKey("Expense Entry No.");
             ExpenseAllocation.SetRange("Expense Entry No.", ExpEntryNo);
-            if ExpenseAllocation.FindLast then begin
+            if ExpenseAllocation.FindLast() then begin
                 ExpenseAllocation."Bank-Currency Amount" := ExpenseAllocation."Bank-Currency Amount" + RemainingAmtBankLCY;
-                ExpenseAllocation.Modify;
+                ExpenseAllocation.Modify();
             end;
         end;
     end;
@@ -573,7 +573,7 @@ table 6086321 "CEM Expense Allocation"
 
         _Expense.Get(ExpEntryNo);
 
-        ExpenseAllocation.Reset;
+        ExpenseAllocation.Reset();
         ExpenseAllocation.SetCurrentKey("Expense Entry No.");
         ExpenseAllocation.SetRange("Expense Entry No.", _Expense."Entry No.");
         ExpenseAllocation.SetFilter("Continia User ID", '<>%1', _Expense."Continia User ID");
@@ -590,7 +590,7 @@ table 6086321 "CEM Expense Allocation"
             else
                 Error(RemAmountMissmatchErr, _Expense."Currency Code", _Expense.Amount, _Expense.Amount - ExpenseAllocation.Amount);
 
-        if ZeroAmountLines then
+        if ZeroAmountLines() then
             if ShowDialog then
                 exit(Confirm(ConfZeroLines, false))
             else
@@ -622,111 +622,8 @@ table 6086321 "CEM Expense Allocation"
 
 
     procedure AddDefaultDim(ValidatedFieldNo: Integer)
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
     begin
-        if "Entry No." = 0 then
-            exit;
-
-        DeleteOldDefaultDim;
-
-        if ContiniaUser.Get("Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode <> '' then
-                EMDimMgt.InsertDefaultDimAllocation(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.InsertDefaultDimAllocation(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-        end;
-
-        if "Expense Account" <> '' then
-            EMDimMgt.InsertDefaultDimAllocation(DATABASE::"G/L Account", "Expense Account", Rec);
-
-        if "Expense Type" <> '' then
-            EMDimMgt.InsertDefaultDimAllocation(DATABASE::"CEM Expense Type", "Expense Type", Rec);
-
-        if "Job No." <> '' then
-            EMDimMgt.InsertDefaultDimAllocation(DATABASE::Job, "Job No.", Rec);
-
-        if "Job Task No." <> '' then
-            EMDimMgt.InsertDefaultDimAllocation(DATABASE::"Job Task", "Job Task No.", Rec);
-
-        case ValidatedFieldNo of
-            FieldNo("Continia User ID"):
-                if ContiniaUser.Get("Continia User ID") then begin
-                    if ContiniaUser.GetSalesPurchCode <> '' then
-                        EMDimMgt.InsertDefaultDimAllocation(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
-
-                    if ContiniaUser."Vendor No." <> '' then
-                        EMDimMgt.InsertDefaultDimAllocation(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-                end;
-
-            FieldNo("Expense Account"):
-                if "Expense Account" <> '' then
-                    EMDimMgt.InsertDefaultDimAllocation(DATABASE::"G/L Account", "Expense Account", Rec);
-
-            FieldNo("Expense Type"):
-                if "Expense Type" <> '' then
-                    EMDimMgt.InsertDefaultDimAllocation(DATABASE::"CEM Expense Type", "Expense Type", Rec);
-
-            FieldNo("Job No."):
-                if "Job No." <> '' then
-                    EMDimMgt.InsertDefaultDimAllocation(DATABASE::Job, "Job No.", Rec);
-
-            FieldNo("Job Task No."):
-                if "Job Task No." <> '' then
-                    EMDimMgt.InsertDefaultDimAllocation(DATABASE::"Job Task", "Job Task No.", Rec);
-        end;
     end;
-
-    local procedure DeleteOldDefaultDim()
-    var
-        ContiniaUser: Record "CDC Continia User Setup";
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
-    begin
-        if ContiniaUser.Get(xRec."Continia User ID") then begin
-            if ContiniaUser.GetSalesPurchCode <> '' then
-                EMDimMgt.DeleteDefaultDimAllocation(DATABASE::"Salesperson/Purchaser", ContiniaUser.GetSalesPurchCode, Rec);
-
-            if ContiniaUser."Vendor No." <> '' then
-                EMDimMgt.DeleteDefaultDimAllocation(DATABASE::Vendor, ContiniaUser."Vendor No.", Rec);
-        end;
-
-        if xRec."Expense Type" <> '' then
-            EMDimMgt.DeleteDefaultDimAllocation(DATABASE::"CEM Expense Type", xRec."Expense Type", Rec);
-
-        if xRec."Expense Account" <> '' then
-            EMDimMgt.DeleteDefaultDimAllocation(DATABASE::"G/L Account", xRec."Expense Account", Rec);
-
-        if xRec."Job No." <> '' then
-            EMDimMgt.DeleteDefaultDimAllocation(DATABASE::Job, xRec."Job No.", Rec);
-
-        if xRec."Job No." <> '' then
-            EMDimMgt.DeleteDefaultDimAllocation(DATABASE::"Job Task", xRec."Job Task No.", Rec);
-    end;
-
-    local procedure CopyAttendees(Expense: Record "CEM Expense"; ExpenseAllocation: Record "CEM Expense Allocation")
-    var
-        Attendee: Record "CEM Attendee";
-        Attendee2: Record "CEM Attendee";
-        ExpenseType: Record "CEM Expense Type";
-    begin
-        if ExpenseType.Get(ExpenseAllocation."Expense Type") then
-            if not ExpenseType."Attendees Required" then
-                exit;
-
-        Attendee.SetRange("Table ID", DATABASE::"CEM Expense");
-        Attendee.SetRange("Doc. Ref. No.", Expense."Entry No.");
-        if Attendee.FindSet then
-            repeat
-                Attendee2.Copy(Attendee);
-                Attendee2."Table ID" := DATABASE::"CEM Expense Allocation";
-                Attendee2."Doc. Ref. No." := ExpenseAllocation."Entry No.";
-                Attendee2."Entry No." := Attendee2.GetNextEntryNo;
-                Attendee2.Insert;
-            until Attendee.Next = 0;
-    end;
-
 
     procedure GetPostingDescription(): Text[1024]
     var
@@ -766,65 +663,9 @@ table 6086321 "CEM Expense Allocation"
 
 
     procedure RecalculateAmounts(var BaseAmount: Decimal; var VATAmount: Decimal; var VATPercentage: Decimal)
-    var
-        ExpenseTemp: Record "CEM Expense" temporary;
-        ExpenseAllocation: Record "CEM Expense Allocation";
-        ExpenseAllocationTemp: Record "CEM Expense Allocation" temporary;
-        Currency: Record Currency;
-        GLAccount: Record "G/L Account";
-        VATPostingSetup: Record "VAT Posting Setup";
-        SalesTaxInterface: Codeunit "CEM Sales Tax Interface";
-        VATPercentageAllocation: Decimal;
     begin
-        ExpenseAllocationTemp.DeleteAll;
-        ExpenseAllocationTemp := Rec;
-
         BaseAmount := 0;
         VATAmount := 0;
         VATPercentage := 0;
-
-        if SalesTaxInterface.ShouldHandleCASalesTax then begin
-            if SalesTaxInterface.IsAllocationSalesTaxLine(ExpenseAllocationTemp) then
-                VATAmount := ExpenseAllocationTemp.Amount
-            else
-                BaseAmount := ExpenseAllocationTemp.Amount;
-            exit;
-        end;
-
-        if ExpenseAllocationTemp."Expense Account" <> '' then
-            if GLAccount.Get(ExpenseAllocationTemp."Expense Account") then
-                if VATPostingSetup.Get(GLAccount."VAT Bus. Posting Group", GLAccount."VAT Prod. Posting Group") then
-                    VATPercentage := VATPostingSetup."VAT %";
-
-        if (ExpenseAllocationTemp."VAT Bus. Posting Group" <> '') or (ExpenseAllocationTemp."VAT Prod. Posting Group" <> '') then begin
-            if ExpenseAllocationTemp."VAT Bus. Posting Group" = '' then
-                ExpenseAllocationTemp."VAT Bus. Posting Group" := GLAccount."VAT Bus. Posting Group";
-            if ExpenseAllocationTemp."VAT Prod. Posting Group" = '' then
-                ExpenseAllocationTemp."VAT Prod. Posting Group" := GLAccount."VAT Prod. Posting Group";
-
-            if VATPostingSetup.Get(ExpenseAllocationTemp."VAT Bus. Posting Group", ExpenseAllocationTemp."VAT Prod. Posting Group") then
-                VATPercentage := VATPostingSetup."VAT %";
-        end;
-
-        if ExpenseAllocationTemp."Currency Code" = '' then
-            Currency.InitRoundingPrecision
-        else
-            Currency.Get(ExpenseAllocationTemp."Currency Code");
-
-        case VATPostingSetup."VAT Calculation Type" of
-            VATPostingSetup."VAT Calculation Type"::"Reverse Charge VAT":
-                begin
-                    VATAmount += Round(ExpenseAllocationTemp.Amount * (VATPercentage / 100), Currency."Amount Rounding Precision", Currency.VATRoundingDirection);
-                    BaseAmount += Round(ExpenseAllocationTemp.Amount - Round(ExpenseAllocationTemp.Amount * (VATPercentage / 100),
-                              Currency."Amount Rounding Precision", Currency.VATRoundingDirection), Currency."Amount Rounding Precision");
-                end;
-            VATPostingSetup."VAT Calculation Type"::"Normal VAT":
-                begin
-                    VATAmount += Round(ExpenseAllocationTemp.Amount * VATPercentage / (100 + VATPercentage), Currency."Amount Rounding Precision", Currency.VATRoundingDirection);
-                    BaseAmount += Round(ExpenseAllocationTemp.Amount - Round(ExpenseAllocationTemp.Amount * VATPercentage / (100 + VATPercentage),
-                              Currency."Amount Rounding Precision", Currency.VATRoundingDirection), Currency."Amount Rounding Precision");
-                end;
-        end;
     end;
 }
-

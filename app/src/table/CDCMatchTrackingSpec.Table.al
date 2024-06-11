@@ -26,26 +26,26 @@ table 6085783 "CDC Match Tracking Spec."
         field(5; "Purch. Doc. No."; Code[20])
         {
             Caption = 'Purch. Document No.';
-            TableRelation = IF ("Purch. Doc. Type" = CONST(Receipt)) "Purch. Rcpt. Header"
-            ELSE
-            IF ("Purch. Doc. Type" = CONST("Return Shipment")) "Return Shipment Header"
-            ELSE
-            IF ("Purch. Doc. Type" = CONST(Order)) "Purchase Header"."No." WHERE("Document Type" = CONST(Order))
-            ELSE
-            IF ("Purch. Doc. Type" = CONST("Return Order")) "Purchase Header"."No." WHERE("Document Type" = CONST("Return Order"));
+            TableRelation = if ("Purch. Doc. Type" = const(Receipt)) "Purch. Rcpt. Header"
+            else
+            if ("Purch. Doc. Type" = const("Return Shipment")) "Return Shipment Header"
+            else
+            if ("Purch. Doc. Type" = const(Order)) "Purchase Header"."No." where("Document Type" = const(Order))
+            else
+            if ("Purch. Doc. Type" = const("Return Order")) "Purchase Header"."No." where("Document Type" = const("Return Order"));
         }
         field(6; "Purch. Line No."; Integer)
         {
             Caption = 'Purchase Line No.';
-            TableRelation = IF ("Purch. Doc. Type" = CONST(Receipt)) "Purch. Rcpt. Line"."Line No." WHERE("Document No." = FIELD("Purch. Doc. No."))
-            ELSE
-            IF ("Purch. Doc. Type" = CONST("Return Shipment")) "Return Shipment Line"."Line No." WHERE("Document No." = FIELD("Purch. Doc. No."))
-            ELSE
-            IF ("Purch. Doc. Type" = CONST(Order)) "Purchase Line"."Line No." WHERE("Document Type" = CONST(Order),
-                                                                                                        "Document No." = FIELD("Purch. Doc. No."))
-            ELSE
-            IF ("Purch. Doc. Type" = CONST("Return Order")) "Purchase Line"."Line No." WHERE("Document Type" = CONST("Return Order"),
-                                                                                                                                                                                             "Document No." = FIELD("Purch. Doc. No."));
+            TableRelation = if ("Purch. Doc. Type" = const(Receipt)) "Purch. Rcpt. Line"."Line No." where("Document No." = field("Purch. Doc. No."))
+            else
+            if ("Purch. Doc. Type" = const("Return Shipment")) "Return Shipment Line"."Line No." where("Document No." = field("Purch. Doc. No."))
+            else
+            if ("Purch. Doc. Type" = const(Order)) "Purchase Line"."Line No." where("Document Type" = const(Order),
+                                                                                                        "Document No." = field("Purch. Doc. No."))
+            else
+            if ("Purch. Doc. Type" = const("Return Order")) "Purchase Line"."Line No." where("Document Type" = const("Return Order"),
+                                                                                                                                                                                             "Document No." = field("Purch. Doc. No."));
         }
         field(7; "Matched Quantity"; Decimal)
         {
@@ -76,11 +76,11 @@ table 6085783 "CDC Match Tracking Spec."
         field(12; "Document No. Spec"; Code[20])
         {
             Caption = 'Document No.';
-            TableRelation = IF ("Type Spec" = CONST(Document)) "CDC Document"
-            ELSE
-            IF ("Type Spec" = CONST("Purchase Invoice")) "Purchase Header"."No." WHERE("Document Type" = CONST(Invoice))
-            ELSE
-            IF ("Type Spec" = CONST("Purchase Credit Memo")) "Purchase Header"."No." WHERE("Document Type" = CONST("Credit Memo"));
+            TableRelation = if ("Type Spec" = const(Document)) "CDC Document"
+            else
+            if ("Type Spec" = const("Purchase Invoice")) "Purchase Header"."No." where("Document Type" = const(Invoice))
+            else
+            if ("Type Spec" = const("Purchase Credit Memo")) "Purchase Header"."No." where("Document Type" = const("Credit Memo"));
         }
         field(13; "Item No. Spec"; Code[250])
         {

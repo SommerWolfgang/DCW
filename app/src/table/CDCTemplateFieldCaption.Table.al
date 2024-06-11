@@ -15,15 +15,15 @@ table 6085581 "CDC Template Field Caption"
             Caption = 'Type';
             OptionCaption = 'Header,Line';
             OptionMembers = Header,Line;
-            TableRelation = "CDC Template Field".Type WHERE ("Template No." = FIELD ("Template No."));
+            TableRelation = "CDC Template Field".Type where("Template No." = field("Template No."));
             ValidateTableRelation = false;
         }
         field(3; "Code"; Code[20])
         {
             Caption = 'Code';
             NotBlank = true;
-            TableRelation = "CDC Template Field".Code WHERE ("Template No." = FIELD ("Template No."),
-                                                             Type = FIELD (Type));
+            TableRelation = "CDC Template Field".Code where("Template No." = field("Template No."),
+                                                             Type = field(Type));
         }
         field(4; "Line No."; Integer)
         {

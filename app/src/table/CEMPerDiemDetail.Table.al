@@ -24,12 +24,6 @@ table 6086388 "CEM Per Diem Detail"
         field(4; "Accommodation Allowance"; Boolean)
         {
             Caption = 'Accommodation Allowance';
-
-            trigger OnValidate()
-            begin
-                if "Accommodation Allowance" and IsFirstDay then
-                    Error(AccommodationNotAllowed);
-            end;
         }
         field(5; Breakfast; Boolean)
         {
@@ -135,46 +129,6 @@ table 6086388 "CEM Per Diem Detail"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        Destinations: Record "CEM Per Diem Detail Dest.";
-    begin
-        Destinations.SetRange("Per Diem Entry No.", Rec."Per Diem Entry No.");
-        Destinations.SetRange("Per Diem Detail Entry No.", Rec."Entry No.");
-        Destinations.DeleteAll;
-
-        if not SkipSendToExpUser then
-            SendToExpenseUser(true);
-    end;
-
-    trigger OnInsert()
-    begin
-        "Entry No." := GetEntryNo;
-    end;
-
-    trigger OnModify()
-    begin
-        Modified := true;
-        PerDiemCalcEngine.FindRateAndUpdateAmtOnDetail(Rec);
-
-        if not SkipSendToExpUser then
-            SendToExpenseUser(false);
-    end;
-
-    var
-        PerDiemGlobal: Record "CEM Per Diem";
-        PerDiemCalcEngine: Codeunit "CEM Per Diem Calc. Engine";
-        GotPerDiem: Boolean;
-        PerDiemLoaded: Boolean;
-        SkipSendToExpUser: Boolean;
-        AccommodationNotAllowed: Label 'Accommodation cannot be selected on the first day';
-
-
     procedure GetEntryNo(): Integer
     var
         PerDiemDetails: Record "CEM Per Diem Detail";
@@ -182,7 +136,7 @@ table 6086388 "CEM Per Diem Detail"
         Rec.TestField("Per Diem Entry No.");
 
         PerDiemDetails.SetRange("Per Diem Entry No.", "Per Diem Entry No.");
-        if PerDiemDetails.FindLast then
+        if PerDiemDetails.FindLast() then
             exit(PerDiemDetails."Entry No." + 1)
         else
             exit(1);
@@ -191,7 +145,6 @@ table 6086388 "CEM Per Diem Detail"
 
     procedure SetSkipSendToUser(SkipSend: Boolean)
     begin
-        SkipSendToExpUser := SkipSend;
     end;
 
 
@@ -224,28 +177,19 @@ table 6086388 "CEM Per Diem Detail"
         if PerDiemDestination.IsEmpty then
             exit('');
 
-        PerDiemDestination.FindSet;
+        PerDiemDestination.FindSet();
         repeat
             PerDiemDestination.CalcFields("Destination Name");
             if DestinationTxt <> '' then
                 DestinationTxt += ',';
 
             DestinationTxt += PerDiemDestination."Destination Name";
-        until PerDiemDestination.Next = 0;
+        until PerDiemDestination.Next() = 0;
     end;
 
 
     procedure DrillDownDestinations()
-    var
-        PerDiemDestination: Record "CEM Per Diem Detail Dest.";
-        PerDiemDestinationsPage: Page "CEM Per Diem Destinations";
     begin
-        PerDiemDestination.SetRange("Per Diem Entry No.", "Per Diem Entry No.");
-        PerDiemDestination.SetRange("Per Diem Detail Entry No.", Rec."Entry No.");
-
-        PerDiemDestinationsPage.SetTableView(PerDiemDestination);
-        PerDiemDestinationsPage.Editable(true);
-        PerDiemDestinationsPage.RunModal;
     end;
 
 
@@ -259,132 +203,14 @@ table 6086388 "CEM Per Diem Detail"
 
 
     procedure GetLastDestination(): Code[10]
-    var
-        PerDiemDetail: Record "CEM Per Diem Detail";
-        PerDiemDetailDest: Record "CEM Per Diem Detail Dest.";
-        DestCountry: Code[20];
     begin
-        // Last destination must be returned, with the following exception:
-        // When the user is returning home from a specific country, he gets the rate of that specific country instead of the home rate
-
-        if not GetPerDiem(Rec."Per Diem Entry No.") then
-            exit;
-
-        PerDiemDetail.Ascending(false);
-        PerDiemDetail.SetRange("Per Diem Entry No.", Rec."Per Diem Entry No.");
-        PerDiemDetail.SetFilter("Entry No.", '<=%1', "Entry No.");
-        if PerDiemDetail.Find('-') then
-            repeat
-                Clear(DestCountry);
-                if GetLastDestinationCountry(PerDiemDetail, DestCountry) then
-                    if (DestCountry = PerDiemGlobal."Departure Country/Region") then begin
-                        // If the user is returning in the home coutry, he needs to stay more than one day in order to get the rate.
-                        // Otherwise it is considered just a return for a trip abroad
-                        if IsNextDayDestinationInHomeCountry(PerDiemDetail) then
-                            exit(PerDiemGlobal."Departure Country/Region");
-                    end else
-                        exit(DestCountry);
-
-            until PerDiemDetail.Next = 0;
-
-        // Destination should only be used if no other Detail destination is specified. It should never overwrite the detail destinations.
-        if PerDiemGlobal."Destination Country/Region" <> '' then
-            exit(PerDiemGlobal."Destination Country/Region");
-
-        // No Destination was found on the Per Diem Details, then we take the Departure destination.
-        exit(PerDiemGlobal."Departure Country/Region");
     end;
-
-    local procedure GetLastDestinationCountry(PerDiemDetail: Record "CEM Per Diem Detail"; var DestCountry: Code[10]): Boolean
-    var
-        PerDiemDetailDestination: Record "CEM Per Diem Detail Dest.";
-    begin
-        PerDiemDetailDestination.SetCurrentKey("Arrival Time");
-        PerDiemDetailDestination.SetRange("Per Diem Entry No.", PerDiemDetail."Per Diem Entry No.");
-        PerDiemDetailDestination.SetRange("Per Diem Detail Entry No.", PerDiemDetail."Entry No.");
-        PerDiemDetailDestination.SetFilter("Destination Country/Region", '<>%1', '');
-        if PerDiemDetailDestination.FindLast then begin
-            DestCountry := PerDiemDetailDestination."Destination Country/Region";
-            exit(true);
-        end;
-    end;
-
-    local procedure IsNextDayDestinationInHomeCountry(PerDiemDetail: Record "CEM Per Diem Detail"): Boolean
-    var
-        PerDiemDetail2: Record "CEM Per Diem Detail";
-        PerDiemDetailDestination: Record "CEM Per Diem Detail Dest.";
-    begin
-        // Find the next Per Diem Detail
-        PerDiemDetail2.SetRange("Per Diem Entry No.", PerDiemDetail."Per Diem Entry No.");
-        PerDiemDetail2.SetFilter("Entry No.", '>%1', PerDiemDetail."Entry No.");
-        if not PerDiemDetail2.FindFirst then
-            exit(false);
-
-        PerDiemDetailDestination.SetCurrentKey("Arrival Time");
-        PerDiemDetailDestination.SetRange("Per Diem Entry No.", PerDiemDetail2."Per Diem Entry No.");
-        PerDiemDetailDestination.SetRange("Per Diem Detail Entry No.", PerDiemDetail2."Entry No.");
-        PerDiemDetailDestination.SetFilter("Destination Country/Region", '<>%1', '');
-        if not PerDiemDetailDestination.FindLast then
-            exit(true); // No destination was specified for this day. Last known address wins.
-
-        exit(PerDiemDetailDestination."Destination Country/Region" = PerDiemGlobal."Departure Country/Region");
-    end;
-
 
     procedure SendToExpenseUser(ShouldDelete: Boolean)
-    var
-        PerDiem: Record "CEM Per Diem";
-        PerDiemDetail: Record "CEM Per Diem Detail";
-        PerDiemDetailTemp: Record "CEM Per Diem Detail" temporary;
-        SendToExpUser: Codeunit "CEM Per Diem - Send to User";
     begin
-        PerDiem.Get("Per Diem Entry No.");
-
-        if not (PerDiem.Status = PerDiem.Status::"Pending Expense User") then
-            exit;
-
-        PerDiemDetailTemp.DeleteAll;
-
-        // Load commited and un-commited data from the page.
-        PerDiemDetail.SetRange("Per Diem Entry No.", PerDiem."Entry No.");
-        if PerDiemDetail.FindSet then
-            repeat
-                PerDiemDetailTemp.TransferFields(PerDiemDetail);
-                PerDiemDetailTemp.Insert;
-            until PerDiemDetail.Next = 0;
-
-        if ShouldDelete then begin
-            if PerDiemDetailTemp.Get(Rec."Per Diem Entry No.", Rec."Entry No.", Rec.Date) then
-                PerDiemDetailTemp.Delete;
-        end else
-            if PerDiemDetailTemp.Get(Rec."Per Diem Entry No.", Rec."Entry No.", Rec.Date) then begin
-                PerDiemDetailTemp := Rec;
-                PerDiemDetailTemp.Modify;
-            end else begin
-                PerDiemDetailTemp := Rec;
-                PerDiemDetailTemp."Entry No." += 1;
-                PerDiemDetailTemp.Insert;
-            end;
-
-        SendToExpUser.SetPerDiemDetails(PerDiemDetailTemp);
-        SendToExpUser.Update(PerDiem);
     end;
-
 
     procedure SetGlobalPerDiem(var PerDiem: Record "CEM Per Diem")
     begin
-        // When Per Diem is un-commited we shouldn't read it from the database.
-
-        PerDiemGlobal := PerDiem;
-        PerDiemLoaded := true;
-    end;
-
-    local procedure GetPerDiem(PerDiemEntryNo: Integer): Boolean
-    begin
-        if PerDiemLoaded and (PerDiemEntryNo = PerDiemGlobal."Entry No.") then
-            exit(true);
-
-        exit(PerDiemGlobal.Get(PerDiemEntryNo));
     end;
 }
-

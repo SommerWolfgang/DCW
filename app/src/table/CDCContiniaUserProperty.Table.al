@@ -51,11 +51,11 @@ table 6085780 "CDC Continia User Property"
     begin
         if not Get(UserId) then begin
             "User ID" := UserId;
-            Insert;
+            Insert();
         end;
 
         "Selected Scanner" := ScannerCode;
-        Modify;
+        Modify();
     end;
 }
 

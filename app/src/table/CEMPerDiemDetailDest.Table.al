@@ -24,7 +24,7 @@ table 6086491 "CEM Per Diem Detail Dest."
         }
         field(11; "Destination Name"; Text[50])
         {
-            CalcFormula = Lookup ("CEM Country/Region".Name WHERE (Code = FIELD ("Destination Country/Region")));
+            CalcFormula = lookup("CEM Country/Region".Name where(Code = field("Destination Country/Region")));
             Caption = 'Destination Name';
             Editable = false;
             FieldClass = FlowField;
@@ -36,7 +36,7 @@ table 6086491 "CEM Per Diem Detail Dest."
             trigger OnValidate()
             begin
                 if xRec."Arrival Time" <> Rec."Arrival Time" then
-                    CheckArrivalDates;
+                    CheckArrivalDates();
             end;
         }
     }
@@ -62,26 +62,26 @@ table 6086491 "CEM Per Diem Detail Dest."
     begin
         PerDiemDestination.SetRange("Per Diem Entry No.", Rec."Per Diem Entry No.");
         PerDiemDestination.SetRange("Per Diem Detail Entry No.", Rec."Per Diem Detail Entry No.");
-        if PerDiemDestination.FindLast then
+        if PerDiemDestination.FindLast() then
             "Entry No." := PerDiemDestination."Entry No." + 1
         else
             "Entry No." := 1;
 
-        CheckDepartureCountry;
-        CheckArrivalDates;
+        CheckDepartureCountry();
+        CheckArrivalDates();
     end;
 
     trigger OnModify()
     begin
-        CheckArrivalDates;
+        CheckArrivalDates();
     end;
 
     var
         [InDataSet]
         SkipSendToExpUser: Boolean;
-        SameArrivalTimeErr: Label 'You cannot have different destinations at the same %1.';
-        DestinationBeforeTimeErr: Label '%1 cannot be before %2.';
         DestinationAfterTimeErr: Label '%1 cannot be after %2.';
+        DestinationBeforeTimeErr: Label '%1 cannot be before %2.';
+        SameArrivalTimeErr: Label 'You cannot have different destinations at the same %1.';
 
     local procedure CheckArrivalDates()
     var
@@ -101,14 +101,14 @@ table 6086491 "CEM Per Diem Detail Dest."
         DetailDest.SetRange("Per Diem Detail Entry No.", Rec."Per Diem Detail Entry No.");
         DetailDest.SetFilter("Entry No.", '>%1', Rec."Entry No.");
         DetailDest.SetFilter("Arrival Time", '<=%1', Rec."Arrival Time");
-        if DetailDest.FindFirst then
+        if DetailDest.FindFirst() then
             Error(DestinationBeforeTimeErr, FieldCaption("Arrival Time"), Format(DetailDest."Arrival Time"));
 
         DetailDest.SetRange("Per Diem Entry No.", Rec."Per Diem Entry No.");
         DetailDest.SetRange("Per Diem Detail Entry No.", Rec."Per Diem Detail Entry No.");
         DetailDest.SetFilter("Entry No.", '<%1', Rec."Entry No.");
         DetailDest.SetFilter("Arrival Time", '>=%1', Rec."Arrival Time");
-        if DetailDest.FindFirst then
+        if DetailDest.FindFirst() then
             Error(DestinationAfterTimeErr, FieldCaption("Arrival Time"), Format(DetailDest."Arrival Time"));
     end;
 

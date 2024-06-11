@@ -30,14 +30,14 @@ table 6086346 "CEM Configured Field"
 
             trigger OnValidate()
             var
-                FieldType: Record "CEM Field Type";
                 ConfigField: Record "CEM Configured Field";
+                FieldType: Record "CEM Field Type";
             begin
             end;
         }
         field(11; "Field Description"; Text[50])
         {
-            CalcFormula = Lookup ("CEM Field Type".Description WHERE (Code = FIELD ("Field Code")));
+            CalcFormula = lookup("CEM Field Type".Description where(Code = field("Field Code")));
             Caption = 'Field Description';
             Editable = false;
             FieldClass = FlowField;
@@ -67,9 +67,9 @@ table 6086346 "CEM Configured Field"
 
     trigger OnDelete()
     var
+        ConfigField: Record "CEM Configured Field";
         EMSetup: Record "CEM Expense Management Setup";
         FieldType: Record "CEM Field Type";
-        ConfigField: Record "CEM Configured Field";
     begin
     end;
 }

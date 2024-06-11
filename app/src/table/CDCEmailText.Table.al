@@ -15,7 +15,7 @@ table 6085737 "CDC E-mail Text"
             Caption = 'Reminder Level';
             MinValue = 1;
             NotBlank = true;
-            TableRelation = IF (Type = CONST("Approval Reminder E-Mail Setup")) "CDC App. Reminder E-Mail Setup";
+            TableRelation = if (Type = const("Approval Reminder E-Mail Setup")) "CDC App. Reminder E-Mail Setup";
         }
         field(3; Position; Option)
         {

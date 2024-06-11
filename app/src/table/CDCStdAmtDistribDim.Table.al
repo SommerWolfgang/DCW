@@ -23,7 +23,7 @@ table 6085776 "CDC Std. Amt. Distrib. Dim."
         {
             Caption = 'Dimension Value Code';
             NotBlank = true;
-            TableRelation = "Dimension Value".Code WHERE("Dimension Code" = FIELD("Dimension Code"));
+            TableRelation = "Dimension Value".Code where("Dimension Code" = field("Dimension Code"));
 
             trigger OnValidate()
             var

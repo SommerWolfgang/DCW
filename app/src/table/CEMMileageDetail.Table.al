@@ -7,18 +7,6 @@ table 6086365 "CEM Mileage Detail"
         field(1; "Mileage Entry No."; Integer)
         {
             Caption = 'Mileage Entry No.';
-            TableRelation = "CEM Mileage";
-
-            trigger OnLookup()
-            var
-                Mileage: Record "CEM Mileage";
-            begin
-                Mileage.Get("Mileage Entry No.");
-                if not Mileage.Posted then
-                    PAGE.Run(PAGE::"CEM Mileage", Mileage)
-                else
-                    PAGE.Run(PAGE::"CEM Posted Mileage", Mileage);
-            end;
         }
         field(2; "Continia User ID"; Code[50])
         {
@@ -130,7 +118,7 @@ table 6086365 "CEM Mileage Detail"
         Mileage: Record "CEM Mileage";
     begin
         if Mileage.Get("Mileage Entry No.") then
-            Mileage.OpenDocumentCard;
+            Mileage.OpenDocumentCard();
     end;
 }
 

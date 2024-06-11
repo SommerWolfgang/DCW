@@ -52,11 +52,11 @@ table 6085634 "CDC Continia User Permission"
         field(9; "No. of Assigning Selections"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Continia User Pms. Sel." WHERE("Continia User ID" = FIELD("Continia User ID"),
-                                                                     "Approval User Group Code" = FIELD("Approval User Group Code"),
-                                                                     Type = FIELD(Type),
-                                                                     "Dimension Code" = FIELD("Dimension Code"),
-                                                                     "Permission Type" = CONST("Assigning Permission")));
+            CalcFormula = count("CDC Continia User Pms. Sel." where("Continia User ID" = field("Continia User ID"),
+                                                                     "Approval User Group Code" = field("Approval User Group Code"),
+                                                                     Type = field(Type),
+                                                                     "Dimension Code" = field("Dimension Code"),
+                                                                     "Permission Type" = const("Assigning Permission")));
             Caption = 'No. of Assigning Selections';
             Editable = false;
             FieldClass = FlowField;
@@ -64,11 +64,11 @@ table 6085634 "CDC Continia User Permission"
         field(10; "No. of Approval Selections"; Integer)
         {
             BlankZero = true;
-            CalcFormula = Count("CDC Continia User Pms. Sel." WHERE("Continia User ID" = FIELD("Continia User ID"),
-                                                                     "Approval User Group Code" = FIELD("Approval User Group Code"),
-                                                                     Type = FIELD(Type),
-                                                                     "Dimension Code" = FIELD("Dimension Code"),
-                                                                     "Permission Type" = CONST("Approval Permission")));
+            CalcFormula = count("CDC Continia User Pms. Sel." where("Continia User ID" = field("Continia User ID"),
+                                                                     "Approval User Group Code" = field("Approval User Group Code"),
+                                                                     Type = field(Type),
+                                                                     "Dimension Code" = field("Dimension Code"),
+                                                                     "Permission Type" = const("Approval Permission")));
             Caption = 'No. of Approval Selections';
             Editable = false;
             FieldClass = FlowField;

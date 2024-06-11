@@ -48,18 +48,18 @@ table 6086389 "CEM Tax Jurisdiction"
     begin
         // Reloads all the jurisdictions, saving previous EM setup
         EMTaxJurisdiction.SetFilter("Expense Type Reference", '<>%1', '');
-        if EMTaxJurisdiction.FindSet then begin
-            EMTaxJurisdictionTemp.DeleteAll;
+        if EMTaxJurisdiction.FindSet() then begin
+            EMTaxJurisdictionTemp.DeleteAll();
             repeat
                 EMTaxJurisdictionTemp.Copy(EMTaxJurisdiction);
-                EMTaxJurisdictionTemp.Insert;
-            until EMTaxJurisdiction.Next = 0;
+                EMTaxJurisdictionTemp.Insert();
+            until EMTaxJurisdiction.Next() = 0;
         end;
 
-        EMTaxJurisdiction.Reset;
-        EMTaxJurisdiction.DeleteAll;
+        EMTaxJurisdiction.Reset();
+        EMTaxJurisdiction.DeleteAll();
 
-        if TaxJurisdiction.FindSet then
+        if TaxJurisdiction.FindSet() then
             repeat
                 Clear(EMTaxJurisdiction);
                 EMTaxJurisdiction.Code := TaxJurisdiction.Code;
@@ -67,8 +67,8 @@ table 6086389 "CEM Tax Jurisdiction"
                 // Save previous EM Setup:
                 if EMTaxJurisdictionTemp.Get(TaxJurisdiction.Code) then
                     EMTaxJurisdiction."Expense Type Reference" := EMTaxJurisdictionTemp."Expense Type Reference";
-                EMTaxJurisdiction.Insert;
-            until TaxJurisdiction.Next = 0;
+                EMTaxJurisdiction.Insert();
+            until TaxJurisdiction.Next() = 0;
     end;
 
 
@@ -77,11 +77,11 @@ table 6086389 "CEM Tax Jurisdiction"
         TaxAreaLine: Record "Tax Area Line";
     begin
         TaxAreaLine.SetRange("Tax Area", TaxAreaCode);
-        if TaxAreaLine.FindSet then
+        if TaxAreaLine.FindSet() then
             repeat
                 Rec.Get(TaxAreaLine."Tax Jurisdiction Code");
                 Rec.Mark(true);
-            until TaxAreaLine.Next = 0;
+            until TaxAreaLine.Next() = 0;
     end;
 }
 

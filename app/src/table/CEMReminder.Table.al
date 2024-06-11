@@ -69,7 +69,7 @@ table 6086364 "CEM Reminder"
         EMReminder.SetRange("Document No.", DocumentNo);
         EMReminder.SetRange("Doc. Ref. No.", DocRefNo);
         EMReminder.SetRange("Reminder Terms Code", ContiniaUserSetup."Expense Reminder Code");
-        if EMReminder.FindLast then;
+        if EMReminder.FindLast() then;
 
         "Table ID" := TableID;
         "Document Type" := DocumentType;
@@ -78,13 +78,13 @@ table 6086364 "CEM Reminder"
         "Reminder Terms Code" := ContiniaUserSetup."Expense Reminder Code";
         "No." := EMReminder."No." + 1;
         "Reminder Sent" := Today;
-        Insert;
+        Insert();
 
         ReminderLevel.SetRange("Reminder Terms Code", ContiniaUserSetup."Expense Reminder Code");
         ReminderLevel.SetRange("No.", "No.");
-        if not ReminderLevel.FindLast then begin
+        if not ReminderLevel.FindLast() then begin
             ReminderLevel.SetRange("No.");
-            if not ReminderLevel.FindLast then;
+            if not ReminderLevel.FindLast() then;
         end;
     end;
 
@@ -101,7 +101,7 @@ table 6086364 "CEM Reminder"
         SetRange("Document No.", DocumentNo);
         SetRange("Doc. Ref. No.", DocRefNo);
         SetRange("Reminder Terms Code", ContiniaUserSetup."Expense Reminder Code");
-        if FindLast then begin
+        if FindLast() then begin
             "Reminder Sent" := Today;
             Modify(true);
         end;
@@ -132,7 +132,7 @@ table 6086364 "CEM Reminder"
         EMReminder.SetRange("Document No.", DocumentNo);
         EMReminder.SetRange("Doc. Ref. No.", DocRefNo);
         EMReminder.SetRange("Reminder Terms Code", ReminderCode.Code);
-        if not EMReminder.FindLast then begin
+        if not EMReminder.FindLast() then begin
             EMReminder."Reminder Terms Code" := ReminderCode.Code;
             EMReminder."Reminder Sent" := DateCreated;
         end;
@@ -141,7 +141,7 @@ table 6086364 "CEM Reminder"
             exit(CalcDate(ReminderLevel."Grace Period", EMReminder."Reminder Sent"))
         else begin
             ReminderLevel.SetRange("Reminder Terms Code", ContiniaUserSetup."Expense Reminder Code");
-            if ReminderLevel.FindLast then
+            if ReminderLevel.FindLast() then
                 exit(CalcDate(ReminderLevel."Grace Period", EMReminder."Reminder Sent"));
         end;
     end;

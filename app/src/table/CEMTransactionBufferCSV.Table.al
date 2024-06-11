@@ -44,10 +44,10 @@ table 6086411 "CEM Transaction Buffer CSV"
     var
         CurrentLineNo: Integer;
     begin
-        DeleteAll;
+        DeleteAll();
         InitializeReaderFromStream(CSVInStream, CSVFieldSeparator, CSVEncoding);
 
-        while not StreamReader.EndOfStream do begin
+        while not StreamReader.EndOfStream() do begin
             CurrentLineNo += 1;
             ReadLine(CurrentLineNo);
         end;
@@ -76,9 +76,9 @@ table 6086411 "CEM Transaction Buffer CSV"
         Character: Text[1];
     begin
         if IsTabDelimited then
-            Line := ConvertStr(StreamReader.ReadLine, Format(TabChar), ';')
+            Line := ConvertStr(StreamReader.ReadLine(), Format(TabChar), ';')
         else
-            Line := StreamReader.ReadLine;
+            Line := StreamReader.ReadLine();
 
         Length := StrLen(Line);
 
@@ -134,7 +134,7 @@ table 6086411 "CEM Transaction Buffer CSV"
 
     local procedure InsertEntry(LineNo: Integer; FieldNo: Integer; FieldValue: Text[250])
     begin
-        Init;
+        Init();
         "Line No." := LineNo;
         "Field No." := FieldNo;
 
@@ -142,7 +142,7 @@ table 6086411 "CEM Transaction Buffer CSV"
             FieldValue := CopyStr(FieldValue, 1, 250);
 
         Value := FieldValue;
-        Insert;
+        Insert();
     end;
 
 
@@ -160,7 +160,7 @@ table 6086411 "CEM Transaction Buffer CSV"
 
     procedure GetNumberOfLines(): Integer
     begin
-        if FindLast then
+        if FindLast() then
             exit("Line No.");
     end;
 
@@ -171,16 +171,16 @@ table 6086411 "CEM Transaction Buffer CSV"
         DecimalType: Decimal;
     begin
         TempCSVBuffer.Copy(Rec, true);
-        TempCSVBuffer.Reset;
+        TempCSVBuffer.Reset();
         TempCSVBuffer.SetRange("Line No.", "Line No.");
 
-        if not TempCSVBuffer.FindSet then
+        if not TempCSVBuffer.FindSet() then
             exit;
 
         repeat
             if Evaluate(DecimalType, TempCSVBuffer.GetValue(TempCSVBuffer."Line No.", TempCSVBuffer."Field No.")) then
                 exit(true);
-        until TempCSVBuffer.Next = 0;
+        until TempCSVBuffer.Next() = 0;
     end;
 
 
@@ -189,16 +189,16 @@ table 6086411 "CEM Transaction Buffer CSV"
         TempCSVBuffer: Record "CEM Transaction Buffer CSV" temporary;
     begin
         TempCSVBuffer.Copy(Rec, true);
-        TempCSVBuffer.Reset;
+        TempCSVBuffer.Reset();
         TempCSVBuffer.SetRange("Line No.", LineNo);
 
-        if not TempCSVBuffer.FindSet then
+        if not TempCSVBuffer.FindSet() then
             exit;
 
         repeat
             if StrPos(TempCSVBuffer.Value, Value) > 0 then
                 exit(true);
-        until TempCSVBuffer.Next = 0;
+        until TempCSVBuffer.Next() = 0;
     end;
 
 

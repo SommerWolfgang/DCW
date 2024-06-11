@@ -7,12 +7,11 @@ table 6085589 "CDC Log Rename Table"
         field(1; "Table No."; Integer)
         {
             Caption = 'Table No.';
-            TableRelation = AllObj."Object ID" WHERE ("Object Type" = CONST (Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
         }
-        field(2; "Table Name"; Text[30])
+        field(2; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup (AllObjWithCaption."Object Caption" WHERE ("Object Type" = CONST (Table),
-                                                                           "Object ID" = FIELD ("Table No.")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table), "Object ID" = field("Table No.")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;

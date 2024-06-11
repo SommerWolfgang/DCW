@@ -13,7 +13,7 @@ table 6086396 "CEM Release Notification Entry"
         {
             Caption = 'Table ID';
             Editable = false;
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Table));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Table));
 
             trigger OnLookup()
             var
@@ -31,22 +31,11 @@ table 6086396 "CEM Release Notification Entry"
         {
             Caption = 'Document No.';
             Editable = false;
-
-            trigger OnLookup()
-            var
-                Expense: Record "CEM Expense";
-                ExpHeader: Record "CEM Expense Header";
-                Mileage: Record "CEM Mileage";
-                PerDiem: Record "CEM Per Diem";
-                EMApprovalMgt: Codeunit "CEM Approval Management";
-            begin
-                LookupCard(Rec);
-            end;
         }
         field(10; "Table Name"; Text[249])
         {
-            CalcFormula = Lookup(AllObjWithCaption."Object Caption" WHERE("Object Type" = CONST(Table),
-                                                                           "Object ID" = FIELD("Table ID")));
+            CalcFormula = lookup(AllObjWithCaption."Object Caption" where("Object Type" = const(Table),
+                                                                           "Object ID" = field("Table ID")));
             Caption = 'Table Name';
             Editable = false;
             FieldClass = FlowField;
@@ -101,7 +90,7 @@ table 6086396 "CEM Release Notification Entry"
 
     trigger OnInsert()
     begin
-        "Entry No." := GetEntryNo;
+        "Entry No." := GetEntryNo();
         "Created Date/Time" := CurrentDateTime;
     end;
 
@@ -117,7 +106,7 @@ table 6086396 "CEM Release Notification Entry"
     var
         Entry: Record "CEM Release Notification Entry";
     begin
-        if Entry.FindLast then
+        if Entry.FindLast() then
             exit(Entry."Entry No." + 1)
         else
             exit(1);
@@ -129,7 +118,7 @@ table 6086396 "CEM Release Notification Entry"
         if PendingEntryExists(TableID, DocumentNo, HistoryDocument) then
             exit;
 
-        Init;
+        Init();
         "Table ID" := TableID;
         "Document No." := DocumentNo;
         "Document for History" := HistoryDocument;
@@ -139,10 +128,10 @@ table 6086396 "CEM Release Notification Entry"
 
     procedure SetIgnoreStatusMultiple(var ReleaseNotificationEntry: Record "CEM Release Notification Entry")
     begin
-        if ReleaseNotificationEntry.FindSet then
+        if ReleaseNotificationEntry.FindSet() then
             repeat
                 ReleaseNotificationEntry.TestField(Status, ReleaseNotificationEntry.Status::Error);
-            until ReleaseNotificationEntry.Next = 0;
+            until ReleaseNotificationEntry.Next() = 0;
 
         ReleaseNotificationEntry.ModifyAll(Status, ReleaseNotificationEntry.Status::Ignore);
     end;
@@ -159,38 +148,12 @@ table 6086396 "CEM Release Notification Entry"
 
 
     procedure LookupCard(Entry: Record "CEM Release Notification Entry")
-    var
-        Expense: Record "CEM Expense";
-        ExpHeader: Record "CEM Expense Header";
-        Mileage: Record "CEM Mileage";
-        PerDiem: Record "CEM Per Diem";
-        EMApprovalMgt: Codeunit "CEM Approval Management";
     begin
-        case Entry."Table ID" of
-
-            DATABASE::"CEM Expense":
-                if Expense.Get(EMApprovalMgt.Code2Int(Entry."Document No.")) then
-                    Expense.OpenDocumentCard;
-
-            DATABASE::"CEM Mileage":
-                if Mileage.Get(EMApprovalMgt.Code2Int(Entry."Document No.")) then
-                    Mileage.OpenDocumentCard;
-
-            DATABASE::"CEM Per Diem":
-                if PerDiem.Get(EMApprovalMgt.Code2Int(Entry."Document No.")) then
-                    PerDiem.OpenDocumentCard;
-
-            DATABASE::"CEM Expense Header":
-                if ExpHeader.Get(ExpHeader."Document Type"::Settlement, Entry."Document No.") then
-                    ExpHeader.OpenDocumentCard;
-
-        end;
     end;
-
 
     procedure CheckForUnprocessedEntries(): Boolean
     begin
-        Reset;
+        Reset();
         SetCurrentKey(Status);
         SetRange(Status, Status::Pending, Status::Error);
         SetRange("Document for History", false);
@@ -201,7 +164,7 @@ table 6086396 "CEM Release Notification Entry"
 
     procedure CheckForUnprocessedHistEntries(): Boolean
     begin
-        Reset;
+        Reset();
         SetCurrentKey(Status);
         SetRange(Status, Status::Pending, Status::Error);
         SetRange("Document for History", true);

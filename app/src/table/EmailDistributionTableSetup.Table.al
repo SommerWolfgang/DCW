@@ -25,12 +25,10 @@ table 12032501 "Email Distribution Table Setup"
         field(500; "From Status"; Code[20])
         {
             Caption = 'From Status';
-            TableRelation = "Lot-/ Serial No. Status";
         }
         field(510; "To Status"; Code[20])
         {
             Caption = 'To Status';
-            TableRelation = "Lot-/ Serial No. Status";
         }
     }
 

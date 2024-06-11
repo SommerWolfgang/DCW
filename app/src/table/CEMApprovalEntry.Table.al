@@ -39,9 +39,9 @@ table 6086319 "CEM Approval Entry"
         }
         field(13; Comment; Boolean)
         {
-            CalcFormula = Exist("Approval Comment Line" WHERE("Table ID" = FIELD("Table ID"),
-                                                               "Document Type" = FIELD("Document Type"),
-                                                               "Document No." = FIELD("Document No.")));
+            CalcFormula = exist("Approval Comment Line" where("Table ID" = field("Table ID"),
+                                                               "Document Type" = field("Document Type"),
+                                                               "Document No." = field("Document No.")));
             Caption = 'Comment';
             Editable = false;
             FieldClass = FlowField;
@@ -55,7 +55,7 @@ table 6086319 "CEM Approval Entry"
 
             trigger OnLookup()
             begin
-                AmountLookup;
+                AmountLookup();
             end;
         }
         field(16; "Amount (LCY)"; Decimal)
@@ -66,7 +66,7 @@ table 6086319 "CEM Approval Entry"
 
             trigger OnLookup()
             begin
-                AmountLookup;
+                AmountLookup();
             end;
         }
         field(17; "Currency Code"; Code[10])
@@ -85,7 +85,7 @@ table 6086319 "CEM Approval Entry"
         }
         field(201; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -111,13 +111,13 @@ table 6086319 "CEM Approval Entry"
         {
             Caption = 'Global Dimension 1 Code';
             CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(209; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
             CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(210; "Job No."; Code[20])
         {
@@ -127,7 +127,7 @@ table 6086319 "CEM Approval Entry"
         field(211; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(212; "On Hold"; Code[3])
         {
@@ -136,11 +136,11 @@ table 6086319 "CEM Approval Entry"
         field(213; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF ("Table ID" = CONST(6086320)) "CEM Expense Type"
-            ELSE
-            IF ("Table ID" = CONST(6086338)) "CEM Vehicle"
-            ELSE
-            IF ("Table ID" = CONST(6086339)) "CEM Expense Header"."No.";
+            TableRelation = if ("Table ID" = const(6086320)) "CEM Expense Type"
+            else
+            if ("Table ID" = const(6086338)) "CEM Vehicle"
+            else
+            if ("Table ID" = const(6086339)) "CEM Expense Header"."No.";
         }
         field(214; Details; Text[250])
         {

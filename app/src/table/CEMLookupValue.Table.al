@@ -48,7 +48,7 @@ table 6086347 "CEM Lookup Value"
         if Manual then begin
             FieldType.Get("Field Type Code");
             FieldType."Last Update Date/Time" := CurrentDateTime;
-            FieldType.Modify;
+            FieldType.Modify();
         end;
     end;
 
@@ -59,7 +59,7 @@ table 6086347 "CEM Lookup Value"
         if Manual then begin
             FieldType.Get("Field Type Code");
             FieldType."Last Update Date/Time" := CurrentDateTime;
-            FieldType.Modify;
+            FieldType.Modify();
         end;
     end;
 }

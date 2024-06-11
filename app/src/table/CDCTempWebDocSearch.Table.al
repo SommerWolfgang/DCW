@@ -17,13 +17,13 @@ table 6086009 "CDC Temp. Web Doc. Search"
         field(3; "No."; Code[20])
         {
             Caption = 'No.';
-            TableRelation = IF (Type = CONST ("Posted Purch. Invoice")) "Purch. Inv. Header"
-            ELSE
-            IF (Type = CONST ("Posted Purch. Credit Memo")) "Purch. Cr. Memo Hdr."
-            ELSE
-            IF (Type = CONST ("Purchase Invoice")) "Purchase Header"."No." WHERE ("Document Type" = CONST (Invoice))
-            ELSE
-            IF (Type = CONST ("Purchase Credit Memo")) "Purchase Header"."No." WHERE ("Document Type" = CONST ("Credit Memo"));
+            TableRelation = if (Type = const("Posted Purch. Invoice")) "Purch. Inv. Header"
+            else
+            if (Type = const("Posted Purch. Credit Memo")) "Purch. Cr. Memo Hdr."
+            else
+            if (Type = const("Purchase Invoice")) "Purchase Header"."No." where("Document Type" = const(Invoice))
+            else
+            if (Type = const("Purchase Credit Memo")) "Purchase Header"."No." where("Document Type" = const("Credit Memo"));
         }
         field(4; Name; Text[50])
         {

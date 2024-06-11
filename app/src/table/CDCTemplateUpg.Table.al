@@ -114,7 +114,7 @@ table 6086110 "CDC Template Upg."
         CDCTemplateFieldUpg: Record "CDC Template Field Upg.";
     begin
         CDCTemplateFieldUpg.SetRange(CDCTemplateFieldUpg."Template No.", "No.");
-        CDCTemplateFieldUpg.DeleteAll;
+        CDCTemplateFieldUpg.DeleteAll();
     end;
 
     trigger OnInsert()
@@ -170,11 +170,11 @@ table 6086110 "CDC Template Upg."
         CDCTemplate: Record "CDC Template";
     begin
         CDCTemplate.SetRange("Prices Including VAT", true);
-        if CDCTemplate.FindSet then
+        if CDCTemplate.FindSet() then
             repeat
                 InsertUpdateTemplateHeader(CDCTemplate);
                 InsertUpdateTemplateFields(CDCTemplate);
-            until CDCTemplate.Next = 0;
+            until CDCTemplate.Next() = 0;
     end;
 
 
@@ -186,10 +186,10 @@ table 6086110 "CDC Template Upg."
         if TemplateFilter <> '' then
             CDCTemplateUpg.SetFilter("No.", TemplateFilter);
         CDCTemplateUpg.SetRange(CDCTemplateUpg."New field config (manual)", false);
-        if CDCTemplateUpg.FindSet then
+        if CDCTemplateUpg.FindSet() then
             repeat
                 UpgradeCDCFieldConfiguration(CDCTemplateUpg);
-            until CDCTemplateUpg.Next = 0;
+            until CDCTemplateUpg.Next() = 0;
     end;
 
 
@@ -200,27 +200,27 @@ table 6086110 "CDC Template Upg."
     begin
         SetRange(Ignore, false);
         SetRange(Upgraded, false);
-        if FindSet then
+        if FindSet() then
             repeat
                 if "New field config (manual)" or "New field config (auto)" then begin
                     CDCTemplateFieldUpg.SetRange("Template No.", "No.");
-                    if CDCTemplateFieldUpg.FindSet then
+                    if CDCTemplateFieldUpg.FindSet() then
                         repeat
                             CDCTemplateField.Get(CDCTemplateFieldUpg."Template No.", CDCTemplateFieldUpg.Type, CDCTemplateFieldUpg.Code);
                             CDCTemplateField."G/L Account Field Code" := CDCTemplateFieldUpg."New G/L Account Field Code";
                             CDCTemplateField."Transfer Amount to Document" := CDCTemplateFieldUpg."New Transfer Amt. to Document";
                             CDCTemplateField."Subtract from Amount Field" := CDCTemplateFieldUpg."New Subtract from Amount Field";
-                            CDCTemplateField.Modify;
-                        until CDCTemplateFieldUpg.Next = 0;
+                            CDCTemplateField.Modify();
+                        until CDCTemplateFieldUpg.Next() = 0;
                     Upgraded := true;
-                    Modify;
+                    Modify();
                 end;
-            until Next = 0;
+            until Next() = 0;
     end;
 
     local procedure InsertUpdateTemplateHeader(TemplateRec: Record "CDC Template")
     begin
-        Init;
+        Init();
         "No." := TemplateRec."No.";
         "Source Record ID Tree ID" := TemplateRec."Source Record ID Tree ID";
         "Recognize Lines" := TemplateRec."Recognize Lines";
@@ -233,7 +233,7 @@ table 6086110 "CDC Template Upg."
         Type := TemplateRec.Type;
 
         // Only templates, not already in the upgrade table, are added.
-        if Insert then;
+        if Insert() then;
     end;
 
     local procedure InsertUpdateTemplateFields(TemplateRec: Record "CDC Template")
@@ -249,7 +249,7 @@ table 6086110 "CDC Template Upg."
         else
             CDCTemplateField.SetRange(Type, CDCTemplateField.Type::Header);
 
-        if CDCTemplateField.FindSet then
+        if CDCTemplateField.FindSet() then
             repeat
                 CDCTemplateFieldUpg."Template No." := CDCTemplateField."Template No.";
                 CDCTemplateFieldUpg.Type := CDCTemplateField.Type;
@@ -260,8 +260,8 @@ table 6086110 "CDC Template Upg."
                 CDCTemplateFieldUpg."Subtract from Amount Field" := CDCTemplateField."Subtract from Amount Field";
                 CDCTemplateFieldUpg."Field Name" := CDCTemplateField."Field Name";
                 // Only template fields, not already in the upgrade table, are added.
-                if CDCTemplateFieldUpg.Insert then;
-            until CDCTemplateField.Next = 0;
+                if CDCTemplateFieldUpg.Insert() then;
+            until CDCTemplateField.Next() = 0;
     end;
 
     local procedure UpgradeCDCFieldConfiguration(var TemplateToUpgrade: Record "CDC Template Upg.") TemplateUpdated: Boolean
@@ -276,7 +276,7 @@ table 6086110 "CDC Template Upg."
         case GetConfigurationType(CDCTemplateFieldUpg) of
             'EXVAT':
                 begin
-                    if CDCTemplateFieldUpg.FindSet then
+                    if CDCTemplateFieldUpg.FindSet() then
                         repeat
                             case CDCTemplateFieldUpg.Code of
                                 'AMOUNTEXCLVAT':
@@ -287,18 +287,18 @@ table 6086110 "CDC Template Upg."
                                         CDCTemplateFieldUpg."New G/L Account Field Code" := CDCTemplateFieldUpg2."G/L Account Field Code";
                                         CDCTemplateFieldUpg."New Subtract from Amount Field" := CDCTemplateFieldUpg2."Subtract from Amount Field";
                                         CDCTemplateFieldUpg."New Transfer Amt. to Document" := CDCTemplateFieldUpg2."Transfer Amount to Document";
-                                        CDCTemplateFieldUpg.Modify;
+                                        CDCTemplateFieldUpg.Modify();
                                     end;
                             end;
-                        until CDCTemplateFieldUpg.Next = 0;
+                        until CDCTemplateFieldUpg.Next() = 0;
                     if SetUpgradeStatus(CDCTemplateFieldUpg, 'EXVAT') then begin
                         TemplateToUpgrade."New field config (auto)" := true;
-                        TemplateToUpgrade.Modify;
+                        TemplateToUpgrade.Modify();
                     end;
                 end;
             'EXVATFREIGHT':
                 begin
-                    if CDCTemplateFieldUpg.FindSet then
+                    if CDCTemplateFieldUpg.FindSet() then
                         repeat
                             case CDCTemplateFieldUpg.Code of
                                 'AMOUNTEXCLVAT':
@@ -308,7 +308,7 @@ table 6086110 "CDC Template Upg."
                                         CDCTemplateFieldUpg2.Get(CDCTemplateFieldUpg."Template No.", CDCTemplateFieldUpg.Type, 'FREIGHTAMOUNT');
                                         CDCTemplateFieldUpg."New Subtract from Amount Field" := 'AMOUNTINCLVAT';
                                         CDCTemplateFieldUpg."New Transfer Amt. to Document" := CDCTemplateFieldUpg2."Transfer Amount to Document";
-                                        CDCTemplateFieldUpg.Modify;
+                                        CDCTemplateFieldUpg.Modify();
                                     end;
                                 'AMOUNTINCLVAT':
                                     begin
@@ -316,13 +316,13 @@ table 6086110 "CDC Template Upg."
                                         CDCTemplateFieldUpg."New G/L Account Field Code" := CDCTemplateFieldUpg2."G/L Account Field Code";
                                         CDCTemplateFieldUpg."New Subtract from Amount Field" := CDCTemplateFieldUpg2."Subtract from Amount Field";
                                         CDCTemplateFieldUpg."New Transfer Amt. to Document" := CDCTemplateFieldUpg2."Transfer Amount to Document";
-                                        CDCTemplateFieldUpg.Modify;
+                                        CDCTemplateFieldUpg.Modify();
                                     end;
                             end;
-                        until CDCTemplateFieldUpg.Next = 0;
+                        until CDCTemplateFieldUpg.Next() = 0;
                     if SetUpgradeStatus(CDCTemplateFieldUpg, 'EXVATFREIGHT') then begin
                         TemplateToUpgrade."New field config (auto)" := true;
-                        TemplateToUpgrade.Modify;
+                        TemplateToUpgrade.Modify();
                     end;
                 end;
         end;
@@ -350,7 +350,7 @@ table 6086110 "CDC Template Upg."
 
     local procedure SetUpgradeStatus(var CDCTemplateFieldUpg: Record "CDC Template Field Upg."; ConfigType: Code[20]) DoModify: Boolean
     begin
-        CDCTemplateFieldUpg.FindFirst;
+        CDCTemplateFieldUpg.FindFirst();
         case ConfigType of
             'EXVATFREIGHT':
                 begin
@@ -363,7 +363,7 @@ table 6086110 "CDC Template Upg."
                         if CDCTemplateFieldUpg.Code = 'FREIGHTAMOUNT' then
                             DoModify := DoModify and (CDCTemplateFieldUpg."New Subtract from Amount Field" <> '') and
                               (CDCTemplateFieldUpg."New Transfer Amt. to Document" = CDCTemplateFieldUpg."New Transfer Amt. to Document"::Always);
-                    until CDCTemplateFieldUpg.Next = 0;
+                    until CDCTemplateFieldUpg.Next() = 0;
                 end;
             'EXVAT':
                 begin
@@ -372,7 +372,7 @@ table 6086110 "CDC Template Upg."
                             DoModify := (CDCTemplateFieldUpg."New G/L Account Field Code" <> '') and
                               (CDCTemplateFieldUpg."New Transfer Amt. to Document" =
                                CDCTemplateFieldUpg."New Transfer Amt. to Document"::"If lines are not recognised");
-                    until CDCTemplateFieldUpg.Next = 0;
+                    until CDCTemplateFieldUpg.Next() = 0;
                 end;
         end;
     end;

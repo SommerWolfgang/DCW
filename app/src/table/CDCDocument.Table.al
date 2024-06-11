@@ -45,12 +45,12 @@ table 6085590 "CDC Document"
 
                 "Date-Time for Register/Reject" := CurrentDateTime;
 
-                LogDocumentUsageIfValid;
+                LogDocumentUsageIfValid();
             end;
         }
         field(8; "No. of Pages"; Integer)
         {
-            CalcFormula = Count("CDC Document Page" WHERE("Document No." = FIELD("No.")));
+            CalcFormula = count("CDC Document Page" where("Document No." = field("No.")));
             Caption = 'No. of Pages';
             Editable = false;
             FieldClass = FlowField;
@@ -415,7 +415,7 @@ table 6085590 "CDC Document"
             if Area >= 0 then
                 Comment.SetRange(Area, Area);
         if not Comment.IsEmpty then
-            Comment.DeleteAll;
+            Comment.DeleteAll();
     end;
 
     procedure HasWarningComments(): Boolean

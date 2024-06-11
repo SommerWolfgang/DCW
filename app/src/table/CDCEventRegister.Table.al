@@ -75,8 +75,8 @@ table 6085740 "CDC Event Register"
     var
         EventRegister: Record "CDC Event Register";
     begin
-        EventRegister.LockTable;
-        if EventRegister.FindLast then
+        EventRegister.LockTable();
+        if EventRegister.FindLast() then
             "No." := EventRegister."No." + 1
         else
             "No." := 1;

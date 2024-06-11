@@ -2,7 +2,6 @@ table 6086366 "CEM Mileage Rate ID"
 {
     Caption = 'Mileage Rate ID';
     DataCaptionFields = "Rate ID";
-    LookupPageID = "CEM Mileage Rate ID";
 
     fields
     {

@@ -265,73 +265,73 @@ table 6085573 "CDC Document Capture Setup"
         }
         field(101; "Purch: No. of Open PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = CONST(Open)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = const(Open)));
             Caption = 'No. of Open Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(102; "Purch: No. of Released PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = CONST(Released)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = const(Released)));
             Caption = 'No. of Released Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(103; "Purch: No. of PIs for Approval"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         Status = CONST("Pending Approval")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         Status = const("Pending Approval")));
             Caption = 'No. of Invoices for Approval';
             Editable = false;
             FieldClass = FlowField;
         }
         field(104; "Purch: No. of Overdue PIs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST(Invoice),
-                                                         "Due Date" = FIELD("Date Filter")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const(Invoice),
+                                                         "Due Date" = field("Date Filter")));
             Caption = 'No. of Overdue Invoices';
             Editable = false;
             FieldClass = FlowField;
         }
         field(110; "Purch: No. of Open PCs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = CONST(Open)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = const(Open)));
             Caption = 'No. of Open Credit Memoes';
             Editable = false;
             FieldClass = FlowField;
         }
         field(111; "Purch: No. of Released PCs"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = CONST(Released)));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = const(Released)));
             Caption = 'No. of Released PCM';
             Editable = false;
             FieldClass = FlowField;
         }
         field(112; "Purch: No. of PCs for Approval"; Integer)
         {
-            CalcFormula = Count("Purchase Header" WHERE("Document Type" = CONST("Credit Memo"),
-                                                         Status = CONST("Pending Approval")));
+            CalcFormula = count("Purchase Header" where("Document Type" = const("Credit Memo"),
+                                                         Status = const("Pending Approval")));
             Caption = 'No. of Credit Memoes for Approval';
             Editable = false;
             FieldClass = FlowField;
         }
         field(119; "Purch: No. of Overdue Ap. Ent."; Integer)
         {
-            CalcFormula = Count("Approval Entry" WHERE("Table ID" = CONST(38),
-                                                        "Document Type" = FILTER(Invoice | "Credit Memo"),
-                                                        Status = FILTER(Created | Open),
-                                                        "Due Date" = FIELD("Date Filter")));
+            CalcFormula = count("Approval Entry" where("Table ID" = const(38),
+                                                        "Document Type" = filter(Invoice | "Credit Memo"),
+                                                        Status = filter(Created | Open),
+                                                        "Due Date" = field("Date Filter")));
             Caption = 'No. of Overdue Approval Entries';
             Editable = false;
             FieldClass = FlowField;
         }
         field(120; "Purch: Last Status E-Mail Sent"; Date)
         {
-            CalcFormula = Max("CDC Event Register"."Creation Date" WHERE(Area = CONST("Purch. Approval Status E-mail")));
+            CalcFormula = max("CDC Event Register"."Creation Date" where(Area = const("Purch. Approval Status E-mail")));
             Caption = 'Last Status Email Sent';
             Editable = false;
             FieldClass = FlowField;
@@ -698,7 +698,7 @@ table 6085573 "CDC Document Capture Setup"
         {
             BlankZero = true;
             Caption = 'Codeunit ID: Record ID Lookup';
-            TableRelation = AllObj."Object ID" WHERE("Object Type" = CONST(Codeunit));
+            TableRelation = AllObj."Object ID" where("Object Type" = const(Codeunit));
         }
         field(171; "Company Code in Archive"; Boolean)
         {

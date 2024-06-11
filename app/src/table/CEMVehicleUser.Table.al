@@ -17,7 +17,7 @@ table 6086373 "CEM Vehicle User"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup ("CDC Continia User".Name WHERE ("User ID" = FIELD ("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;

@@ -24,7 +24,7 @@ table 6086492 "CEM Per Diem Dest. Inbox"
         }
         field(11; "Destination Name"; Text[50])
         {
-            CalcFormula = Lookup ("CEM Country/Region".Name WHERE (Code = FIELD ("Destination Country/Region")));
+            CalcFormula = lookup("CEM Country/Region".Name where(Code = field("Destination Country/Region")));
             Caption = 'Destination Name';
             Editable = false;
             FieldClass = FlowField;
@@ -56,7 +56,7 @@ table 6086492 "CEM Per Diem Dest. Inbox"
     begin
         PerDiemDestiInbox.SetRange("Per Diem Inbox Entry No.", Rec."Per Diem Inbox Entry No.");
         PerDiemDestiInbox.SetRange("Per Diem Inbox Detail No.", Rec."Per Diem Inbox Detail No.");
-        if PerDiemDestiInbox.FindLast then
+        if PerDiemDestiInbox.FindLast() then
             "Entry No." := PerDiemDestiInbox."Entry No." + 1
         else
             "Entry No." := 1;

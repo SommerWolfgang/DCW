@@ -50,24 +50,10 @@ table 6086307 "CEM Expense Type"
         field(30; "Global Dimension 1 Code"; Code[20])
         {
             Caption = 'Global Dimension 1 Code';
-            CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(1, "Global Dimension 1 Code");
-            end;
         }
         field(31; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
-            CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            begin
-                ValidateShortcutDimCode(2, "Global Dimension 2 Code");
-            end;
         }
         field(32; "Attendees Required"; Boolean)
         {
@@ -75,8 +61,8 @@ table 6086307 "CEM Expense Type"
         }
         field(33; "No. of Company Policies"; Integer)
         {
-            CalcFormula = Count("CEM Company Policy" WHERE("Document Type" = CONST(Expense),
-                                                            "Document Account No." = FIELD(Code)));
+            CalcFormula = count("CEM Company Policy" where("Document Type" = const(Expense),
+                                                            "Document Account No." = field(Code)));
             Caption = 'No. of Company Policies';
             Editable = false;
             FieldClass = FlowField;
@@ -106,18 +92,8 @@ table 6086307 "CEM Expense Type"
 
         EMDefDim.SetRange("Table ID", DATABASE::"CEM Expense Type");
         EMDefDim.SetRange("No.", Code);
-        EMDefDim.DeleteAll;
+        EMDefDim.DeleteAll();
     end;
-
-    local procedure ValidateShortcutDimCode(FieldNumber: Integer; var ShortcutDimCode: Code[20])
-    var
-        EMDimMgt: Codeunit "CEM Dimension Mgt.";
-    begin
-        EMDimMgt.ValidateDimValueCode(FieldNumber, ShortcutDimCode);
-        EMDimMgt.SaveDefaultDim(DATABASE::"CEM Expense Type", Code, FieldNumber, ShortcutDimCode);
-        Modify;
-    end;
-
 
     procedure IsRefundable() IsRefundable: Boolean
     begin
@@ -130,8 +106,7 @@ table 6086307 "CEM Expense Type"
         ExpType: Record "CEM Expense Type";
     begin
         ExpType.SetRange("No Refund", true);
-        if ExpType.FindFirst then
+        if ExpType.FindFirst() then
             exit(ExpType.Code);
     end;
 }
-

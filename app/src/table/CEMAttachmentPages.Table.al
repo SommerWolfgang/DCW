@@ -69,7 +69,7 @@ table 6086401 "CEM Attachment Pages"
 
     procedure GetPageFileName(): Text[200]
     begin
-        exit(Format("Page No.") + '.' + GetFileExtension);
+        exit(Format("Page No.") + '.' + GetFileExtension());
     end;
 
 

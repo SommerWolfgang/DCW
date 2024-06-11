@@ -13,14 +13,14 @@ table 6086336 "CEM Lookup Value Access"
         field(2; "Parent Field Type Code"; Code[50])
         {
             Caption = 'Parent Field Type Code';
-            TableRelation = "CEM Lookup Value"."Parent Field Type Code" WHERE("Field Type Code" = FIELD("Field Type Code"));
+            TableRelation = "CEM Lookup Value"."Parent Field Type Code" where("Field Type Code" = field("Field Type Code"));
         }
         field(3; "Value Code"; Code[50])
         {
             Caption = 'Value Code';
             NotBlank = true;
-            TableRelation = "CEM Lookup Value".Code WHERE("Field Type Code" = FIELD("Field Type Code"),
-                                                           "Parent Field Type Code" = FIELD("Parent Field Type Code"));
+            TableRelation = "CEM Lookup Value".Code where("Field Type Code" = field("Field Type Code"),
+                                                           "Parent Field Type Code" = field("Parent Field Type Code"));
         }
         field(5; Type; Option)
         {
@@ -38,15 +38,15 @@ table 6086336 "CEM Lookup Value Access"
         {
             Caption = 'Code';
             NotBlank = true;
-            TableRelation = IF (Type = CONST(User)) "CDC Continia User Setup"
-            ELSE
-            IF (Type = CONST(Group)) "CEM Expense User Group";
+            TableRelation = if (Type = const(User)) "CDC Continia User Setup"
+            else
+            if (Type = const(Group)) "CEM Expense User Group";
         }
         field(10; "Value Description"; Text[50])
         {
-            CalcFormula = Lookup("CEM Lookup Value".Description WHERE("Field Type Code" = FIELD("Field Type Code"),
-                                                                       Code = FIELD("Value Code"),
-                                                                       "Parent Field Type Code" = FIELD("Parent Field Type Code")));
+            CalcFormula = lookup("CEM Lookup Value".Description where("Field Type Code" = field("Field Type Code"),
+                                                                       Code = field("Value Code"),
+                                                                       "Parent Field Type Code" = field("Parent Field Type Code")));
             Caption = 'Value Description';
             Editable = false;
             FieldClass = FlowField;
@@ -70,7 +70,7 @@ table 6086336 "CEM Lookup Value Access"
         Fieldtype: Record "CEM Field Type";
     begin
         Fieldtype.Get("Field Type Code");
-        if Fieldtype.GetParentFieldTypeCode <> '' then
+        if Fieldtype.GetParentFieldTypeCode() <> '' then
             TestField("Parent Field Type Code");
     end;
 

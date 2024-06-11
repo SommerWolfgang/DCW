@@ -25,7 +25,7 @@ table 6085732 "CDC Purch. Alloc. Entry"
         field(6; "Source No."; Code[20])
         {
             Caption = 'Source No.';
-            TableRelation = "Purchase Header"."No." WHERE("Document Type" = FIELD("Source Type"));
+            TableRelation = "Purchase Header"."No." where("Document Type" = field("Source Type"));
         }
         field(13; "Vendor Invoice No."; Code[35])
         {
@@ -85,14 +85,14 @@ table 6085732 "CDC Purch. Alloc. Entry"
             Caption = 'Shortcut Dimension 1 Code';
             CaptionClass = '1,2,1';
             Editable = false;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(41; "Shortcut Dimension 2 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 2 Code';
             CaptionClass = '1,2,2';
             Editable = false;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(42; "Currency Code"; Code[10])
         {

@@ -63,7 +63,7 @@ table 6086490 "CEM Agreement Activation Log"
     var
         AgreementActivationLog: Record "CEM Agreement Activation Log";
     begin
-        if AgreementActivationLog.FindLast then
+        if AgreementActivationLog.FindLast() then
             "Entry No." := AgreementActivationLog."Entry No." + 1
         else
             "Entry No." := 1;

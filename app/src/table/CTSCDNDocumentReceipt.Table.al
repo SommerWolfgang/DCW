@@ -51,27 +51,12 @@ table 6086237 "CTS-CDN Document Receipt"
         {
         }
     }
-
-    fieldgroups
-    {
-    }
-
     procedure GetGUIDAsText(): Text[36]
     begin
-        exit(DelChr(Rec."CDN GUID", '<>', '{}'))
     end;
 
 
     procedure OpenXmlFile()
-    var
-        TempBlob: Record "CSC Temp Blob" temporary;
-        CDNFileMgt: Codeunit "CTS-CDN File Management";
-        Success: Boolean;
     begin
-        TempBlob.Init;
-        Rec.CalcFields("XML File");
-        TempBlob.Blob := Rec."XML File";
-        CDNFileMgt.SaveFileWithDialog(TempBlob, GetGUIDAsText + '.xml', 'Download', 'File (*.xml)|*.xml', Success);
     end;
 }
-

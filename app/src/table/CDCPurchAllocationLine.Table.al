@@ -28,12 +28,12 @@ table 6085731 "CDC Purch. Allocation Line"
                 TableID: array[10] of Integer;
             begin
                 GLAccount.Get("G/L Account No.");
-                GLAccount.CheckGLAcc;
+                GLAccount.CheckGLAcc();
                 "Gen. Prod. Posting Group" := GLAccount."Gen. Prod. Posting Group";
                 Validate("VAT Prod. Posting Group", GLAccount."VAT Prod. Posting Group");
 
-                GetPurchAllocHeader;
-                SourceCodeSetup.Get;
+                GetPurchAllocHeader();
+                SourceCodeSetup.Get();
                 TableID[1] := DATABASE::"G/L Account";
                 No[1] := "G/L Account No.";
                 "Dimension Set ID" := DimMgt.GetDefaultDimID(
@@ -61,7 +61,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
             trigger OnValidate()
             begin
-                TestStatus;
+                TestStatus();
                 if xRec."Gen. Prod. Posting Group" <> "Gen. Prod. Posting Group" then
                     if GenProdPostingGrp.ValidateVatProdPostingGroup(GenProdPostingGrp, "Gen. Prod. Posting Group") then
                         Validate("VAT Prod. Posting Group", GenProdPostingGrp."Def. VAT Prod. Posting Group");
@@ -87,7 +87,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
             trigger OnValidate()
             begin
-                TestStatus;
+                TestStatus();
                 if not VATPostingSetup.Get("VAT Bus. Posting Group", "VAT Prod. Posting Group") then
                     Clear(VATPostingSetup);
                 "VAT %" := VATPostingSetup."VAT %";
@@ -123,7 +123,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
             trigger OnValidate()
             begin
-                GetPurchHeader;
+                GetPurchHeader();
 
                 "VAT Difference" := 0;
                 Amount := Round(Amount, Currency."Amount Rounding Precision");
@@ -148,7 +148,7 @@ table 6085731 "CDC Purch. Allocation Line"
                         Error(SalesTaxNotSupportedErr, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
                 end;
 
-                UpdateVATAmounts;
+                UpdateVATAmounts();
             end;
         }
         field(11; "Amount Including VAT"; Decimal)
@@ -160,9 +160,9 @@ table 6085731 "CDC Purch. Allocation Line"
 
             trigger OnValidate()
             begin
-                GetPurchAllocHeader;
+                GetPurchAllocHeader();
                 if PurchAllocHeader."Applies-to Doc. No." = '' then begin
-                    GetPurchHeader;
+                    GetPurchHeader();
                     "Amount Including VAT" := Round("Amount Including VAT", Currency."Amount Rounding Precision");
 
                     case "VAT Calculation Type" of
@@ -186,7 +186,7 @@ table 6085731 "CDC Purch. Allocation Line"
                             Error(SalesTaxNotSupportedErr, FieldCaption("VAT Calculation Type"), "VAT Calculation Type");
                     end;
 
-                    UpdateVATAmounts;
+                    UpdateVATAmounts();
                 end;
             end;
         }
@@ -200,14 +200,14 @@ table 6085731 "CDC Purch. Allocation Line"
             Caption = 'Shortcut Dimension 1 Code';
             CaptionClass = '1,2,1';
             Editable = false;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(1));
         }
         field(14; "Shortcut Dimension 2 Code"; Code[20])
         {
             Caption = 'Shortcut Dimension 2 Code';
             CaptionClass = '1,2,2';
             Editable = false;
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
+            TableRelation = "Dimension Value".Code where("Global Dimension No." = const(2));
         }
         field(15; "Currency Code"; Code[10])
         {
@@ -264,17 +264,17 @@ table 6085731 "CDC Purch. Allocation Line"
 
     trigger OnDelete()
     begin
-        TestStatus;
+        TestStatus();
     end;
 
     trigger OnInsert()
     begin
-        TestStatus;
+        TestStatus();
     end;
 
     trigger OnModify()
     begin
-        TestStatus;
+        TestStatus();
     end;
 
     var
@@ -297,7 +297,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
     procedure GetPurchHeader()
     begin
-        GetPurchAllocHeader;
+        GetPurchAllocHeader();
         if not PurchHeader.Get(PurchAllocHeader."Document Type", PurchAllocHeader."Document No.") then
             Clear(PurchHeader);
 
@@ -313,7 +313,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
     procedure SetupNewLine()
     begin
-        GetPurchAllocHeader;
+        GetPurchAllocHeader();
         "Gen. Bus. Posting Group" := PurchAllocHeader."Gen. Bus. Posting Group";
         "VAT Bus. Posting Group" := PurchAllocHeader."VAT Bus. Posting Group";
         "Currency Code" := PurchAllocHeader."Currency Code";
@@ -322,7 +322,7 @@ table 6085731 "CDC Purch. Allocation Line"
 
     procedure TestStatus()
     begin
-        GetPurchAllocHeader;
+        GetPurchAllocHeader();
         PurchAllocHeader.TestField(Status, PurchAllocHeader.Status::Open);
     end;
 
@@ -334,7 +334,7 @@ table 6085731 "CDC Purch. Allocation Line"
         TestField("Document No.");
         TestField("Line No.");
 
-        GetPurchAllocHeader;
+        GetPurchAllocHeader();
 
         if PurchAllocHeader.Status = PurchAllocHeader.Status::Open then
             "Dimension Set ID" :=
@@ -349,7 +349,7 @@ table 6085731 "CDC Purch. Allocation Line"
         TotalAmount: Decimal;
         TotalAmountInclVAT: Decimal;
     begin
-        GetPurchHeader;
+        GetPurchHeader();
 
         PurchAllocLine.SetRange("Document No.", "Document No.");
         PurchAllocLine.SetFilter("Line No.", '<>%1', "Line No.");
@@ -371,11 +371,11 @@ table 6085731 "CDC Purch. Allocation Line"
         if ("VAT Calculation Type" in
           ["VAT Calculation Type"::"Normal VAT", "VAT Calculation Type"::"Reverse Charge VAT"]) and ("VAT %" <> 0)
         then
-            if PurchAllocLine.FindSet then
+            if PurchAllocLine.FindSet() then
                 repeat
                     TotalAmount := TotalAmount + PurchAllocLine.Amount;
                     TotalAmountInclVAT := TotalAmountInclVAT + PurchAllocLine."Amount Including VAT";
-                until PurchAllocLine.Next = 0;
+                until PurchAllocLine.Next() = 0;
 
         if PurchHeader."Prices Including VAT" then
             case "VAT Calculation Type" of
@@ -392,7 +392,7 @@ table 6085731 "CDC Purch. Allocation Line"
                           TotalAmountInclVAT + "Amount Including VAT" -
                           Round(
                             (TotalAmount + "Amount Including VAT") * (PurchHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
-                            Currency."Amount Rounding Precision", Currency.VATRoundingDirection) -
+                            Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) -
                           TotalAmountInclVAT;
                     end;
                 "VAT Calculation Type"::"Full VAT":
@@ -416,7 +416,7 @@ table 6085731 "CDC Purch. Allocation Line"
                           TotalAmount + Amount +
                           Round(
                             (TotalAmount + Amount) * (1 - PurchHeader."VAT Base Discount %" / 100) * "VAT %" / 100,
-                            Currency."Amount Rounding Precision", Currency.VATRoundingDirection) - TotalAmountInclVAT;
+                            Currency."Amount Rounding Precision", Currency.VATRoundingDirection()) - TotalAmountInclVAT;
                     end;
                 "VAT Calculation Type"::"Full VAT":
                     begin

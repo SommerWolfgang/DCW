@@ -32,7 +32,7 @@ table 12032505 "Email Distribution Code"
     var
         EmailDistributionSetup: Record "Email Distribution Setup";
     begin
-        EmailDistributionSetup.Reset;
+        EmailDistributionSetup.Reset();
         EmailDistributionSetup.SetRange("Email Distribution Code", Code);
         EmailDistributionSetup.DeleteAll(true);
     end;

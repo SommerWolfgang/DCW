@@ -86,7 +86,7 @@ table 6085744 "CDC Detailed Approval Entry"
         DtldAppvlEntryDim.SetRange("Document Type", "Document Type");
         DtldAppvlEntryDim.SetRange("Document No.", "Document No.");
         DtldAppvlEntryDim.SetRange("Document Line No.", "Line No.");
-        DtldAppvlEntryDim.DeleteAll;
+        DtldAppvlEntryDim.DeleteAll();
     end;
 }
 

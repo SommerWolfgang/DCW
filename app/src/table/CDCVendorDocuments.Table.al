@@ -79,7 +79,7 @@ table 6086013 "CDC Vendor Documents"
         PostApprvlCmtLine.SetCurrentKey("Table ID", "Document No.");
         PostApprvlCmtLine.SetRange("Table ID", TableID);
         PostApprvlCmtLine.SetRange("Document No.", DocNo);
-        if PostApprvlCmtLine.FindLast then
+        if PostApprvlCmtLine.FindLast() then
             exit(PostApprvlCmtLine.Comment);
     end;
 
@@ -90,7 +90,7 @@ table 6086013 "CDC Vendor Documents"
         VendLedgEntry.SetRange("Document No.", DocNo);
         VendLedgEntry.SetRange("Document Type", DocType);
         VendLedgEntry.SetRange("Vendor No.", VendorNo);
-        exit(VendLedgEntry.FindFirst);
+        exit(VendLedgEntry.FindFirst());
     end;
 }
 

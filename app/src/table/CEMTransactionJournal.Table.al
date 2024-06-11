@@ -42,7 +42,7 @@ table 6086410 "CEM Transaction Journal"
 
             trigger OnValidate()
             begin
-                UpdateAmountSign;
+                UpdateAmountSign();
             end;
         }
         field(10; "Bank-Currency Amount"; Decimal)
@@ -52,7 +52,7 @@ table 6086410 "CEM Transaction Journal"
 
             trigger OnValidate()
             begin
-                UpdateAmountSign;
+                UpdateAmountSign();
             end;
         }
         field(11; "Entry Type"; Integer)
@@ -144,26 +144,16 @@ table 6086410 "CEM Transaction Journal"
 
             trigger OnValidate()
             begin
-                UpdateAmountSign;
+                UpdateAmountSign();
             end;
         }
         field(140; "First Name"; Text[50])
         {
             Caption = 'First Name';
-
-            trigger OnValidate()
-            begin
-                "Card Name" := "First Name" + ' ' + "Last Name";
-            end;
         }
         field(141; "Last Name"; Text[50])
         {
             Caption = 'Last Name';
-
-            trigger OnValidate()
-            begin
-                "Card Name" := "First Name" + ' ' + "Last Name";
-            end;
         }
         field(150; "Template Code"; Code[20])
         {
@@ -189,7 +179,7 @@ table 6086410 "CEM Transaction Journal"
     var
         TransactionBuffer: Record "CEM Transaction Journal";
     begin
-        if TransactionBuffer.FindLast then
+        if TransactionBuffer.FindLast() then
             Rec."Entry No." := TransactionBuffer."Entry No." + 1
         else
             Rec."Entry No." := 1;
@@ -201,13 +191,7 @@ table 6086410 "CEM Transaction Journal"
 
 
     procedure Import(Template: Record "CEM Transaction Template")
-    var
-        ImportCSV: Codeunit "CEM Transaction Import CSV";
-        CSVInStream: InStream;
-        CSVFileName: Text;
     begin
-        if UploadIntoStream('', '', '', CSVFileName, CSVInStream) then
-            ImportCSV.Import(Template, CSVFileName, CSVInStream);
     end;
 
 

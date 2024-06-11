@@ -11,8 +11,8 @@ table 6086351 "CEM Credit Card Mapping"
         }
         field(20; "Field Name"; Text[30])
         {
-            CalcFormula = Lookup(Field.FieldName WHERE(TableNo = CONST(6086330),
-                                                        "No." = FIELD("Field No.")));
+            CalcFormula = lookup(Field.FieldName where(TableNo = const(6086330),
+                                                        "No." = field("Field No.")));
             Caption = 'Field Name';
             Editable = false;
             FieldClass = FlowField;
@@ -33,17 +33,17 @@ table 6086351 "CEM Credit Card Mapping"
 
     trigger OnDelete()
     begin
-        HandleCreditCardUserMapping;
+        HandleCreditCardUserMapping();
     end;
 
     trigger OnInsert()
     begin
-        HandleCreditCardUserMapping;
+        HandleCreditCardUserMapping();
     end;
 
     trigger OnRename()
     begin
-        HandleCreditCardUserMapping;
+        HandleCreditCardUserMapping();
     end;
 
     var
@@ -68,11 +68,11 @@ table 6086351 "CEM Credit Card Mapping"
     var
         CreditCardUserMapping: Record "CEM Credit Card User Mapping";
     begin
-        if not CreditCardUserMapping.FindFirst then
+        if not CreditCardUserMapping.FindFirst() then
             exit;
 
         if Confirm(CreditCardUserMappingExist, false, CreditCardUserMapping.TableCaption) then
-            CreditCardUserMapping.DeleteAll;
+            CreditCardUserMapping.DeleteAll();
     end;
 
 
@@ -80,14 +80,14 @@ table 6086351 "CEM Credit Card Mapping"
     var
         CardMapping: Record "CEM Credit Card Mapping";
     begin
-        if CardMapping.FindSet then
+        if CardMapping.FindSet() then
             repeat
                 CardMapping.CalcFields("Field Name");
                 if RequiredFields <> '' then
                     RequiredFields := RequiredFields + ', ';
 
                 RequiredFields := CardMapping."Field Name";
-            until CardMapping.Next = 0;
+            until CardMapping.Next() = 0;
     end;
 }
 

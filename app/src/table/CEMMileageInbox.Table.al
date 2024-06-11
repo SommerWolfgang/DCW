@@ -18,7 +18,7 @@ table 6086353 "CEM Mileage Inbox"
         }
         field(3; "Continia User Name"; Text[50])
         {
-            CalcFormula = Lookup("CDC Continia User".Name WHERE("User ID" = FIELD("Continia User ID")));
+            CalcFormula = lookup("CDC Continia User".Name where("User ID" = field("Continia User ID")));
             Caption = 'Name';
             Editable = false;
             FieldClass = FlowField;
@@ -71,34 +71,10 @@ table 6086353 "CEM Mileage Inbox"
         field(15; "Global Dimension 1 Code"; Code[20])
         {
             Caption = 'Global Dimension 1 Code';
-            CaptionClass = '1,1,1';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(1));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(ModifyAcceptedNotAllowed, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Mileage Inbox", 0, '', "Entry No.", 1, "Global Dimension 1 Code");
-            end;
         }
         field(16; "Global Dimension 2 Code"; Code[20])
         {
             Caption = 'Global Dimension 2 Code';
-            CaptionClass = '1,1,2';
-            TableRelation = "Dimension Value".Code WHERE("Global Dimension No." = CONST(2));
-
-            trigger OnValidate()
-            var
-                EMDimMgt: Codeunit "CEM Dimension Mgt.";
-            begin
-                if Rec.Status = Status::Accepted then
-                    Error(ModifyAcceptedNotAllowed, TableCaption, "Entry No.");
-
-                EMDimMgt.UpdateEMDimInboxForGlobalDim(DATABASE::"CEM Mileage Inbox", 0, '', "Entry No.", 2, "Global Dimension 2 Code");
-            end;
         }
         field(17; "Job No."; Code[20])
         {
@@ -108,13 +84,13 @@ table 6086353 "CEM Mileage Inbox"
         field(18; "Job Task No."; Code[20])
         {
             Caption = 'Job Task No.';
-            TableRelation = "Job Task"."Job Task No." WHERE("Job No." = FIELD("Job No."));
+            TableRelation = "Job Task"."Job Task No." where("Job No." = field("Job No."));
         }
         field(20; "Settlement No."; Code[20])
         {
             Caption = 'Settlement No.';
-            TableRelation = "CEM Expense Header"."No." WHERE("Document Type" = CONST(Settlement),
-                                                              "Continia User ID" = FIELD("Continia User ID"));
+            TableRelation = "CEM Expense Header"."No." where("Document Type" = const(Settlement),
+                                                              "Continia User ID" = field("Continia User ID"));
         }
         field(21; Status; Option)
         {
@@ -124,7 +100,7 @@ table 6086353 "CEM Mileage Inbox"
 
             trigger OnValidate()
             begin
-                CheckChangeAndConfirm;
+                CheckChangeAndConfirm();
             end;
         }
         field(26; "Mileage GUID"; Guid)
@@ -226,18 +202,18 @@ table 6086353 "CEM Mileage Inbox"
         }
         field(260; "No. of Attachments"; Integer)
         {
-            CalcFormula = Count("CEM Attachment Inbox" WHERE("Table ID" = CONST(6086353),
-                                                              "Document Type" = CONST(Budget),
-                                                              "Document No." = FILTER(''),
-                                                              "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attachment Inbox" where("Table ID" = const(6086353),
+                                                              "Document Type" = const(Budget),
+                                                              "Document No." = filter(''),
+                                                              "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attachments';
             Editable = false;
             FieldClass = FlowField;
         }
         field(270; "No. of Attendees"; Integer)
         {
-            CalcFormula = Count("CEM Attendee Inbox" WHERE("Table ID" = CONST(6086353),
-                                                            "Doc. Ref. No." = FIELD("Entry No.")));
+            CalcFormula = count("CEM Attendee Inbox" where("Table ID" = const(6086353),
+                                                            "Doc. Ref. No." = field("Entry No.")));
             Caption = 'No. of Attendees';
             Editable = false;
             FieldClass = FlowField;
@@ -269,64 +245,6 @@ table 6086353 "CEM Mileage Inbox"
         }
     }
 
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        EMAttachmentInbox: Record "CEM Attachment Inbox";
-        EMAttendeeInbox: Record "CEM Attendee Inbox";
-        EMDimInbox: Record "CEM Dimension Inbox";
-        Mileage: Record "CEM Mileage";
-        MileageValidate: Codeunit "CEM Mileage-Validate";
-    begin
-        TestField(Status, Status::Accepted);
-
-        EMAttachmentInbox.SetRange("Table ID", DATABASE::"CEM Mileage Inbox");
-        EMAttachmentInbox.SetRange("Document Type", 0);
-        EMAttachmentInbox.SetRange("Document No.", '');
-        EMAttachmentInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttachmentInbox.DeleteAll(true);
-
-        EMAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Mileage Inbox");
-        EMAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMAttendeeInbox.DeleteAll;
-
-        EMDimInbox.SetRange("Table ID", DATABASE::"CEM Mileage Inbox");
-        EMDimInbox.SetRange("Document Type", 0);
-        EMDimInbox.SetRange("Document No.", '');
-        EMDimInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        EMDimInbox.DeleteAll(true);
-
-        if "Mileage Entry No." <> 0 then
-            if Mileage.Get("Mileage Entry No.") then
-                MileageValidate.Run(Mileage);
-    end;
-
-    trigger OnInsert()
-    begin
-        "Date Created" := Today;
-    end;
-
-    trigger OnModify()
-    var
-        UserDelegation: Record "CEM User Delegation";
-    begin
-        if xRec.Status = Status::Accepted then
-            Error(ModifyAcceptedNotAllowed, TableCaption, "Entry No.");
-
-        if Status = Status::Error then
-            Status := Status::Pending;
-
-        UserDelegation.VerifyUser("Continia User ID");
-    end;
-
-    trigger OnRename()
-    begin
-        Error(RenameNotAllowed, TableCaption);
-    end;
-
     var
         ModifyAcceptedNotAllowed: Label 'You cannot modify %1 %2, because it is already accepted.';
         RenameNotAllowed: Label 'You cannot rename a %1.';
@@ -337,9 +255,9 @@ table 6086353 "CEM Mileage Inbox"
     begin
         case FromUnit of
             FromUnit::Km:
-                Value := Round(Value / MilesPrKm, 0.00001);
+                Value := Round(Value / MilesPrKm(), 0.00001);
             FromUnit::Miles:
-                Value := Round(Value * MilesPrKm, 0.00001);
+                Value := Round(Value * MilesPrKm(), 0.00001);
         end;
     end;
 
@@ -351,15 +269,7 @@ table 6086353 "CEM Mileage Inbox"
 
 
     procedure DrillDownAttendees()
-    var
-        ExpAttendeeInbox: Record "CEM Attendee Inbox";
-        ExpAttendeesInbox: Page "CEM Milage Attendees Inbox";
     begin
-        ExpAttendeeInbox.SetRange("Table ID", DATABASE::"CEM Mileage Inbox");
-        ExpAttendeeInbox.SetRange("Doc. Ref. No.", "Entry No.");
-        ExpAttendeesInbox.SetTableView(ExpAttendeeInbox);
-        ExpAttendeesInbox.Editable := not (Status = Status::Accepted);
-        ExpAttendeesInbox.RunModal;
     end;
 
 

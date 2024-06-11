@@ -1,7 +1,6 @@
 table 6086406 "CEM Transaction Template"
 {
     Caption = 'Transaction Import Template';
-    LookupPageID = "CEM Transaction Template List";
 
     fields
     {
@@ -16,17 +15,6 @@ table 6086406 "CEM Transaction Template"
         field(3; Bank; Code[10])
         {
             Caption = 'Bank';
-            TableRelation = "CEM Bank";
-
-            trigger OnLookup()
-            var
-                Banks: Record "CEM Bank";
-            begin
-                if PAGE.RunModal(PAGE::"CEM Banks", Banks) = ACTION::LookupOK then begin
-                    Rec.Bank := Banks.Code;
-                    Rec."Bank Country/Region" := Banks."Country/Region Code";
-                end;
-            end;
         }
         field(4; "File Format"; Option)
         {
@@ -66,20 +54,10 @@ table 6086406 "CEM Transaction Template"
         field(20; "Date Format"; Text[30])
         {
             Caption = 'Date Format';
-
-            trigger OnLookup()
-            begin
-                LookupDateFormats;
-            end;
         }
         field(30; "Decimal Format"; Text[10])
         {
             Caption = 'Decimal Format';
-
-            trigger OnLookup()
-            begin
-                LookupDecimalFormats;
-            end;
         }
         field(31; "Decimal Format Text"; Text[30])
         {
@@ -117,27 +95,6 @@ table 6086406 "CEM Transaction Template"
             Clustered = true;
         }
     }
-
-    fieldgroups
-    {
-    }
-
-    trigger OnDelete()
-    var
-        FieldMapping: Record "CEM Transaction Field Mapping";
-        TemplateRules: Record "CEM Transaction Template Rules";
-    begin
-        FieldMapping.SetRange("Template Code", Code);
-        FieldMapping.DeleteAll;
-
-        TemplateRules.SetRange("Template Code", Code);
-        TemplateRules.DeleteAll;
-    end;
-
-    trigger OnInsert()
-    begin
-        TestField(Code);
-    end;
 
     var
         DateIndex: Integer;
@@ -213,123 +170,18 @@ table 6086406 "CEM Transaction Template"
 
 
     procedure RunCardPageOnBank(Bank: Record "CEM Bank")
-    var
-        Template: Record "CEM Transaction Template";
     begin
-        Template.SetRange(Bank, Bank.Code);
-        Template.SetRange("Bank Country/Region", Bank."Country/Region Code");
-
-        if Template.FindFirst then begin
-            if Template.Count > 1 then
-                if not (PAGE.RunModal(0, Template) = ACTION::LookupOK) then
-                    exit;
-        end else begin
-            Template.Code := Bank.Code;
-            if Bank."Country/Region Code" <> '' then
-                Template.Code := Template.Code + '-' + Bank."Country/Region Code";
-            Template.Bank := Bank.Code;
-            Template.Name := Bank.Name;
-            Template."Bank Country/Region" := Bank."Country/Region Code";
-            Template.Insert;
-        end;
-
-        PAGE.Run(PAGE::"CEM Transaction Template Card", Template);
     end;
-
 
     procedure RunImportJournal()
-    var
-        Template: Record "CEM Transaction Template";
     begin
-        Template.SetRange("File Format", Template."File Format"::CSV);
-
-        if PAGE.RunModal(0, Template) = ACTION::LookupOK then
-            PAGE.Run(PAGE::"CEM Transaction Journal Card", Template);
     end;
-
-    local procedure LookupDecimalFormats()
-    var
-        TempDataFormats: Record "CEM Data Formats" temporary;
-    begin
-        TempDataFormats.LoadDecimalFormats;
-        if PAGE.RunModal(PAGE::"CEM Decimal Format Lookup", TempDataFormats) = ACTION::LookupOK then
-            Validate("Decimal Format", TempDataFormats.Code);
-    end;
-
-    local procedure LookupDateFormats()
-    var
-        TempDataFormats: Record "CEM Data Formats" temporary;
-    begin
-        TempDataFormats.LoadDateFormats;
-
-        if PAGE.RunModal(PAGE::"CEM Date Format Lookup", TempDataFormats) = ACTION::LookupOK then
-            Validate("Date Format", TempDataFormats.Pattern);
-    end;
-
 
     procedure ReadCardNoFromFileName(var FileName: Text; var CardNumberValue: Text)
-    var
-        Journal: Record "CEM Transaction Journal";
-        FileInformation: Codeunit "CDC File Information";
-        Math: Codeunit "CEM Math";
-        FileStream: InStream;
-        LengthToRead: Integer;
-        LastError: Text;
     begin
-        ClearLastError;
-        if not UploadIntoStream('', '', '', FileName, FileStream) then begin
-            LastError := GetLastErrorText;
-            if LastError <> '' then
-                Error(LastError);
-        end;
-
-        FileName := FileInformation.GetFilenameWithoutExt(FileName);
-
-        if FileName <> '' then begin
-            if "Card No. Length" = 0 then
-                LengthToRead := StrLen(FileName)
-            else
-                LengthToRead := Math.Min(StrLen(FileName), "Card No. Length");
-
-            CardNumberValue := CopyStr(FileName, "Card No. Start", LengthToRead);
-        end;
     end;
-
 
     procedure GetLocalDataCulture(): Text[10]
-    var
-        LocalizationMgt: Codeunit "CSC Localization Management";
     begin
-        case LocalizationMgt.Localization of
-            'AT':
-                exit('de-AT');
-            'AU':
-                exit('en-AU');
-            'BE':
-                exit('nl-BE');
-            'CH':
-                exit('de-CH');
-            'DE':
-                exit('de-DE');
-            'DK':
-                exit('da-DK');
-            'ES':
-                exit('es-ES');
-            'FR':
-                exit('fr-FR');
-            'GB', 'W1':
-                exit('en-GB');
-            'NA', 'US':
-                exit('en-US');
-            'NL':
-                exit('nl-NL');
-            'NO':
-                exit('nb-NO');
-            'NZ':
-                exit('en-NZ');
-            'SE':
-                exit('sv-SE');
-        end;
     end;
 }
-

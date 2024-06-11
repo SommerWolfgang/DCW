@@ -15,16 +15,16 @@ table 6086377 "CEM Bank Acc. Statement Line"
         {
             Caption = 'Bank Account No.';
             NotBlank = true;
-            TableRelation = IF ("Bank Account Type" = CONST("G/L Account")) "G/L Account"
-            ELSE
-            IF ("Bank Account Type" = CONST("Bank Account")) "Bank Account"
-            ELSE
-            IF ("Bank Account Type" = CONST(Vendor)) Vendor;
+            TableRelation = if ("Bank Account Type" = const("G/L Account")) "G/L Account"
+            else
+            if ("Bank Account Type" = const("Bank Account")) "Bank Account"
+            else
+            if ("Bank Account Type" = const(Vendor)) Vendor;
         }
         field(3; "Statement No."; Code[20])
         {
             Caption = 'Statement No.';
-            TableRelation = "Bank Account Statement"."Statement No." WHERE("Bank Account No." = FIELD("Bank Account No."));
+            TableRelation = "Bank Account Statement"."Statement No." where("Bank Account No." = field("Bank Account No."));
         }
         field(4; "Statement Line No."; Integer)
         {
@@ -59,7 +59,7 @@ table 6086377 "CEM Bank Acc. Statement Line"
 
             trigger OnLookup()
             begin
-                DisplayApplication;
+                DisplayApplication();
             end;
         }
         field(11; Type; Option)
@@ -75,7 +75,7 @@ table 6086377 "CEM Bank Acc. Statement Line"
 
             trigger OnLookup()
             begin
-                DisplayApplication;
+                DisplayApplication();
             end;
         }
         field(13; "Value Date"; Date)
@@ -122,7 +122,7 @@ table 6086377 "CEM Bank Acc. Statement Line"
     var
         BankTransaction: Record "CEM Bank Transaction";
     begin
-        BankTransaction.Reset;
+        BankTransaction.Reset();
         BankTransaction.SetCurrentKey("Bank Account Type", "Bank Account No.");
         BankTransaction.SetRange("Bank Account Type", "Bank Account Type");
         BankTransaction.SetRange("Bank Account No.", "Bank Account No.");
